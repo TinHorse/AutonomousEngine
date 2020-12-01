@@ -21,6 +21,16 @@ Entity& AssetManager::CreatePlayer(Vector2D position, int sizeX, int sizeY, floa
 	return player;
 }
 
+Entity& AssetManager::CreateAgent(Vector2D position, int sizeX, int sizeY, float scale)
+{
+	auto& agent = manager->AddEntity();
+	agent.AddComponent<TransformComponent>(position.x, position.y, sizeX, sizeY, scale);
+	agent.AddComponent<SpriteComponent>("player", false);
+	agent.AddComponent<ColliderComponent>("agent");
+	agent.AddToGroup(Game::groupAgents);
+	return agent;
+}
+
 void AssetManager::AddTexture(std::string texID, const char *path)
 {
 	textures.emplace(texID, TextureManager::LoadTexture(path));

@@ -35,7 +35,8 @@ public:
 	{
 		groupMap,
 		groupPlayers,
-		groupColliders
+		groupColliders,
+		groupAgents
 	};
 
 private:

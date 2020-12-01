@@ -19,6 +19,7 @@ AssetManager *Game::assets = new AssetManager(&manager);
 bool Game::isRunning = false;
 
 Entity *player = nullptr;
+Entity *agent = nullptr;
 
 Game::Game()
 {
@@ -62,12 +63,14 @@ void Game::Init(const char * title, int xpos, int ypos, int width, int height, b
 	map->LoadMap("assets/tilemap.txt", 20, 20);
 
 	player = &assets->CreatePlayer(Vector2D(200,200), 90, 90, 0.5f);
+	agent = &assets->CreateAgent(Vector2D(250, 50), 90, 90, 0.5f);
 
 }
 
 auto& players(manager.GetGroup(Game::groupPlayers));
 auto& colliders(manager.GetGroup(Game::groupColliders));
 auto& tiles(manager.GetGroup(Game::groupMap));
+auto& agents(manager.GetGroup(Game::groupAgents));
 
 void Game::HandleEvents()
 {
@@ -130,6 +133,10 @@ void Game::Render() // note that all draw function have to be called inside the 
 	for (auto& c : colliders)
 	{
 		c->Draw();
+	}
+	for (auto& a : agents)
+	{
+		a->Draw();
 	}
 	SDL_RenderPresent(renderer);
 }

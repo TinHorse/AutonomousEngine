@@ -5,7 +5,7 @@
 #include "Components.h"
 #include "Collision.h"
 #include "AssetManager.h"
-
+#include "Navigation.h"
 
 Map *map;
 
@@ -15,6 +15,8 @@ Manager manager;
 Camera Game::camera = Camera(0, 0, 800, 640);
 
 AssetManager *Game::assets = new AssetManager(&manager);
+
+Navigation nav;
 
 bool Game::isRunning = false;
 
@@ -65,6 +67,7 @@ void Game::Init(const char * title, int xpos, int ypos, int width, int height, b
 	player = &assets->CreatePlayer(Vector2D(200,200), 90, 90, 0.5f);
 	agent = &assets->CreateAgent(Vector2D(250, 50), 90, 90, 0.5f);
 
+	nav.LoadNavMesh("assets/collisionmap.txt", 20, 20);
 }
 
 auto& players(manager.GetGroup(Game::groupPlayers));

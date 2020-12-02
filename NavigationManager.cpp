@@ -37,6 +37,7 @@ void NavigationManager::LoadMesh(const char * path, int sX, int sY, int sTileX, 
 std::queue<Vector2D> NavigationManager::CalculatePath(Vector2D curLoc, Vector2D targetLoc)
 {
 	std::queue<Vector2D> path;
+	path.push(curLoc);
 	int closestX = (curLoc.x / tileSizeX);
 	int closestY = (curLoc.y / tileSizeY);
 

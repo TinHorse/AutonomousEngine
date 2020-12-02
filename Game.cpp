@@ -69,7 +69,7 @@ void Game::Init(const char * title, int xpos, int ypos, int width, int height, b
 
 	nav.LoadMesh("assets/collisionmap.txt", 20, 20, 32, 32, 2);
 
-
+	agent->GetComponent<PathfindingComponent>().FindPath(Vector2D(500,500));
 }
 
 auto& players(manager.GetGroup(Game::groupPlayers));

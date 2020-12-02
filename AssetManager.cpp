@@ -27,6 +27,7 @@ Entity& AssetManager::CreateAgent(Vector2D position, int sizeX, int sizeY, float
 	agent.AddComponent<TransformComponent>(position.x, position.y, sizeX, sizeY, scale);
 	agent.AddComponent<SpriteComponent>("player", false);
 	agent.AddComponent<ColliderComponent>("agent");
+	agent.AddComponent<PathfindingComponent>();
 	agent.AddToGroup(Game::groupAgents);
 	return agent;
 }

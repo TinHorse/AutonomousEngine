@@ -23,33 +23,35 @@ public:
 	{
 		if (moving)
 		{
-			if (Math::distance(transform->position, target) < 10)
+			if (Math::distance(transform->position, path.front()) < 10)
 			{
-				// if next target doesnt exist, set moving to false and clear target
-				if (storedPath.empty())
+				// else, pull up next target
+				path.pop();
+				if (!path.empty())
+				{
+					Vector2D next = path.front();
+					Vector2D p = (next - transform->position);
+					Vector2D norm = p.Normalize();
+					transform->velocity = norm * static_cast<float>(transform->speed);
+				}
+				else
 				{
 					moving = false;
-					target = transform->position;
-					return;
+					transform->velocity = {0,0};
 				}
-				// else, pull up next target
-				target = storedPath.front();
-				transform->velocity = (target - transform->position).Normalize() * transform->speed;
-				storedPath.pop();
 			}
 		}
 	}
 
 	void FindPath(Vector2D target)
 	{
-		storedPath = std::move(nav.CalculatePath(transform->position, target));
+		path = std::move(nav.CalculatePath(transform->position, target));
 		moving = true;
 	}
 
 private:
 	TransformComponent *transform;
-	std::queue<Vector2D> storedPath;
+	std::queue<Vector2D> path;
 	bool moving;
-	Vector2D target;
 
 };

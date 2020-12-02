@@ -86,6 +86,20 @@ Vector2D & Vector2D::operator/=(const Vector2D & vec)
 	return this->Divide(vec);
 }
 
+Vector2D & Vector2D::operator=(const Vector2D & vec)
+{
+	this->x = vec.x;
+	this->y = vec.y;
+	return *this;
+}
+
+Vector2D & Vector2D::operator*(const float f)
+{
+	this->x *= f;
+	this->y *= f;
+	return *this;
+}
+
 Vector2D & Vector2D::operator*(const int & i)
 {
 	this->x *= i;
@@ -102,8 +116,15 @@ Vector2D & Vector2D::Zero()
 
 Vector2D & Vector2D::Normalize()
 {
-	int magnitude = sqrt((this->x *this->x) + (this->y + this->y));
-	this->x /= magnitude;
-	this->y /= magnitude;
+	int mag = sqrt((this->x *this->x) + (this->y + this->y));
+	if (mag != 0)
+	{
+		this->x /= mag;
+		this->y /= mag;
+	}
+	else
+	{
+		this->Zero();
+	}
 	return *this;
 }

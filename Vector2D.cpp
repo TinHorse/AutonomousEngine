@@ -86,7 +86,7 @@ Vector2D & Vector2D::operator/=(const Vector2D & vec)
 	return this->Divide(vec);
 }
 
-Vector2D & Vector2D::operator=(const Vector2D & vec)
+Vector2D & Vector2D::operator=(const Vector2D vec)
 {
 	this->x = vec.x;
 	this->y = vec.y;

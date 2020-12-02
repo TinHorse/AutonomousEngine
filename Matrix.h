@@ -2,19 +2,19 @@
 #include <array>
 #include <vector>
 
-template<class T, size_t cols, size_t rows>
+class Node;
+
+template<class T, size_t rows, size_t cols>
 class Matrix
 {
+	std::array<T, rows * cols> m_Data;
 public:
-	T& operator()(size_t x, size_t y)
+	T& operator()(size_t y, size_t x)
 	{
-		return data[y * cols + x];
+		return m_Data[y * cols + x];
 	}
 
-
-
-private:
-	std::array<T, cols * rows> data;
+	
 };
 
 struct Mat
@@ -22,11 +22,11 @@ struct Mat
 public:
 	Mat() = default;
 
-	void Init(int mCols, int mRows)
+	void Init(int mCols, int mRows, int defaultValue=0)
 	{
 		cols = mCols;
 		rows = mRows;
-		mat.reserve(mCols * mRows);
+		mat = std::vector<int>(mCols * mRows, defaultValue);
 	}
 	int& operator()(size_t x, size_t y)
 	{

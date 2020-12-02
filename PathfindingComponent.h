@@ -3,7 +3,7 @@
 #include "Vector2D.h"
 #include <vector>
 #include "NavigationManager.h"
-#include <queue>
+#include <stack>
 #include "Math.h"
 
 extern NavigationManager nav;
@@ -23,13 +23,13 @@ public:
 	{
 		if (moving)
 		{
-			if (Math::distance(transform->position, path.front()) < 10)
+			if (Math::distance(transform->position, path.top()) < 10)
 			{
 				// else, pull up next target
 				path.pop();
 				if (!path.empty())
 				{
-					Vector2D next = path.front();
+					Vector2D next = path.top();
 					Vector2D p = (next - transform->position);
 					Vector2D norm = p.Normalize();
 					transform->velocity = norm * static_cast<float>(transform->speed);
@@ -51,7 +51,7 @@ public:
 
 private:
 	TransformComponent *transform;
-	std::queue<Vector2D> path;
+	std::stack<Vector2D> path;
 	bool moving;
 
 };

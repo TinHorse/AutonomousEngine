@@ -4,7 +4,7 @@
 #include "ECS.h"
 #include "Components.h"
 
-extern Manager manager;
+extern EntityManager manager;
 
 Map::Map(std::string tID, int mpTileSize, int mpScale) : texID(tID), tileSize(mpTileSize), mapScale(mpScale)
 {

@@ -8,7 +8,7 @@
 class AssetManager
 {
 public:
-	AssetManager(Manager* man);
+	AssetManager(EntityManager* man);
 	~AssetManager();
 
 	// Object Management
@@ -20,6 +20,6 @@ public:
 	SDL_Texture *GetTexture(std::string texID);
 
 private:
-	Manager *manager;
+	EntityManager *manager;
 	std::map<std::string, SDL_Texture*> textures;
 };

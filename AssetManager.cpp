@@ -1,7 +1,7 @@
 #include "AssetManager.h"
 #include "Components.h"
 
-AssetManager::AssetManager(Manager *man) : manager(man)
+AssetManager::AssetManager(EntityManager *man) : manager(man)
 {
 	
 }

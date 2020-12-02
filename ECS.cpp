@@ -42,17 +42,17 @@ void Entity::RemoveFromGroup(Group mGroup)
 	groupBitSet[mGroup] = false;
 }
 
-void Manager::Update()
+void EntityManager::Update()
 {
 	for (auto& e : entities) e->Update();
 }
 
-void Manager::Draw()
+void EntityManager::Draw()
 {
 	for (auto& e : entities) e->Draw();
 }
 
-void Manager::Refresh()
+void EntityManager::Refresh()
 {
 	// removes entity groups if they are inactive. This is called the erase-remove idiom
 	for (auto i(0u); i < maxGroups; i++)
@@ -84,12 +84,12 @@ void Manager::Refresh()
 
 }
 
-void Manager::AddToGroup(Entity * mEntity, Group mGroup)
+void EntityManager::AddToGroup(Entity * mEntity, Group mGroup)
 {
 	groupedEntities[mGroup].emplace_back(mEntity);
 }
 
-Entity & Manager::AddEntity()
+Entity & EntityManager::AddEntity()
 {
 	Entity *entity = new Entity(*this);
 	std::unique_ptr<Entity> uPtr{ entity }; // creates a new unique_ptr that points to the entity. Note that assignment from standard pointer to unique pointer cannot be done through uPtr = entity but must instead be done via {} operator
@@ -97,7 +97,7 @@ Entity & Manager::AddEntity()
 	return *entity;
 }
 
-std::vector<Entity*>& Manager::GetGroup(Group mGroup)
+std::vector<Entity*>& EntityManager::GetGroup(Group mGroup)
 {
 	return groupedEntities[mGroup];
 }

@@ -99,3 +99,11 @@ Vector2D & Vector2D::Zero()
 	this->y = 0;
 	return *this;
 }
+
+Vector2D & Vector2D::Normalize()
+{
+	int magnitude = sqrt((this->x *this->x) + (this->y + this->y));
+	this->x /= magnitude;
+	this->y /= magnitude;
+	return *this;
+}

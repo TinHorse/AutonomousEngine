@@ -15,7 +15,7 @@
 // declare classes
 class Component;
 class Entity;
-class Manager;
+class EntityManager;
 
 // initialize variable ComponentID to size_t, whose maximum value is equal to the biggest value that can be held by the OS
 using ComponentID = std::size_t;
@@ -64,7 +64,7 @@ public:
 class Entity
 {
 public:
-	Entity(Manager& mManager) : manager(mManager) {}
+	Entity(EntityManager& mManager) : manager(mManager) {}
 	void Update();
 	void Draw();
 	bool IsActive() const;
@@ -107,7 +107,7 @@ public:
 	}
 	
 private:
-	Manager& manager;
+	EntityManager& manager;
 	bool active = true;
 	std::vector<std::unique_ptr<Component>> components;
 
@@ -117,7 +117,7 @@ private:
 };
 
 
-class Manager
+class EntityManager
 {
 public:
 	void Update();

@@ -2,6 +2,7 @@
 #include <fstream>
 #include <list>
 #include <map>
+#include <queue>
 #include "Math.h"
 
 NavigationManager::NavigationManager()
@@ -15,7 +16,7 @@ NavigationManager::~NavigationManager()
 
 void NavigationManager::LoadMesh(const char * path, int sX, int sY, int sTileX, int sTileY, int scale)
 {
-	navMesh.Init(sTileX, sTileY, 0);
+	navMesh.Init(sTileX, sTileY);
 	//matrix. = std::vector<int>(sX*sY);
 	//navMesh.mat = std::vector<Node*>(sX*sY, new Node(false, false, INT_MAX, INT_MAX,x,y));
 	tileSizeX = sTileX * scale;
@@ -31,7 +32,9 @@ void NavigationManager::LoadMesh(const char * path, int sX, int sY, int sTileX, 
 			stream.get(c);
 			if (c == '1')
 			{
-				navMesh(x, y) = atoi(&c);
+				//navMesh(x, y) = atoi(&c);
+				navMesh(x, y)->x = x;
+				navMesh(x, y)->y = y;
 			}
 			stream.ignore();
 		}
@@ -41,6 +44,10 @@ void NavigationManager::LoadMesh(const char * path, int sX, int sY, int sTileX, 
 
 std::stack<Vector2D> NavigationManager::CalculatePath(Vector2D curLoc, Vector2D targetLoc)
 {
+	//UPGRADES
+	// UPGRADE list to priority queue
+	// UPGRADE NODE* TO Node ID
+	
 	//std::queue<Vector2D> path;
 	//path.push(curLoc);
 	int closestX = (curLoc.x / tileSizeX);
@@ -51,23 +58,30 @@ std::stack<Vector2D> NavigationManager::CalculatePath(Vector2D curLoc, Vector2D 
 	int closestXTarget = (targetLoc.x / tileSizeX);
 	int closestYTarget = (targetLoc.y / tileSizeY);
 
-	NN NOTE!! every node has an id. overload == operator for nodes to compare their id's
-
 	// A*
 	// Initialize start and end node
 	Node* current = navMesh(closestX, closestY);
 	Node* goal = navMesh(closestXTarget, closestYTarget);
 
 	// visited map, fLocal and fGlobal, list for nodes yet to be visited, current parent Node map
-	
-
 
 	// list yet to be tested
 	std::list<Node*> not_tested;
 	not_tested.push_back(current);
 
-	std::vector<Node*> neighbours(8);
+	// visited map
+	std::map<Node*, bool> visited;
+
+	// current parent node map
+	std::map<Node*, Node*> parents;
+
 	
+	// fLocal and fGlobal map
+	std::map<Node*, std::pair<int, int>> costs;
+
+
+	std::vector<Node*> neighbours(8);
+
 	// while there are nodes not yet tested
 	while (!not_tested.empty())
 	{
@@ -147,4 +161,7 @@ std::stack<Vector2D> NavigationManager::CalculatePath(Vector2D curLoc, Vector2D 
 
 	//path.push(targetLoc);
 	return finalPath;
+	
+	std::stack<Vector2D> s;
+	return s;
 }

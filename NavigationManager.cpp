@@ -4,6 +4,8 @@
 #include <map>
 #include <queue>
 #include "Math.h"
+#include "Vector2D.h"
+#include <array>
 
 NavigationManager::NavigationManager()
 {
@@ -30,11 +32,16 @@ void NavigationManager::LoadMesh(const char * path, int sX, int sY, int sTileX, 
 		for (int x = 0; x < sY; ++x)
 		{
 			stream.get(c);
+			navMesh(x, y)->x = x;
+			navMesh(x, y)->y = y;
 			if (c == '1')
 			{
-				//navMesh(x, y) = atoi(&c);
-				navMesh(x, y)->x = x;
-				navMesh(x, y)->y = y;
+				///navMesh(x, y) = atoi(&c);
+				navMesh(x, y)->isObstacle = true;
+			}
+			else
+			{
+				navMesh(x, y)->isObstacle = false;
 			}
 			stream.ignore();
 		}
@@ -61,7 +68,7 @@ std::stack<Vector2D> NavigationManager::CalculatePath(Vector2D curLoc, Vector2D 
 	// A*
 	// Initialize start and end node
 	Node* current = navMesh(closestX, closestY);
-	Node* goal = navMesh(closestXTarget, closestYTarget);
+	Node* target = navMesh(closestXTarget, closestYTarget);
 
 	// visited map, fLocal and fGlobal, list for nodes yet to be visited, current parent Node map
 
@@ -74,73 +81,94 @@ std::stack<Vector2D> NavigationManager::CalculatePath(Vector2D curLoc, Vector2D 
 
 	// current parent node map
 	std::map<Node*, Node*> parents;
-
 	
 	// fLocal and fGlobal map
-	std::map<Node*, std::pair<int, int>> costs;
+	std::map<Node*, std::pair<int, int>> goals;
+
+	// set up data structures
+	for (int y = 0; y < navMesh.cols; y++)
+	{
+		for (int x = 0; x < navMesh.rows; x++)
+		{
+			visited[navMesh(x, y)] = false;
+			parents[navMesh(x, y)] = nullptr;
+			goals[navMesh(x, y)] = std::make_pair(INT_MAX, INT_MAX);
+		}
+	}
 
 
-	std::vector<Node*> neighbours(8);
+	std::vector<Node*> neighbours;
 
 	// while there are nodes not yet tested
 	while (!not_tested.empty())
 	{
 		// sort list by global goal (min). Note that global goal is distance to target
-		not_tested.sort([](const Node* nA, const Node* nB) {return nA->fGlobal < nB->fGlobal; });
+		///not_tested.sort([](const Node* nA, const Node* nB) {return nA->fGlobal < nB->fGlobal; });
+		not_tested.sort([goals](Node* nA, Node* nB) {return goals.at(nA).second < goals.at(nB).second; });
 
 		// if the node has been visited, remove it
-		while (!not_tested.empty() && not_tested.front()->visited)
+		while (!not_tested.empty() && visited[not_tested.front()])
 		{
 			not_tested.pop_front();
 		}
-
+		
 		// if the list is empty now, terminate
 		if (not_tested.empty())
 		{
 			break;
 		}
-
+		
 		// set current node to front of the list
 		current = not_tested.front();
-		current->visited = true;
+		visited[current] = true;
 
 		// populate neighbours vector
-		neighbours[0] = navMesh(current->x+1, current->y);
-		neighbours[1] = navMesh(current->x+1, current->y+1);
-		neighbours[2] = navMesh(current->x, current->y+1);
-		neighbours[3] = navMesh(current->x-1, current->y+1);
-		neighbours[4] = navMesh(current->x-1, current->y);
-		neighbours[5] = navMesh(current->x-1, current->y-1);
-		neighbours[6] = navMesh(current->x, current->y-1);
-		neighbours[7] = navMesh(current->x+1, current->y-1);
+		neighbours.clear();
+		std::cout << "hey1" << std::endl;
+		navMesh(current->x + 1, current->y);
+		std::cout << "hey2" << std::endl;
+		std::cout << current->x << " " << current->y << std::endl;
+		std::cout << neighbours.size() << std::endl;
+		//neighbours.push_back(navMesh(current->x + 1, current->y));
+		std::cout << "hey3" << std::endl;
 
+		
+		neighbours.push_back(navMesh(current->x+1, current->y));
+		neighbours.push_back(navMesh(current->x+1, current->y+1));
+		neighbours.push_back(navMesh(current->x, current->y+1));
+		neighbours.push_back(navMesh(current->x-1, current->y+1));
+		neighbours.push_back(navMesh(current->x-1, current->y));
+		neighbours.push_back(navMesh(current->x-1, current->y-1));
+		neighbours.push_back(navMesh(current->x, current->y-1));
+		neighbours.push_back(navMesh(current->x + 1, current->y - 1));
+		
 		// check all neighbours
 		for (Node * n : neighbours)
 		{
 			if (n != nullptr)
 			{
 				// check if neighbour has already been visited and make sure it is not an obstacle
-				if (!n->visited && !n->isObstacle)
+				if (!visited[n] && !n->isObstacle)
 				{
 					not_tested.push_back(n);
 				}
 
 				// calculate the neighbour's local goals
-				Vector2D vN(n->x, n->y);
-				Vector2D vCurr(current->x, current->y);
-				float lowestGoal = n->fLocal + Math::distance(vN, vCurr);
+				float lowestGoal = goals[n].first + Math::distance(n->x, n->y, current->x, current->y);
 
 				// check if the lowest local goal is smaller than the neighbour's previous local goal
-				if (lowestGoal < n->fLocal)
+				if (lowestGoal < goals[n].first)
 				{
 					// set the neighbour's parent to the current node
-					n->parent = current;
+					parents[n] = current;
+
 					// update the neighbour's local goal
-					n->fLocal = lowestGoal;
+					goals[n].first = lowestGoal;
 
 					// set the neighbour's global goal to the local goal plus the distance to the target
-					n->fGlobal = n->fLocal + Math::distance(vN, targetLoc);
+					goals[n].second = lowestGoal + Math::distance(n->x, n->y, target->x, target->y);
 				}
+
 			}
 
 		}
@@ -149,19 +177,16 @@ std::stack<Vector2D> NavigationManager::CalculatePath(Vector2D curLoc, Vector2D 
 
 	}
 
-	std::stack<Vector2D> finalPath;
+	std::stack<Vector2D> path;
 	if (current != nullptr)
 	{
-		while (goal->parent != nullptr)
+		while (target != nullptr)
 		{
-			finalPath.push(Vector2D(goal->x, goal->y));
+			path.push(Vector2D(target->x, target->y));
+			std::cout << target->x << std::endl;
+			target = parents[target];
 		}
 	}
 
-
-	//path.push(targetLoc);
-	return finalPath;
-	
-	std::stack<Vector2D> s;
-	return s;
+	return path;
 }

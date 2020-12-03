@@ -1,7 +1,8 @@
 #pragma once
 #include "NavMesh.h"
-#include "Vector2D.h"
 #include <stack>
+
+class Vector2D;
 
 
 class NavigationManager

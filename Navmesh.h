@@ -1,21 +1,24 @@
 #pragma once
 #include <vector>
+#include <iostream>
 
 static int NodeID = 0;
 
 struct Node
 {
 	Node() = default;
-	Node(int X, int Y) : x(X), y(Y)
+	Node(int X, int Y, bool obs) : x(X), y(Y), isObstacle(obs)
 	{
 		ID = NodeID++;
 	}
-	int ID;
 	bool operator==(Node& node)
 	{
 		return this->ID == node.ID;
 	}
+
 	int x, y;
+	int ID;
+	bool isObstacle;
 };
 
 struct NavMesh
@@ -31,7 +34,15 @@ public:
 	}
 	Node* operator()(size_t x, size_t y)
 	{
-		return mesh[y * cols + x];
+		if ((y * cols + x) < mesh.size())
+		{
+			return mesh[y * cols + x];
+		}
+		else
+		{
+			std::cout << y<< " " << cols <<" "<< x << " bigger than " << mesh.size();
+			return nullptr;
+		}
 	}
 
 	int cols, rows;

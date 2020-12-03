@@ -8,6 +8,14 @@
 #include <array>
 #include <vector>
 
+#include <chrono>
+using namespace std::chrono;
+
+
+float heuristic(const Node *n, const Node *target)
+{
+	return Math::distance(n->x, n->y, target->x, target->y);
+}
 
 NavigationManager::NavigationManager()
 {
@@ -43,6 +51,7 @@ void NavigationManager::LoadMesh(const char * path, int sX, int sY, int sTileX, 
 			{
 				navMesh.mesh.push_back(new Node(x, y, false));
 			}
+
 			stream.ignore();
 		}
 	}
@@ -51,10 +60,11 @@ void NavigationManager::LoadMesh(const char * path, int sX, int sY, int sTileX, 
 
 std::stack<Vector2D> NavigationManager::CalculatePath(Vector2D curLoc, Vector2D targetLoc)
 {
-	//UPGRADES
-	// UPGRADE list to priority queue
-	// UPGRADE NODE* TO Node ID
-	
+	auto start = high_resolution_clock::now();
+	//UPGRADES:
+	// NEIGHBOURS STORAGE IN NODES
+
+
 	//std::queue<Vector2D> path;
 	//path.push(curLoc);
 	int closestX = (curLoc.x / tileSizeX);
@@ -70,107 +80,103 @@ std::stack<Vector2D> NavigationManager::CalculatePath(Vector2D curLoc, Vector2D 
 	Node* current = navMesh(closestX, closestY);
 	Node* target = navMesh(closestXTarget, closestYTarget);
 
+
+	// check if start or target are out of bounds, check if target is obstacle
 	std::stack<Vector2D> path;
-	if (!current || !target)
+	if (!current || !target || target->isObstacle)
 	{
 		return path;
 	}
 
 
+
 	// list yet to be tested
-	std::list<Node*> not_tested;
-	not_tested.push_back(current);
-	
+	std::priority_queue<Node*, std::vector<Node*>, NodeCompare> not_tested;
+	not_tested.push(current);
+
 
 	// visited map
-	std::map<Node*, bool> visited;
+	std::map<int, bool> visited;
 
 	// current parent node map
 	std::map<Node*, Node*> parents;
-	
+
 	// fLocal and fGlobal map
-	std::map<Node*, std::pair<int, int>> goals;
+	std::map<Node*, int> goals;
+
 
 	// set up data structures
 	for (int y = 0; y < navMesh.cols; y++)
 	{
 		for (int x = 0; x < navMesh.rows; x++)
 		{
-			visited[navMesh(x, y)] = false;
+			visited[x*y] = false;
 			parents[navMesh(x, y)] = nullptr;
-			goals[navMesh(x, y)] = std::make_pair(10000,10000);
+			goals[navMesh(x, y)] = INT_MAX;
 		}
 	}
 
+
 	// Initialize currrent
-	goals[current] = std::make_pair(0.f, Math::distance(current->x, current->y, target->x, target->y));
-
-
-	// neighbour nodes
-	std::vector<Node*> neighbours;
+	goals[current] = Math::distance(current->x, current->y, target->x, target->y);
 
 	// while there are nodes not yet tested
-	while (!not_tested.empty())
+
+	int numCalls = 0;
+
+	while (!not_tested.empty() && current != target)
 	{
+
 		// sort list by global goal (min). Note that global goal is distance to target
 		///not_tested.sort([](const Node* nA, const Node* nB) {return nA->fGlobal < nB->fGlobal; });
-		not_tested.sort([goals](Node* nA, Node* nB) {return goals.at(nA).second < goals.at(nB).second; });
+		//not_tested.([goals](Node* nA, Node* nB) {return goals.at(nA).second < goals.at(nB).second; });
 
 		// if the node has been visited, remove it
-		while (!not_tested.empty() && visited[not_tested.front()])
+		while (!not_tested.empty() && visited[not_tested.top()->ID])
 		{
-			not_tested.pop_front();
+			not_tested.pop();
 		}
-		
+
 		// if the list is empty now, terminate
 		if (not_tested.empty())
 		{
 			break;
 		}
-		
-		// set current node to front of the list
-		current = not_tested.front();
-		visited[current] = true;
 
-		// populate neighbours vector
-		neighbours.clear();
-		neighbours.push_back(navMesh(current->x+1, current->y));
-		neighbours.push_back(navMesh(current->x+1, current->y+1));
-		neighbours.push_back(navMesh(current->x, current->y+1));
-		neighbours.push_back(navMesh(current->x-1, current->y+1));
-		neighbours.push_back(navMesh(current->x-1, current->y));
-		neighbours.push_back(navMesh(current->x-1, current->y-1));
-		neighbours.push_back(navMesh(current->x, current->y-1));
-		neighbours.push_back(navMesh(current->x + 1, current->y - 1));
-		
+		// set current node to front of the list
+		current = not_tested.top();
+		visited[current->ID] = true;
+
+
 		// check all neighbours
-		for (Node * n : neighbours)
+		for (Node * n : navMesh.getNeighbours(current->x, current->y))
 		{
+			numCalls++;
 			if (n != nullptr)
 			{
 				// check if neighbour has already been visited and make sure it is not an obstacle
-				bool vis = visited[n];
+				bool vis = visited[n->ID];
 				bool isObstacle = n->isObstacle;
-				if (!visited[n] && !n->isObstacle)
+				if (!visited[n->ID] && !n->isObstacle)
 				{
-					not_tested.push_back(n);
+					not_tested.push(n);
 				}
 
 				// calculate the neighbour's local goals
-				float lowestGoal = goals[current].first + Math::distance(n->x, n->y, current->x, current->y);
+				float lowestGoal = goals[current] + Math::distance(n->x, n->y, current->x, current->y);
 
-				float local = goals[n].first;
+				float local = goals[n];
 				// check if the lowest local goal is smaller than the neighbour's previous local goal
-				if (lowestGoal < goals[n].first)
+				if (lowestGoal < goals[n])
 				{
 					// set the neighbour's parent to the current node
 					parents[n] = current;
 
 					// update the neighbour's local goal
-					goals[n].first = lowestGoal;
+					goals[n] = lowestGoal;
 
 					// set the neighbour's global goal to the local goal plus the distance to the target
-					goals[n].second = goals[n].first +Math::distance(n->x, n->y, target->x, target->y);
+					n->globalDist = goals[n] + Math::distance(n->x, n->y, target->x, target->y);
 				}
 
 			}
@@ -178,10 +184,14 @@ std::stack<Vector2D> NavigationManager::CalculatePath(Vector2D curLoc, Vector2D 
 		}
 
 
-
+	}
+	for (int i = 0; i < navMesh.mesh.size(); i++)
+	{
+		navMesh.mesh[i]->globalDist = INT_MAX;
 	}
 
-	//std::stack<Vector2D> path;
+
+	// Backtrack through the parent map to find the final path
 	if (current != nullptr)
 	{
 		while (target != nullptr)
@@ -190,7 +200,13 @@ std::stack<Vector2D> NavigationManager::CalculatePath(Vector2D curLoc, Vector2D 
 			target = parents[target];
 		}
 	}
+	path.pop();
 	path.push(curLoc);
+
+	auto stop = high_resolution_clock::now();
+	auto duration = duration_cast<microseconds>(stop - start);
+	//std::cout << duration.count() << std::endl;
+	//std::cout << numCalls << std::endl;
 
 	return path;
 }

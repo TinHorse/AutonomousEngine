@@ -2,7 +2,6 @@
 #include <vector>
 #include <iostream>
 
-
 static int NodeID = 0;
 struct Node
 {
@@ -22,6 +21,7 @@ struct Node
 	int x, y;
 	int ID;
 	bool isObstacle;
+	int globalDist = INT_MAX;
 };
 
 struct NavMesh
@@ -34,9 +34,9 @@ public:
 		cols = mCols;
 		rows = mRows;
 	}
-	Node* operator()(size_t x, size_t y)
+	Node* operator()(const int& x, const int& y)
 	{
-		if ((y * cols + x) < mesh.size())
+		if (boundsCheck(y * cols + x))
 		{
 			return mesh[y * cols + x];
 		}
@@ -45,7 +45,51 @@ public:
 			return nullptr;
 		}
 	}
+	std::vector<Node*> getNeighbours(const int& x, const int& y)
+	{
+		std::vector<Node*> neighbours;
+		if (boundsCheck((y) * cols + x + 1)) {
+			neighbours.push_back(mesh[(y)* cols + x]);
+		}
+		if (boundsCheck((y + 1) * cols + x + 1)) {
+			neighbours.push_back(mesh[(y + 1) * cols + x + 1]);
+		}
+		if (boundsCheck((y + 1) * cols + x)) {
+			neighbours.push_back(mesh[(y + 1) * cols + x]);
+		}
+		if (boundsCheck((y + 1) * cols + x - 1)) {
+			neighbours.push_back(mesh[(y + 1) * cols + x - 1]);
+		}
+		if (boundsCheck((y) * cols + x - 1)) {
+			neighbours.push_back(mesh[(y)* cols + x - 1]);
+		}
+		if (boundsCheck((y - 1) * cols + x - 1)) {
+			neighbours.push_back(mesh[(y - 1) * cols + x - 1]);
+		}
+		if (boundsCheck((y - 1) * cols + x)) {
+			neighbours.push_back(mesh[(y - 1) * cols + x]);
+		}
+		if (boundsCheck((y - 1) * cols + x + 1)) {
+			neighbours.push_back(mesh[(y - 1) * cols + x + 1]);
+		}
+
+		return neighbours;
+	}
+	
+	bool boundsCheck(const int& index)
+	{
+		return (index >= 0 && index < mesh.size());
+	}
 
 	int cols, rows;
 	std::vector<Node*> mesh;
+};
+
+struct NodeCompare
+{
+	bool operator()(const Node* nA, const Node* nB) const
+	{
+		return nA->globalDist > nB->globalDist;
+	}
+
 };

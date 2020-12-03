@@ -76,8 +76,11 @@ void Game::Init(const char * title, int xpos, int ypos, int width, int height, b
 
 	for (int i = 0; i < 10; i++)
 	{
-		Entity& agent = assets->CreateAgent(Vector2D(i * 50, 50), 90, 90, 0.25f);
-		agent.GetComponent<PathfindingComponent>().FindPath(Vector2D(600, 500));
+		for (int j = 0; j < 10; j++)
+		{
+			Entity& agent = assets->CreateAgent(Vector2D(i * 50, j * 50), 90, 90, 0.25f);
+			agent.GetComponent<PathfindingComponent>().FindPath(Vector2D(600-(i*50), 600-(j*50)));
+		}
 	}
 
 }

@@ -1,15 +1,13 @@
 #include "NavigationManager.h"
 #include <fstream>
-#include <list>
 #include <map>
 #include <queue>
 #include "Math.h"
 #include "Vector2D.h"
-#include <array>
-#include <vector>
 
 #include <chrono>
 using namespace std::chrono;
+
 
 
 float heuristic(const Node *n, const Node *target)
@@ -58,9 +56,9 @@ void NavigationManager::LoadMesh(const char * path, int sX, int sY, int sTileX, 
 	stream.close();
 }
 
-std::stack<Vector2D> NavigationManager::CalculatePath(Vector2D curLoc, Vector2D targetLoc)
+std::stack<Vector2D> NavigationManager::CalculatePath(const Vector2D& curLoc, const Vector2D& targetLoc)
 {
-	auto start = high_resolution_clock::now();
+	
 	//UPGRADES:
 	// NEIGHBOURS STORAGE IN NODES
 
@@ -123,10 +121,8 @@ std::stack<Vector2D> NavigationManager::CalculatePath(Vector2D curLoc, Vector2D 
 	// while there are nodes not yet tested
 
 	int numCalls = 0;
-
 	while (!not_tested.empty() && current != target)
 	{
-
 		// sort list by global goal (min). Note that global goal is distance to target
 		///not_tested.sort([](const Node* nA, const Node* nB) {return nA->fGlobal < nB->fGlobal; });
 		//not_tested.([goals](Node* nA, Node* nB) {return goals.at(nA).second < goals.at(nB).second; });
@@ -189,7 +185,7 @@ std::stack<Vector2D> NavigationManager::CalculatePath(Vector2D curLoc, Vector2D 
 	{
 		navMesh.mesh[i]->globalDist = INT_MAX;
 	}
-
+	
 
 	// Backtrack through the parent map to find the final path
 	if (current != nullptr)
@@ -202,11 +198,6 @@ std::stack<Vector2D> NavigationManager::CalculatePath(Vector2D curLoc, Vector2D 
 	}
 	path.pop();
 	path.push(curLoc);
-
-	auto stop = high_resolution_clock::now();
-	auto duration = duration_cast<microseconds>(stop - start);
-	//std::cout << duration.count() << std::endl;
-	//std::cout << numCalls << std::endl;
 
 	return path;
 }

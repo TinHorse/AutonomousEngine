@@ -7,6 +7,7 @@
 #include "AssetManager.h"
 #include "NavigationManager.h"
 
+
 Map *map;
 
 SDL_Renderer *Game::renderer = nullptr;
@@ -66,20 +67,19 @@ void Game::Init(const char * title, int xpos, int ypos, int width, int height, b
 
 	// load map
 	map = new Map("terrain", 32, 1);
-	map->LoadMap("assets/tilemap.txt", 20, 20);
+	map->LoadMap("assets/tilemap.txt", 30, 30);
 
 	// Load navigation
-	nav.LoadMesh("assets/collisionmap.txt", 20, 20, 32, 32, 1);
+	nav.LoadMesh("assets/collisionmap.txt", 30, 30, 32, 32, 1);
 
 	player = &assets->CreatePlayer(Vector2D(200,200), 90, 90, 0.25f);
 
 
 	for (int i = 0; i < 10; i++)
 	{
-		for (int j = 0; j < 10; j++)
+		for (int j = 0; j < 2; j++)
 		{
 			Entity& agent = assets->CreateAgent(Vector2D(i * 50, j * 50), 90, 90, 0.25f);
-			agent.GetComponent<PathfindingComponent>().FindPath(Vector2D(600-(i*50), 600-(j*50)));
 		}
 	}
 
@@ -103,9 +103,22 @@ void Game::HandleEvents()
 	}
 }
 
+
+static int agentIndex = 0;
 void Game::Update()
 {
+	
 	cnt++;
+	if (cnt % 25 == 0)
+	{
+		agentIndex++;
+		if (agentIndex < agents.size())
+		{
+			agents[agentIndex]->GetComponent<PathfindingComponent>().FindPath(Vector2D(800, 800));
+		}
+	}
+	
+
 	manager.Refresh();
 	manager.Update();
 	camera.camRect.x;
@@ -139,6 +152,7 @@ void Game::Update()
 
 void Game::Render() // note that all draw function have to be called inside the SDL Renderer
 {
+	
 	SDL_RenderClear(renderer);
 	for (auto& t : tiles)
 	{
@@ -148,14 +162,17 @@ void Game::Render() // note that all draw function have to be called inside the 
 	{
 		p->Draw();
 	}
+	
+	
 	for (auto& c : colliders)
 	{
-		c->Draw();
+		//c->Draw();
 	}
 	for (auto& a : agents)
 	{
 		a->Draw();
 	}
+	
 	SDL_RenderPresent(renderer);
 }
 

@@ -44,8 +44,8 @@ public:
 	}
 
 	void FindPath(Vector2D target)
-	{
-		path = std::move(nav.CalculatePath(transform->position, target));
+	{		
+		path = nav.CalculatePath(transform->position, target);
 		if (!path.empty())
 		{
 			moving = true;

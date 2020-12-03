@@ -2,14 +2,17 @@
 #include <vector>
 #include <iostream>
 
-static int NodeID = 0;
 
+static int NodeID = 0;
 struct Node
 {
-	Node() = default;
+	Node()
+	{
+		ID = ++NodeID;
+	}
 	Node(int X, int Y, bool obs) : x(X), y(Y), isObstacle(obs)
 	{
-		ID = NodeID++;
+		ID = ++NodeID;
 	}
 	bool operator==(Node& node)
 	{
@@ -30,7 +33,6 @@ public:
 	{
 		cols = mCols;
 		rows = mRows;
-		mesh = std::vector<Node*>(mCols * mRows, new Node());
 	}
 	Node* operator()(size_t x, size_t y)
 	{
@@ -40,7 +42,6 @@ public:
 		}
 		else
 		{
-			std::cout << y<< " " << cols <<" "<< x << " bigger than " << mesh.size();
 			return nullptr;
 		}
 	}

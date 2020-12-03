@@ -116,7 +116,7 @@ Vector2D & Vector2D::Zero()
 
 Vector2D & Vector2D::Normalize()
 {
-	int mag = sqrt((this->x *this->x) + (this->y + this->y));
+	float mag = sqrt((this->x * this->x) + (this->y * this->y));
 	if (mag != 0)
 	{
 		this->x /= mag;

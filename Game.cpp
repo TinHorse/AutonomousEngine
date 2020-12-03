@@ -21,7 +21,8 @@ NavigationManager nav;
 bool Game::isRunning = false;
 
 Entity *player = nullptr;
-Entity *agent = nullptr;
+
+
 
 Game::Game()
 {
@@ -58,18 +59,27 @@ void Game::Init(const char * title, int xpos, int ypos, int width, int height, b
 		isRunning = false;
 	}
 
+	// load assets
 	assets->AddTexture("terrain", "assets/tileset.png");
 	assets->AddTexture("player", "assets/player_animated.png");
 
-	map = new Map("terrain", 32, 2);
+
+	// load map
+	map = new Map("terrain", 32, 1);
 	map->LoadMap("assets/tilemap.txt", 20, 20);
 
-	player = &assets->CreatePlayer(Vector2D(200,200), 90, 90, 0.5f);
-	agent = &assets->CreateAgent(Vector2D(250, 50), 90, 90, 0.5f);
+	// Load navigation
+	nav.LoadMesh("assets/collisionmap.txt", 20, 20, 32, 32, 1);
 
-	nav.LoadMesh("assets/collisionmap.txt", 20, 20, 32, 32, 2);
+	player = &assets->CreatePlayer(Vector2D(200,200), 90, 90, 0.25f);
 
-	agent->GetComponent<PathfindingComponent>().FindPath(Vector2D(500,500));
+
+	for (int i = 0; i < 10; i++)
+	{
+		Entity& agent = assets->CreateAgent(Vector2D(i * 50, 50), 90, 90, 0.25f);
+		agent.GetComponent<PathfindingComponent>().FindPath(Vector2D(600, 500));
+	}
+
 }
 
 auto& players(manager.GetGroup(Game::groupPlayers));

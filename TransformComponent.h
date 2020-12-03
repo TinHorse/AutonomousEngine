@@ -7,7 +7,7 @@ class TransformComponent : public Component
 public:
 	Vector2D position;
 	Vector2D velocity;
-	int speed = 1;
+	float speed = 1.5f;
 
 	int height = 128;
 	int width = 128;

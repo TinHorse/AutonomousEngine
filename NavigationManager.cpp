@@ -6,6 +6,8 @@
 #include "Math.h"
 #include "Vector2D.h"
 #include <array>
+#include <vector>
+
 
 NavigationManager::NavigationManager()
 {
@@ -18,7 +20,7 @@ NavigationManager::~NavigationManager()
 
 void NavigationManager::LoadMesh(const char * path, int sX, int sY, int sTileX, int sTileY, int scale)
 {
-	navMesh.Init(sTileX, sTileY);
+	navMesh.Init(sX, sY);
 	//matrix. = std::vector<int>(sX*sY);
 	//navMesh.mat = std::vector<Node*>(sX*sY, new Node(false, false, INT_MAX, INT_MAX,x,y));
 	tileSizeX = sTileX * scale;
@@ -29,19 +31,17 @@ void NavigationManager::LoadMesh(const char * path, int sX, int sY, int sTileX, 
 	stream.open(path);
 	for (int y = 0; y < sY; ++y)
 	{
-		for (int x = 0; x < sY; ++x)
+		for (int x = 0; x < sX; ++x)
 		{
 			stream.get(c);
-			navMesh(x, y)->x = x;
-			navMesh(x, y)->y = y;
 			if (c == '1')
 			{
 				///navMesh(x, y) = atoi(&c);
-				navMesh(x, y)->isObstacle = true;
+				navMesh.mesh.push_back(new Node(x,y, true));
 			}
 			else
 			{
-				navMesh(x, y)->isObstacle = false;
+				navMesh.mesh.push_back(new Node(x, y, false));
 			}
 			stream.ignore();
 		}
@@ -70,11 +70,17 @@ std::stack<Vector2D> NavigationManager::CalculatePath(Vector2D curLoc, Vector2D 
 	Node* current = navMesh(closestX, closestY);
 	Node* target = navMesh(closestXTarget, closestYTarget);
 
-	// visited map, fLocal and fGlobal, list for nodes yet to be visited, current parent Node map
+	std::stack<Vector2D> path;
+	if (!current || !target)
+	{
+		return path;
+	}
+
 
 	// list yet to be tested
 	std::list<Node*> not_tested;
 	not_tested.push_back(current);
+	
 
 	// visited map
 	std::map<Node*, bool> visited;
@@ -92,11 +98,15 @@ std::stack<Vector2D> NavigationManager::CalculatePath(Vector2D curLoc, Vector2D 
 		{
 			visited[navMesh(x, y)] = false;
 			parents[navMesh(x, y)] = nullptr;
-			goals[navMesh(x, y)] = std::make_pair(INT_MAX, INT_MAX);
+			goals[navMesh(x, y)] = std::make_pair(10000,10000);
 		}
 	}
 
+	// Initialize currrent
+	goals[current] = std::make_pair(0.f, Math::distance(current->x, current->y, target->x, target->y));
 
+
+	// neighbour nodes
 	std::vector<Node*> neighbours;
 
 	// while there are nodes not yet tested
@@ -124,15 +134,6 @@ std::stack<Vector2D> NavigationManager::CalculatePath(Vector2D curLoc, Vector2D 
 
 		// populate neighbours vector
 		neighbours.clear();
-		std::cout << "hey1" << std::endl;
-		navMesh(current->x + 1, current->y);
-		std::cout << "hey2" << std::endl;
-		std::cout << current->x << " " << current->y << std::endl;
-		std::cout << neighbours.size() << std::endl;
-		//neighbours.push_back(navMesh(current->x + 1, current->y));
-		std::cout << "hey3" << std::endl;
-
-		
 		neighbours.push_back(navMesh(current->x+1, current->y));
 		neighbours.push_back(navMesh(current->x+1, current->y+1));
 		neighbours.push_back(navMesh(current->x, current->y+1));
@@ -148,14 +149,17 @@ std::stack<Vector2D> NavigationManager::CalculatePath(Vector2D curLoc, Vector2D 
 			if (n != nullptr)
 			{
 				// check if neighbour has already been visited and make sure it is not an obstacle
+				bool vis = visited[n];
+				bool isObstacle = n->isObstacle;
 				if (!visited[n] && !n->isObstacle)
 				{
 					not_tested.push_back(n);
 				}
 
 				// calculate the neighbour's local goals
-				float lowestGoal = goals[n].first + Math::distance(n->x, n->y, current->x, current->y);
+				float lowestGoal = goals[current].first + Math::distance(n->x, n->y, current->x, current->y);
 
+				float local = goals[n].first;
 				// check if the lowest local goal is smaller than the neighbour's previous local goal
 				if (lowestGoal < goals[n].first)
 				{
@@ -166,7 +170,7 @@ std::stack<Vector2D> NavigationManager::CalculatePath(Vector2D curLoc, Vector2D 
 					goals[n].first = lowestGoal;
 
 					// set the neighbour's global goal to the local goal plus the distance to the target
-					goals[n].second = lowestGoal + Math::distance(n->x, n->y, target->x, target->y);
+					goals[n].second = goals[n].first +Math::distance(n->x, n->y, target->x, target->y);
 				}
 
 			}
@@ -177,16 +181,16 @@ std::stack<Vector2D> NavigationManager::CalculatePath(Vector2D curLoc, Vector2D 
 
 	}
 
-	std::stack<Vector2D> path;
+	//std::stack<Vector2D> path;
 	if (current != nullptr)
 	{
 		while (target != nullptr)
 		{
-			path.push(Vector2D(target->x, target->y));
-			std::cout << target->x << std::endl;
+			path.push(Vector2D(target->x * tileSizeX, target->y * tileSizeY));
 			target = parents[target];
 		}
 	}
+	path.push(curLoc);
 
 	return path;
 }

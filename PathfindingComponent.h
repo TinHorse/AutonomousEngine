@@ -32,7 +32,7 @@ public:
 					Vector2D next = path.top();
 					Vector2D p = (next - transform->position);
 					Vector2D norm = p.Normalize();
-					transform->velocity = norm * static_cast<float>(transform->speed);
+					transform->velocity = norm * transform->speed;
 				}
 				else
 				{
@@ -46,7 +46,10 @@ public:
 	void FindPath(Vector2D target)
 	{
 		path = std::move(nav.CalculatePath(transform->position, target));
-		moving = true;
+		if (!path.empty())
+		{
+			moving = true;
+		}
 	}
 
 private:

@@ -4,7 +4,6 @@
 
 class Vector2D;
 
-
 class NavigationManager
 {
 public:

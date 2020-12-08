@@ -15,8 +15,8 @@ EntityManager manager;
 Camera Game::camera = Camera(0, 0, 800, 640);
 
 AssetManager *Game::assets = new AssetManager(&manager);
-
 NavigationManager nav;
+
 
 bool Game::isRunning = false;
 

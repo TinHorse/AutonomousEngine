@@ -7,6 +7,8 @@
 #include "Vector2D.h"
 #include <array>
 #include <vector>
+#include <chrono>
+using namespace std::chrono;
 
 float heuristic(const Node *n, const Node *target)
 {
@@ -22,11 +24,22 @@ NavigationManager::~NavigationManager()
 {
 }
 
+void NavigationManager::Init()
+{
+	for (int y = 0; y < navMesh.cols; y++)
+	{
+		for (int x = 0; x < navMesh.rows; x++)
+		{
+			visited[navMesh(x, y)->ID] = false;
+			parents[navMesh(x, y)] = nullptr;
+			goals[navMesh(x, y)] = INT_MAX;
+		}
+	}
+}
+
 void NavigationManager::LoadMesh(const char * path, int sX, int sY, int sTileX, int sTileY, int scale)
 {
 	navMesh.Init(sX, sY);
-	//matrix. = std::vector<int>(sX*sY);
-	//navMesh.mat = std::vector<Node*>(sX*sY, new Node(false, false, INT_MAX, INT_MAX,x,y));
 	tileSizeX = sTileX * scale;
 	tileSizeY = sTileY * scale;
 
@@ -58,7 +71,7 @@ std::stack<Vector2D> NavigationManager::CalculatePath(Vector2D curLoc, Vector2D 
 {
 	//UPGRADES:
 	// NEIGHBOURS STORAGE IN NODES
-
+	auto start = high_resolution_clock::now();
 
 	//std::queue<Vector2D> path;
 	//path.push(curLoc);
@@ -89,28 +102,9 @@ std::stack<Vector2D> NavigationManager::CalculatePath(Vector2D curLoc, Vector2D 
 	std::priority_queue<Node*, std::vector<Node*>, NodeCompare> not_tested;
 	not_tested.push(current);
 
-
-	// visited map
-	std::map<int, bool> visited;
-
-	// current parent node map
-	std::map<Node*, Node*> parents;
-
-	// fLocal and fGlobal map
-	std::map<Node*, int> goals;
-
-
+	
 	// set up data structures
-	for (int y = 0; y < navMesh.cols; y++)
-	{
-		for (int x = 0; x < navMesh.rows; x++)
-		{
-			visited[x*y] = false;
-			parents[navMesh(x, y)] = nullptr;
-			goals[navMesh(x, y)] = INT_MAX;
-		}
-	}
-
+	Clean();
 
 	// Initialize currrent
 	goals[current] = Math::distance(current->x, current->y, target->x, target->y);
@@ -180,10 +174,7 @@ std::stack<Vector2D> NavigationManager::CalculatePath(Vector2D curLoc, Vector2D 
 
 
 	}
-	for (int i = 0; i < navMesh.mesh.size(); i++)
-	{
-		navMesh.mesh[i]->globalDist = INT_MAX;
-	}
+
 
 
 	// Backtrack through the parent map to find the final path
@@ -197,5 +188,32 @@ std::stack<Vector2D> NavigationManager::CalculatePath(Vector2D curLoc, Vector2D 
 	}
 	path.pop();
 	path.push(curLoc);
+
+
+
+	auto stop = high_resolution_clock::now();
+	auto duration = duration_cast<microseconds>(stop - start);
+	std::cout << "manager " << duration.count() << std::endl;
+
 	return path;
+}
+
+void NavigationManager::Clean()
+{
+	for (auto it = visited.begin(); it != visited.end(); ++it)
+	{
+		it->second = false;
+	}
+	for (auto it = parents.begin(); it != parents.end(); ++it)
+	{
+		it->second = nullptr;
+	}
+	for (auto it = goals.begin(); it != goals.end(); ++it)
+	{
+		it->second = INT_MAX;
+	}
+	for (int n = 0; n < navMesh.mesh.size(); ++n)
+	{
+		navMesh.mesh[n]->globalDist = INT_MAX;
+	}
 }

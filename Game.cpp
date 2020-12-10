@@ -75,6 +75,7 @@ void Game::Init(const char * title, int xpos, int ypos, int width, int height, b
 
 	// Load navigation
 	navigationMan.LoadMesh("assets/collisionmap.txt", 40, 40, 32, 32, 1);
+	navigationMan.Init();
 
 	player = &assets->CreatePlayer(Vector2D(200,200), 90, 90, 0.25f);
 
@@ -137,29 +138,8 @@ void Game::Update()
 		camera.camRect.y = camera.camRect.h;
 	}
 
-	auto start = high_resolution_clock::now();
-	
+	// Collision
 	collisionMan.CalculateCollision();
-	auto stop = high_resolution_clock::now();
-	auto duration = duration_cast<microseconds>(stop - start);
-	std::cout << "manager " << duration.count() << std::endl;
-	
-
-	auto start2 = high_resolution_clock::now();
-	for (auto& c : colliders)
-	{
-		for (auto& c2 : agents)
-		{
-			if (true)
-			{
-				Collision::AABB(c->GetComponent<ColliderComponent>(), c2->GetComponent<ColliderComponent>());
-			}
-		}
-	}
-	auto stop2 = high_resolution_clock::now();
-	auto duration2 = duration_cast<microseconds>(stop2 - start2);
-	std::cout << "standard " << duration2.count() << std::endl;
-	std::cout << std::endl;
 }
 
 void Game::Render() // note that all draw function have to be called inside the SDL Renderer

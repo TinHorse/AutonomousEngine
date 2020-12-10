@@ -2,6 +2,7 @@
 #include <fstream>
 
 extern EntityManager manager;
+int Matrix::matIndex = 1;
 
 void CollisionManager::LoadMesh(const char * path, int sX, int sY, int sTileX, int sTileY, int scale)
 {
@@ -19,14 +20,15 @@ void CollisionManager::LoadMesh(const char * path, int sX, int sY, int sTileX, i
 			stream.get(c);
 			if (c == '1')
 			{
-				colMat.mesh.push_back(new CollisionNode(x, y, true));
 				auto& tileCol(manager.AddEntity());
-				tileCol.AddComponent<ColliderComponent>("terrain", x * tileSizeX, y * tileSizeY, tileSizeX);
+				auto& collider = tileCol.AddComponent<ColliderComponent>("terrain", x * tileSizeX, y * tileSizeY, tileSizeX);
 				tileCol.AddToGroup(Game::groupColliders);
+				colMat.addNode(&collider);
+				colMat.mesh.push_back(colMat.matIndex);
 			}
 			else
 			{
-				colMat.mesh.push_back(new CollisionNode(x, y, false));
+				colMat.mesh.push_back(0);
 			}
 
 			stream.ignore();
@@ -37,65 +39,33 @@ void CollisionManager::LoadMesh(const char * path, int sX, int sY, int sTileX, i
 
 void CollisionManager::AddAgent(const Entity & agent)
 {
-	Vector2D v = agent.GetComponent<TransformComponent>().position;
-
-	colMat(v.x / tileSizeX, v.y / tileSizeY)->colliders.insert(agent.GetComponentPtr<ColliderComponent>());
 	dynamic_colliders.push_back(agent.GetComponentPtr<ColliderComponent>());
 }
 
 void CollisionManager::CalculateCollision()
 {
-	int numCalls = 0;
-	CollisionNode *colNode;
+	//int numCalls = 0;
 
 	for (ColliderComponent* dynCol : dynamic_colliders)
 	{
 		// determine node position
 		int x = dynCol->transform->position.x / tileSizeX;
 		int y = dynCol->transform->position.y / tileSizeY;
-
-		colNode = colMat(x, y);
-
-		// if not registered on tile, register collider
-		
-		if (colNode->colliders.find(dynCol) == colNode->colliders.end())
-		{
-			colNode->colliders.insert(dynCol);
-		}
-		
-		
-
-		// check collision with other dynamic colliders
-		
-		for (auto* col : colNode->colliders)
-		{
-			if (col != dynCol)
-			{
-				Collision::AABB(col->collider, dynCol->collider);
-			}
-			numCalls++;
-		}
 		
 		// check collision with static colliders
 		
 		for (auto *n : colMat.getRegion(x, y))
 		{
-			
-			if (n->isObstacle)
+			if (n != nullptr)
 			{
-				numCalls++;
-				Collision::AABB(dynCol->collider, n->x, n->y, tileSizeX, tileSizeY);
-			}
-			
-			for (auto *c : n->colliders)
-			{
-				numCalls++;
-				Collision::AABB(c->collider, dynCol->collider);
-				//std::cout << dynCol->entity << " colliding with " << c->entity << std::endl;
-			}
-			
+				//numCalls++;
+				if (Collision::AABB(*dynCol, *n))
+				{
+					//dynCol->entity->GetComponent<TransformComponent>().velocity = { 0,0 };
+				}
+			}			
 		}
 		
 	}
-	std::cout << "num " << numCalls << std::endl;
+	//std::cout << "num " << numCalls << std::endl;
 }

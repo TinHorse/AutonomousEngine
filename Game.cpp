@@ -71,23 +71,23 @@ void Game::Init(const char * title, int xpos, int ypos, int width, int height, b
 
 	// load map
 	map = new Map("terrain", 32, 1);
-	map->LoadMap("assets/tilemap.txt", 20, 20);
+	map->LoadMap("assets/tilemap.txt", 40, 40);
 
 	// Load navigation
-	navigationMan.LoadMesh("assets/collisionmap.txt", 20, 20, 32, 32, 1);
+	navigationMan.LoadMesh("assets/collisionmap.txt", 40, 40, 32, 32, 1);
 
 	player = &assets->CreatePlayer(Vector2D(200,200), 90, 90, 0.25f);
 
 	// Load collision
-	collisionMan.LoadMesh("assets/collisionmap.txt", 20, 20, 32, 32, 1);
+	collisionMan.LoadMesh("assets/collisionmap.txt", 40, 40, 32, 32, 1);
 	collisionMan.AddAgent(*player);
 
-	for (int i = 0; i < 30; i++)
+	for (int i = 0; i < 20; i++)
 	{
-		for (int j = 0; j < 10; j++)
+		for (int j = 0; j < 20; j++)
 		{
-			Entity& agent = assets->CreateAgent(Vector2D(i * 50, j * 50), 90, 90, 0.25f);
-			agent.GetComponent<PathfindingComponent>().FindPath(Vector2D(600-(i*50), 600-(j*50)));
+			Entity& agent = assets->CreateAgent(Vector2D(i * 20, j * 20), 90, 90, 0.25f);
+			agent.GetComponent<PathfindingComponent>().FindPath(Vector2D(600-(i*20), 600-(j*20)));
 			collisionMan.AddAgent(agent);
 		}
 	}
@@ -142,37 +142,24 @@ void Game::Update()
 	collisionMan.CalculateCollision();
 	auto stop = high_resolution_clock::now();
 	auto duration = duration_cast<microseconds>(stop - start);
-	std::cout << "first one" << duration.count() << std::endl;
+	std::cout << "manager " << duration.count() << std::endl;
+	
 
-	start = high_resolution_clock::now();
-	int numCalls = 0;
-	for (auto& c : agents)
-	{
-		for (auto& c2 : agents)
-		{
-			if (c != c2)
-			{
-				Collision::AABB(c->GetComponent<ColliderComponent>(), c2->GetComponent<ColliderComponent>());
-				numCalls++;
-			}
-		}
-	}
+	auto start2 = high_resolution_clock::now();
 	for (auto& c : colliders)
 	{
 		for (auto& c2 : agents)
 		{
-			if (c != c2)
+			if (true)
 			{
 				Collision::AABB(c->GetComponent<ColliderComponent>(), c2->GetComponent<ColliderComponent>());
-				numCalls++;
 			}
 		}
 	}
-	stop = high_resolution_clock::now();
-	duration = duration_cast<microseconds>(stop - start);
-	std::cout << "second one" << duration.count() << std::endl;
-	std::cout << "Num Calls " << numCalls << std::endl;
-
+	auto stop2 = high_resolution_clock::now();
+	auto duration2 = duration_cast<microseconds>(stop2 - start2);
+	std::cout << "standard " << duration2.count() << std::endl;
+	std::cout << std::endl;
 }
 
 void Game::Render() // note that all draw function have to be called inside the SDL Renderer

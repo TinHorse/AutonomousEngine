@@ -5,14 +5,6 @@
 #include <set>
 using std::vector;
 
-struct CollisionNode
-{
-	CollisionNode() {}
-	CollisionNode(int X, int Y, bool obs) : x(X), y(Y), isObstacle(obs) {}
-	int x, y;
-	bool isObstacle;
-	std::set<ColliderComponent*> colliders;
-};
 
 struct Matrix
 {
@@ -23,9 +15,9 @@ public:
 	{
 		cols = mCols;
 		rows = mRows;
-		neighbours = std::vector<CollisionNode*>(9, nullptr);
+		neighbours = std::vector<ColliderComponent*>(9);
 	}
-	CollisionNode* operator()(const int& x, const int& y)
+	int operator()(const int& x, const int& y)
 	{
 		if (boundsCheck(y * cols + x))
 		{
@@ -33,35 +25,37 @@ public:
 		}
 		else
 		{
-			return nullptr;
+			return 0;
 		}
 	}
-	const std::vector<CollisionNode*>& getRegion(const int& x, const int& y)
+	const std::vector<ColliderComponent*>& getRegion(const int& x, const int& y)
 	{
-		neighbours[0] = (mesh[ y* cols + x]);
-		if (boundsCheck((y)* cols + x + 1)) {
-			neighbours[1] = (mesh[(y)* cols + x+1]);
+		if (DoesNodeExist((y)* cols + x)) {
+			neighbours[0] = nodes[(mesh[y* cols + x])];
 		}
-		if (boundsCheck((y + 1) * cols + x + 1)) {
-			neighbours[2] = (mesh[(y + 1) * cols + x + 1]);
+		if (DoesNodeExist((y)* cols + x + 1)) {
+			neighbours[1] = nodes[(mesh[(y)* cols + x+1])];
 		}
-		if (boundsCheck((y + 1) * cols + x)) {
-			neighbours[3] = (mesh[(y + 1) * cols + x]);
+		if (DoesNodeExist((y + 1) * cols + x + 1)) {
+			neighbours[2] = nodes[(mesh[(y + 1) * cols + x + 1])];
 		}
-		if (boundsCheck((y + 1) * cols + x - 1)) {
-			neighbours[4] = (mesh[(y + 1) * cols + x - 1]);
+		if (DoesNodeExist((y + 1) * cols + x)) {
+			neighbours[3] = nodes[(mesh[(y + 1) * cols + x])];
 		}
-		if (boundsCheck((y)* cols + x - 1)) {
-			neighbours[5] = (mesh[(y)* cols + x - 1]);
+		if (DoesNodeExist((y + 1) * cols + x - 1)) {
+			neighbours[4] = nodes[(mesh[(y + 1) * cols + x - 1])];
 		}
-		if (boundsCheck((y - 1) * cols + x - 1)) {
-			neighbours[6] = (mesh[(y - 1) * cols + x - 1]);
+		if (DoesNodeExist((y)* cols + x - 1)) {
+			neighbours[5] = nodes[(mesh[(y)* cols + x - 1])];
 		}
-		if (boundsCheck((y - 1) * cols + x)) {
-			neighbours[7] = (mesh[(y - 1) * cols + x]);
+		if (DoesNodeExist((y - 1) * cols + x - 1)) {
+			neighbours[6] = nodes[(mesh[(y - 1) * cols + x - 1])];
 		}
-		if (boundsCheck((y - 1) * cols + x + 1)) {
-			neighbours[8] = (mesh[(y - 1) * cols + x + 1]);
+		if (DoesNodeExist((y - 1) * cols + x)) {
+			neighbours[7] = nodes[(mesh[(y - 1) * cols + x])];
+		}
+		if (DoesNodeExist((y - 1) * cols + x + 1)) {
+			neighbours[8] = nodes[(mesh[(y - 1) * cols + x + 1])];
 		}
 
 		return neighbours;
@@ -71,10 +65,22 @@ public:
 	{
 		return (index >= 0 && index < mesh.size());
 	}
+	bool DoesNodeExist(const int& index)
+	{
+		return (index >= 0 && index < mesh.size() && mesh[index] != 0);
+	}
+
+	void addNode(ColliderComponent* comp)
+	{
+		nodes.insert(std::make_pair(matIndex++, comp));
+	}
 
 	int cols, rows;
-	std::vector<CollisionNode*> mesh;
-	std::vector<CollisionNode*> neighbours;
+	static int matIndex;
+	int index;
+	std::vector<int> mesh;
+	std::map<int, ColliderComponent*> nodes;
+	std::vector<ColliderComponent*> neighbours;
 };
 
 class CollisionManager

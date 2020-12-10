@@ -15,6 +15,20 @@ bool Collision::AABB(const SDL_Rect& rectA, const SDL_Rect& rectB)
 	return false;
 }
 
+bool Collision::AABB(const SDL_Rect& rectA, const int& Bx, const int& By, const int& Bw, const int& Bh)
+{
+	if (
+		rectA.x + rectA.w > Bx &&
+		rectA.y + rectA.h > By &&
+		Bx + Bw > rectA.x &&
+		By + Bh > rectA.y
+		)
+	{
+		return true;
+	}
+	return false;
+}
+
 bool Collision::AABB(const ColliderComponent & colA, const ColliderComponent & colB)
 {
 	if (AABB(colA.collider, colB.collider))

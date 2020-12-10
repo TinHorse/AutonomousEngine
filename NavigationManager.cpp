@@ -8,10 +8,6 @@
 #include <array>
 #include <vector>
 
-#include <chrono>
-using namespace std::chrono;
-
-
 float heuristic(const Node *n, const Node *target)
 {
 	return Math::distance(n->x, n->y, target->x, target->y);
@@ -60,7 +56,6 @@ void NavigationManager::LoadMesh(const char * path, int sX, int sY, int sTileX, 
 
 std::stack<Vector2D> NavigationManager::CalculatePath(Vector2D curLoc, Vector2D targetLoc)
 {
-	auto start = high_resolution_clock::now();
 	//UPGRADES:
 	// NEIGHBOURS STORAGE IN NODES
 
@@ -202,11 +197,5 @@ std::stack<Vector2D> NavigationManager::CalculatePath(Vector2D curLoc, Vector2D 
 	}
 	path.pop();
 	path.push(curLoc);
-
-	auto stop = high_resolution_clock::now();
-	auto duration = duration_cast<microseconds>(stop - start);
-	//std::cout << duration.count() << std::endl;
-	//std::cout << numCalls << std::endl;
-
 	return path;
 }

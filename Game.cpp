@@ -6,6 +6,9 @@
 #include "Collision.h"
 #include "AssetManager.h"
 #include "NavigationManager.h"
+#include "CollisionManager.h"
+#include <chrono>
+using namespace std::chrono;
 
 Map *map;
 
@@ -15,7 +18,8 @@ EntityManager manager;
 Camera Game::camera = Camera(0, 0, 800, 640);
 
 AssetManager *Game::assets = new AssetManager(&manager);
-NavigationManager nav;
+NavigationManager navigationMan;
+CollisionManager collisionMan;
 
 
 bool Game::isRunning = false;
@@ -62,6 +66,7 @@ void Game::Init(const char * title, int xpos, int ypos, int width, int height, b
 	// load assets
 	assets->AddTexture("terrain", "assets/tileset.png");
 	assets->AddTexture("player", "assets/player_animated.png");
+	assets->AddTexture("collider", "assets/colliderTex.png");
 
 
 	// load map
@@ -69,20 +74,23 @@ void Game::Init(const char * title, int xpos, int ypos, int width, int height, b
 	map->LoadMap("assets/tilemap.txt", 20, 20);
 
 	// Load navigation
-	nav.LoadMesh("assets/collisionmap.txt", 20, 20, 32, 32, 1);
+	navigationMan.LoadMesh("assets/collisionmap.txt", 20, 20, 32, 32, 1);
 
 	player = &assets->CreatePlayer(Vector2D(200,200), 90, 90, 0.25f);
 
+	// Load collision
+	collisionMan.LoadMesh("assets/collisionmap.txt", 20, 20, 32, 32, 1);
+	collisionMan.AddAgent(*player);
 
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 30; i++)
 	{
 		for (int j = 0; j < 10; j++)
 		{
 			Entity& agent = assets->CreateAgent(Vector2D(i * 50, j * 50), 90, 90, 0.25f);
 			agent.GetComponent<PathfindingComponent>().FindPath(Vector2D(600-(i*50), 600-(j*50)));
+			collisionMan.AddAgent(agent);
 		}
 	}
-
 }
 
 auto& players(manager.GetGroup(Game::groupPlayers));
@@ -129,11 +137,41 @@ void Game::Update()
 		camera.camRect.y = camera.camRect.h;
 	}
 
-	ColliderComponent& playerCollider = player->GetComponent<ColliderComponent>();
+	auto start = high_resolution_clock::now();
+	
+	collisionMan.CalculateCollision();
+	auto stop = high_resolution_clock::now();
+	auto duration = duration_cast<microseconds>(stop - start);
+	std::cout << "first one" << duration.count() << std::endl;
+
+	start = high_resolution_clock::now();
+	int numCalls = 0;
+	for (auto& c : agents)
+	{
+		for (auto& c2 : agents)
+		{
+			if (c != c2)
+			{
+				Collision::AABB(c->GetComponent<ColliderComponent>(), c2->GetComponent<ColliderComponent>());
+				numCalls++;
+			}
+		}
+	}
 	for (auto& c : colliders)
 	{
-		Collision::AABB(c->GetComponent<ColliderComponent>(), playerCollider);
+		for (auto& c2 : agents)
+		{
+			if (c != c2)
+			{
+				Collision::AABB(c->GetComponent<ColliderComponent>(), c2->GetComponent<ColliderComponent>());
+				numCalls++;
+			}
+		}
 	}
+	stop = high_resolution_clock::now();
+	duration = duration_cast<microseconds>(stop - start);
+	std::cout << "second one" << duration.count() << std::endl;
+	std::cout << "Num Calls " << numCalls << std::endl;
 
 }
 
@@ -156,6 +194,7 @@ void Game::Render() // note that all draw function have to be called inside the 
 	{
 		a->Draw();
 	}
+
 	SDL_RenderPresent(renderer);
 }
 

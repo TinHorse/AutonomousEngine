@@ -6,7 +6,7 @@
 #include <stack>
 #include "Math.h"
 
-extern NavigationManager nav;
+extern NavigationManager navigationMan;
 
 class PathfindingComponent : public Component
 {
@@ -45,7 +45,7 @@ public:
 
 	void FindPath(Vector2D target)
 	{
-		path = std::move(nav.CalculatePath(transform->position, target));
+		path = std::move(navigationMan.CalculatePath(transform->position, target));
 		if (!path.empty())
 		{
 			moving = true;

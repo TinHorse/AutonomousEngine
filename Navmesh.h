@@ -49,7 +49,7 @@ public:
 	{
 		std::vector<Node*> neighbours;
 		if (boundsCheck((y) * cols + x + 1)) {
-			neighbours.push_back(mesh[(y)* cols + x]);
+			neighbours.push_back(mesh[(y)* cols + x + 1]);
 		}
 		if (boundsCheck((y + 1) * cols + x + 1)) {
 			neighbours.push_back(mesh[(y + 1) * cols + x + 1]);

@@ -16,29 +16,28 @@ public:
 	}
 	void Update() override
 	{
-		if (Game::event.type == SDL_KEYDOWN)
+		const Uint8* keystate = SDL_GetKeyboardState(NULL);
+		if (keystate)
 		{
-			switch (Game::event.key.keysym.sym)
+			if (keystate[SDL_SCANCODE_W])
 			{
-			case SDLK_w:
 				transform->velocity.y = -1;
 				sprite->Play("walk");
-				break;
-			case SDLK_s:
+			}
+			if (keystate[SDL_SCANCODE_S]) {
 				transform->velocity.y = 1;
 				sprite->Play("walk");
-				break;
-			case SDLK_a:
+			}
+			if (keystate[SDL_SCANCODE_A])
+			{
 				transform->velocity.x = -1;
 				sprite->Play("walk");
 				sprite->spriteFlip = SDL_FLIP_HORIZONTAL;
-				break;
-			case SDLK_d:
+			}
+			if (keystate[SDL_SCANCODE_D])
+			{
 				transform->velocity.x = 1;
 				sprite->Play("walk");
-				break;
-			default:
-				break;
 			}
 
 		}

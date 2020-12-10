@@ -1,5 +1,6 @@
 #include "NavigationManager.h"
 #include <fstream>
+<<<<<<< HEAD
 #include <map>
 #include <queue>
 #include "Math.h"
@@ -14,6 +15,10 @@ float heuristic(const Node *n, const Node *target)
 {
 	return Math::distance(n->x, n->y, target->x, target->y);
 }
+=======
+#include <queue>
+#include "Math.h"
+>>>>>>> collision
 
 NavigationManager::NavigationManager()
 {
@@ -24,11 +29,22 @@ NavigationManager::~NavigationManager()
 {
 }
 
+void NavigationManager::Init()
+{
+	for (int y = 0; y < navMesh.cols; y++)
+	{
+		for (int x = 0; x < navMesh.rows; x++)
+		{
+			visited[navMesh(x, y)->ID] = false;
+			parents[navMesh(x, y)] = nullptr;
+			goals[navMesh(x, y)] = INT_MAX;
+		}
+	}
+}
+
 void NavigationManager::LoadMesh(const char * path, int sX, int sY, int sTileX, int sTileY, int scale)
 {
 	navMesh.Init(sX, sY);
-	//matrix. = std::vector<int>(sX*sY);
-	//navMesh.mat = std::vector<Node*>(sX*sY, new Node(false, false, INT_MAX, INT_MAX,x,y));
 	tileSizeX = sTileX * scale;
 	tileSizeY = sTileY * scale;
 
@@ -42,7 +58,6 @@ void NavigationManager::LoadMesh(const char * path, int sX, int sY, int sTileX, 
 			stream.get(c);
 			if (c == '1')
 			{
-				///navMesh(x, y) = atoi(&c);
 				navMesh.mesh.push_back(new Node(x,y, true));
 			}
 			else
@@ -58,6 +73,7 @@ void NavigationManager::LoadMesh(const char * path, int sX, int sY, int sTileX, 
 
 std::stack<Vector2D> NavigationManager::CalculatePath(const Vector2D& curLoc, const Vector2D& targetLoc)
 {
+<<<<<<< HEAD
 	
 	//UPGRADES:
 	// NEIGHBOURS STORAGE IN NODES
@@ -65,10 +81,10 @@ std::stack<Vector2D> NavigationManager::CalculatePath(const Vector2D& curLoc, co
 
 	//std::queue<Vector2D> path;
 	//path.push(curLoc);
+=======
+>>>>>>> collision
 	int closestX = (curLoc.x / tileSizeX);
 	int closestY = (curLoc.y / tileSizeY);
-
-	//path.push(Vector2D(closestX * tileSizeX, closestY * tileSizeY));
 
 	int closestXTarget = (targetLoc.x / tileSizeX);
 	int closestYTarget = (targetLoc.y / tileSizeY);
@@ -86,39 +102,18 @@ std::stack<Vector2D> NavigationManager::CalculatePath(const Vector2D& curLoc, co
 		return path;
 	}
 
-
-
 	// list yet to be tested
 	std::priority_queue<Node*, std::vector<Node*>, NodeCompare> not_tested;
 	not_tested.push(current);
 
-
-	// visited map
-	std::map<int, bool> visited;
-
-	// current parent node map
-	std::map<Node*, Node*> parents;
-
-	// fLocal and fGlobal map
-	std::map<Node*, int> goals;
-
-
 	// set up data structures
-	for (int y = 0; y < navMesh.cols; y++)
-	{
-		for (int x = 0; x < navMesh.rows; x++)
-		{
-			visited[x*y] = false;
-			parents[navMesh(x, y)] = nullptr;
-			goals[navMesh(x, y)] = INT_MAX;
-		}
-	}
-
+	Restart();
 
 	// Initialize currrent
-	goals[current] = Math::distance(current->x, current->y, target->x, target->y);
+	goals[current] = Math::distanceNoSqrt(current->x, current->y, target->x, target->y);
 
 	// while there are nodes not yet tested
+<<<<<<< HEAD
 
 	int numCalls = 0;
 	while (!not_tested.empty() && current != target)
@@ -127,6 +122,10 @@ std::stack<Vector2D> NavigationManager::CalculatePath(const Vector2D& curLoc, co
 		///not_tested.sort([](const Node* nA, const Node* nB) {return nA->fGlobal < nB->fGlobal; });
 		//not_tested.([goals](Node* nA, Node* nB) {return goals.at(nA).second < goals.at(nB).second; });
 
+=======
+	while (!not_tested.empty() && current != target)
+	{
+>>>>>>> collision
 		// if the node has been visited, remove it
 		while (!not_tested.empty() && visited[not_tested.top()->ID])
 		{
@@ -147,7 +146,6 @@ std::stack<Vector2D> NavigationManager::CalculatePath(const Vector2D& curLoc, co
 		// check all neighbours
 		for (Node * n : navMesh.getNeighbours(current->x, current->y))
 		{
-			numCalls++;
 			if (n != nullptr)
 			{
 				// check if neighbour has already been visited and make sure it is not an obstacle
@@ -159,7 +157,7 @@ std::stack<Vector2D> NavigationManager::CalculatePath(const Vector2D& curLoc, co
 				}
 
 				// calculate the neighbour's local goals
-				float lowestGoal = goals[current] + Math::distance(n->x, n->y, current->x, current->y);
+				float lowestGoal = goals[current] + Math::distanceNoSqrt(n->x, n->y, current->x, current->y);
 
 				float local = goals[n];
 				// check if the lowest local goal is smaller than the neighbour's previous local goal
@@ -172,20 +170,19 @@ std::stack<Vector2D> NavigationManager::CalculatePath(const Vector2D& curLoc, co
 					goals[n] = lowestGoal;
 
 					// set the neighbour's global goal to the local goal plus the distance to the target
-					n->globalDist = goals[n] + Math::distance(n->x, n->y, target->x, target->y);
+					n->globalDist = goals[n] + Math::distanceNoSqrt(n->x, n->y, target->x, target->y);
 				}
-
 			}
-
 		}
-
-
 	}
+<<<<<<< HEAD
 	for (int i = 0; i < navMesh.mesh.size(); i++)
 	{
 		navMesh.mesh[i]->globalDist = INT_MAX;
 	}
 	
+=======
+>>>>>>> collision
 
 	// Backtrack through the parent map to find the final path
 	if (current != nullptr)
@@ -200,4 +197,24 @@ std::stack<Vector2D> NavigationManager::CalculatePath(const Vector2D& curLoc, co
 	path.push(curLoc);
 
 	return path;
+}
+
+void NavigationManager::Restart()
+{
+	for (auto it = visited.begin(); it != visited.end(); ++it)
+	{
+		it->second = false;
+	}
+	for (auto it = parents.begin(); it != parents.end(); ++it)
+	{
+		it->second = nullptr;
+	}
+	for (auto it = goals.begin(); it != goals.end(); ++it)
+	{
+		it->second = INT_MAX;
+	}
+	for (int n = 0; n < navMesh.mesh.size(); ++n)
+	{
+		navMesh.mesh[n]->globalDist = INT_MAX;
+	}
 }

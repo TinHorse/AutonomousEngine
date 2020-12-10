@@ -6,6 +6,9 @@
 #include "Collision.h"
 #include "AssetManager.h"
 #include "NavigationManager.h"
+#include "CollisionManager.h"
+#include <chrono>
+using namespace std::chrono;
 
 
 Map *map;
@@ -16,8 +19,9 @@ EntityManager manager;
 Camera Game::camera = Camera(0, 0, 800, 640);
 
 AssetManager *Game::assets = new AssetManager(&manager);
+NavigationManager navigationMan;
+CollisionManager collisionMan;
 
-NavigationManager nav;
 
 bool Game::isRunning = false;
 
@@ -63,26 +67,43 @@ void Game::Init(const char * title, int xpos, int ypos, int width, int height, b
 	// load assets
 	assets->AddTexture("terrain", "assets/tileset.png");
 	assets->AddTexture("player", "assets/player_animated.png");
+	assets->AddTexture("collider", "assets/colliderTex.png");
 
 
 	// load map
 	map = new Map("terrain", 32, 1);
+<<<<<<< HEAD
 	map->LoadMap("assets/tilemap.txt", 30, 30);
 
 	// Load navigation
 	nav.LoadMesh("assets/collisionmap.txt", 30, 30, 32, 32, 1);
+=======
+	map->LoadMap("assets/tilemap.txt", 40, 40);
+
+	// Load navigation
+	navigationMan.LoadMesh("assets/collisionmap.txt", 40, 40, 32, 32, 1);
+	navigationMan.Init();
+>>>>>>> collision
 
 	player = &assets->CreatePlayer(Vector2D(200,200), 90, 90, 0.25f);
 
+	// Load collision
+	collisionMan.LoadMesh("assets/collisionmap.txt", 40, 40, 32, 32, 1);
 
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 1; i++)
 	{
+<<<<<<< HEAD
 		for (int j = 0; j < 2; j++)
 		{
 			Entity& agent = assets->CreateAgent(Vector2D(i * 50, j * 50), 90, 90, 0.25f);
+=======
+		for (int j = 0; j < 1; j++)
+		{
+			Entity& agent = assets->CreateAgent(Vector2D(i * 20, j * 20), 90, 90, 0.25f);
+			agent.GetComponent<PathfindingComponent>().FindPath(Vector2D(600-(i*50), 600-(j*50)));
+>>>>>>> collision
 		}
 	}
-
 }
 
 auto& players(manager.GetGroup(Game::groupPlayers));
@@ -142,12 +163,8 @@ void Game::Update()
 		camera.camRect.y = camera.camRect.h;
 	}
 
-	ColliderComponent& playerCollider = player->GetComponent<ColliderComponent>();
-	for (auto& c : colliders)
-	{
-		Collision::AABB(c->GetComponent<ColliderComponent>(), playerCollider);
-	}
-
+	// Collision
+	collisionMan.CalculateCollision();
 }
 
 void Game::Render() // note that all draw function have to be called inside the SDL Renderer
@@ -172,7 +189,11 @@ void Game::Render() // note that all draw function have to be called inside the 
 	{
 		a->Draw();
 	}
+<<<<<<< HEAD
 	
+=======
+
+>>>>>>> collision
 	SDL_RenderPresent(renderer);
 }
 

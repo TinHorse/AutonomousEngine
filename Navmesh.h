@@ -13,7 +13,7 @@ struct Node
 	{
 		ID = ++NodeID;
 	}
-	bool operator==(Node& node)
+	bool operator==(const Node& node)
 	{
 		return this->ID == node.ID;
 	}
@@ -33,6 +33,7 @@ public:
 	{
 		cols = mCols;
 		rows = mRows;
+		neighbours = std::vector<Node*>(8);
 	}
 	Node* operator()(const int& x, const int& y)
 	{
@@ -45,32 +46,31 @@ public:
 			return nullptr;
 		}
 	}
-	std::vector<Node*> getNeighbours(const int& x, const int& y)
+	const std::vector<Node*>& getNeighbours(const int& x, const int& y)
 	{
-		std::vector<Node*> neighbours;
 		if (boundsCheck((y) * cols + x + 1)) {
-			neighbours.push_back(mesh[(y)* cols + x]);
+			neighbours[0] = (mesh[(y)* cols + x + 1]);
 		}
 		if (boundsCheck((y + 1) * cols + x + 1)) {
-			neighbours.push_back(mesh[(y + 1) * cols + x + 1]);
+			neighbours[1] = (mesh[(y + 1) * cols + x + 1]);
 		}
 		if (boundsCheck((y + 1) * cols + x)) {
-			neighbours.push_back(mesh[(y + 1) * cols + x]);
+			neighbours[2] = (mesh[(y + 1) * cols + x]);
 		}
 		if (boundsCheck((y + 1) * cols + x - 1)) {
-			neighbours.push_back(mesh[(y + 1) * cols + x - 1]);
+			neighbours[3] = (mesh[(y + 1) * cols + x - 1]);
 		}
 		if (boundsCheck((y) * cols + x - 1)) {
-			neighbours.push_back(mesh[(y)* cols + x - 1]);
+			neighbours[4] = (mesh[(y)* cols + x - 1]);
 		}
 		if (boundsCheck((y - 1) * cols + x - 1)) {
-			neighbours.push_back(mesh[(y - 1) * cols + x - 1]);
+			neighbours[5] = (mesh[(y - 1) * cols + x - 1]);
 		}
 		if (boundsCheck((y - 1) * cols + x)) {
-			neighbours.push_back(mesh[(y - 1) * cols + x]);
+			neighbours[6] = (mesh[(y - 1) * cols + x]);
 		}
 		if (boundsCheck((y - 1) * cols + x + 1)) {
-			neighbours.push_back(mesh[(y - 1) * cols + x + 1]);
+			neighbours[7] = (mesh[(y - 1) * cols + x + 1]);
 		}
 
 		return neighbours;
@@ -83,6 +83,7 @@ public:
 
 	int cols, rows;
 	std::vector<Node*> mesh;
+	std::vector<Node*> neighbours;
 };
 
 struct NodeCompare

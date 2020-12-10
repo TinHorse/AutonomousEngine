@@ -105,6 +105,14 @@ public:
 		return *static_cast<T*>(ptr); // static cast the pointer, which converts the pointer to a pointer to the type of the component, rather than being a pointer to its base class Component
 		// NOTE on static cast: new_type value = static_cast <new_type> (expression);
 	}
+
+	template<typename T>
+	inline T * GetComponentPtr() const
+	{
+		auto ptr(componentArray[GetComponentTypeID<T>()]); // create pointer to transform of component in component array
+		return static_cast<T*>(ptr); // static cast the pointer, which converts the pointer to a pointer to the type of the component, rather than being a pointer to its base class Component
+		// NOTE on static cast: new_type value = static_cast <new_type> (expression);
+	}
 	
 private:
 	EntityManager& manager;

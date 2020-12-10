@@ -21,20 +21,15 @@ public:
 
 	void Update() override
 	{
+		transform->velocity = { 0,0 };
 		if (moving)
 		{
+			transform->velocity = Vector2D(path.top() - transform->position).Normalize() * transform->speed;
 			if (Math::distance(transform->position, path.top()) < 10)
 			{
 				// else, pull up next target
 				path.pop();
-				if (!path.empty())
-				{
-					Vector2D next = path.top();
-					Vector2D p = (next - transform->position);
-					Vector2D norm = p.Normalize();
-					transform->velocity = norm * transform->speed;
-				}
-				else
+				if (path.empty())
 				{
 					moving = false;
 					transform->velocity = {0,0};
@@ -48,6 +43,8 @@ public:
 		path = std::move(navigationMan.CalculatePath(transform->position, target));
 		if (!path.empty())
 		{
+			path.pop();
+			next = path.top();
 			moving = true;
 		}
 	}
@@ -55,6 +52,7 @@ public:
 private:
 	TransformComponent *transform;
 	std::stack<Vector2D> path;
+	Vector2D next;
 	bool moving;
 
 };

@@ -1,8 +1,9 @@
 #include "CollisionManager.h"
+#include "Collision.h"
 #include <fstream>
 
 extern EntityManager manager;
-int Matrix::matIndex = 1;
+int CollisionMesh::matIndex = 1;
 
 void CollisionManager::LoadMesh(const char * path, int sX, int sY, int sTileX, int sTileY, int scale)
 {
@@ -37,46 +38,76 @@ void CollisionManager::LoadMesh(const char * path, int sX, int sY, int sTileX, i
 	stream.close();
 }
 
-void CollisionManager::AddAgent(const Entity & agent)
-{
-	dynamic_colliders.push_back(agent.GetComponentPtr<ColliderComponent>());
-}
-
 void CollisionManager::CalculateCollision()
 {
-	//int numCalls = 0;
-
-	for (ColliderComponent* dynCol : dynamic_colliders)
+	for (Entity* dynCol : manager.GetGroup(Game::groupAgents))
 	{
+
 		// determine node position
-		int x = dynCol->transform->position.x / tileSizeX;
-		int y = dynCol->transform->position.y / tileSizeY;
+		int x = dynCol->GetComponent<ColliderComponent>().transform->position.x / tileSizeX;
+		int y = dynCol->GetComponent<ColliderComponent>().transform->position.y / tileSizeY;
 		
 		// check collision with static colliders
 		
+		Vector2D force;
 		for (auto *n : colMat.getRegion(x, y))
 		{
 			if (n != nullptr)
 			{
-				//numCalls++;
-				if (Collision::AABB(*dynCol, *n))
+				if (Collision::AABB(dynCol->GetComponent<ColliderComponent>(), *n))
 				{
-					dynCol->entity->GetComponent<TransformComponent>().velocity = { 0,0 };
+					force += Collision::CalculateOpposingForce(dynCol->GetComponent<ColliderComponent>(), *n);
 				}
 			}			
 		}
+		dynCol->GetComponent<TransformComponent>().velocity += force;
+		dynCol->GetComponent<TransformComponent>().velocity.Normalize() * dynCol->GetComponent<TransformComponent>().speed;
+		
 
-
-		for (ColliderComponent* dynCol2 : dynamic_colliders)
+		for (Entity* dynCol2 : manager.GetGroup(Game::groupAgents))
 		{
 			if (dynCol != dynCol2)
 			{
-				if (Collision::AABB(*dynCol, *dynCol2))
+				if (Collision::AABB(dynCol->GetComponent<ColliderComponent>(), dynCol2->GetComponent<ColliderComponent>()))
 				{
-					dynCol->entity->GetComponent<TransformComponent>().velocity * -1;
+					//dynCol->GetComponent<TransformComponent>().velocity * -1;
 				}
 			}
 		}
 	}
-	//std::cout << "num " << numCalls << std::endl;
+
+	for (Entity* dynCol : manager.GetGroup(Game::groupPlayers))
+	{
+
+		// determine node position
+		int x = dynCol->GetComponent<ColliderComponent>().transform->position.x / tileSizeX;
+		int y = dynCol->GetComponent<ColliderComponent>().transform->position.y / tileSizeY;
+
+		// check collision with static colliders
+
+		for (auto *n : colMat.getRegion(x, y))
+		{
+			if (n != nullptr)
+			{
+				if (Collision::AABB(dynCol->GetComponent<ColliderComponent>(), *n))
+				{
+					//dynCol->GetComponent<TransformComponent>().velocity += Collision::CalculateOpposingForce(dynCol->GetComponent<ColliderComponent>(), *n).Normalize();
+				}
+			}
+		}
+
+		Vector2D force;
+		for (Entity* dynCol2 : manager.GetGroup(Game::groupColliders))
+		{
+			if (dynCol != dynCol2)
+			{
+				if (Collision::AABB(dynCol->GetComponent<ColliderComponent>(), dynCol2->GetComponent<ColliderComponent>()))
+				{
+					force += Collision::CalculateOpposingForce(dynCol->GetComponent<ColliderComponent>(), dynCol2->GetComponent<ColliderComponent>());
+				}
+			}
+		}
+		dynCol->GetComponent<TransformComponent>().velocity += force;
+		dynCol->GetComponent<TransformComponent>().velocity.Normalize() * dynCol->GetComponent<TransformComponent>().speed;
+	}
 }

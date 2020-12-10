@@ -149,6 +149,7 @@ std::stack<Vector2D> NavigationManager::CalculatePath(Vector2D curLoc, Vector2D 
 	}
 	path.pop();
 	path.push(curLoc);
+
 	return path;
 }
 

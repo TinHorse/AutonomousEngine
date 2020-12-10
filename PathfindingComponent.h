@@ -39,13 +39,10 @@ public:
 	}
 
 	void FindPath(Vector2D target)
-<<<<<<< HEAD
 	{		
 		path = nav.CalculatePath(transform->position, target);
-=======
 	{
 		path = std::move(navigationMan.CalculatePath(transform->position, target));
->>>>>>> collision
 		if (!path.empty())
 		{
 			path.pop();

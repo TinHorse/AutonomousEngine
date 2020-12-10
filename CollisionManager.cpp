@@ -1,5 +1,6 @@
 #include "CollisionManager.h"
 #include "Collision.h"
+#include "ECS.h"
 #include <fstream>
 
 extern EntityManager manager;

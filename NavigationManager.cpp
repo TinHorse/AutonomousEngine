@@ -1,24 +1,8 @@
 #include "NavigationManager.h"
 #include <fstream>
-<<<<<<< HEAD
-#include <map>
+
 #include <queue>
 #include "Math.h"
-#include "Vector2D.h"
-
-#include <chrono>
-using namespace std::chrono;
-
-
-
-float heuristic(const Node *n, const Node *target)
-{
-	return Math::distance(n->x, n->y, target->x, target->y);
-}
-=======
-#include <queue>
-#include "Math.h"
->>>>>>> collision
 
 NavigationManager::NavigationManager()
 {
@@ -73,16 +57,6 @@ void NavigationManager::LoadMesh(const char * path, int sX, int sY, int sTileX, 
 
 std::stack<Vector2D> NavigationManager::CalculatePath(const Vector2D& curLoc, const Vector2D& targetLoc)
 {
-<<<<<<< HEAD
-	
-	//UPGRADES:
-	// NEIGHBOURS STORAGE IN NODES
-
-
-	//std::queue<Vector2D> path;
-	//path.push(curLoc);
-=======
->>>>>>> collision
 	int closestX = (curLoc.x / tileSizeX);
 	int closestY = (curLoc.y / tileSizeY);
 
@@ -113,19 +87,10 @@ std::stack<Vector2D> NavigationManager::CalculatePath(const Vector2D& curLoc, co
 	goals[current] = Math::distanceNoSqrt(current->x, current->y, target->x, target->y);
 
 	// while there are nodes not yet tested
-<<<<<<< HEAD
 
 	int numCalls = 0;
 	while (!not_tested.empty() && current != target)
 	{
-		// sort list by global goal (min). Note that global goal is distance to target
-		///not_tested.sort([](const Node* nA, const Node* nB) {return nA->fGlobal < nB->fGlobal; });
-		//not_tested.([goals](Node* nA, Node* nB) {return goals.at(nA).second < goals.at(nB).second; });
-
-=======
-	while (!not_tested.empty() && current != target)
-	{
->>>>>>> collision
 		// if the node has been visited, remove it
 		while (!not_tested.empty() && visited[not_tested.top()->ID])
 		{
@@ -175,14 +140,6 @@ std::stack<Vector2D> NavigationManager::CalculatePath(const Vector2D& curLoc, co
 			}
 		}
 	}
-<<<<<<< HEAD
-	for (int i = 0; i < navMesh.mesh.size(); i++)
-	{
-		navMesh.mesh[i]->globalDist = INT_MAX;
-	}
-	
-=======
->>>>>>> collision
 
 	// Backtrack through the parent map to find the final path
 	if (current != nullptr)

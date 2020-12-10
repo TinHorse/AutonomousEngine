@@ -61,11 +61,22 @@ void CollisionManager::CalculateCollision()
 				//numCalls++;
 				if (Collision::AABB(*dynCol, *n))
 				{
-					//dynCol->entity->GetComponent<TransformComponent>().velocity = { 0,0 };
+					dynCol->entity->GetComponent<TransformComponent>().velocity = { 0,0 };
 				}
 			}			
 		}
-		
+
+
+		for (ColliderComponent* dynCol2 : dynamic_colliders)
+		{
+			if (dynCol != dynCol2)
+			{
+				if (Collision::AABB(*dynCol, *dynCol2))
+				{
+					dynCol->entity->GetComponent<TransformComponent>().velocity * -1;
+				}
+			}
+		}
 	}
 	//std::cout << "num " << numCalls << std::endl;
 }

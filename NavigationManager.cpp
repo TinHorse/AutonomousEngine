@@ -10,11 +10,6 @@
 #include <chrono>
 using namespace std::chrono;
 
-float heuristic(const Node *n, const Node *target)
-{
-	return Math::distance(n->x, n->y, target->x, target->y);
-}
-
 NavigationManager::NavigationManager()
 {
 	
@@ -107,7 +102,7 @@ std::stack<Vector2D> NavigationManager::CalculatePath(Vector2D curLoc, Vector2D 
 	Clean();
 
 	// Initialize currrent
-	goals[current] = Math::distance(current->x, current->y, target->x, target->y);
+	goals[current] = Math::distanceNoSqrt(current->x, current->y, target->x, target->y);
 
 	// while there are nodes not yet tested
 
@@ -152,7 +147,7 @@ std::stack<Vector2D> NavigationManager::CalculatePath(Vector2D curLoc, Vector2D 
 				}
 
 				// calculate the neighbour's local goals
-				float lowestGoal = goals[current] + Math::distance(n->x, n->y, current->x, current->y);
+				float lowestGoal = goals[current] + Math::distanceNoSqrt(n->x, n->y, current->x, current->y);
 
 				float local = goals[n];
 				// check if the lowest local goal is smaller than the neighbour's previous local goal
@@ -165,7 +160,7 @@ std::stack<Vector2D> NavigationManager::CalculatePath(Vector2D curLoc, Vector2D 
 					goals[n] = lowestGoal;
 
 					// set the neighbour's global goal to the local goal plus the distance to the target
-					n->globalDist = goals[n] + Math::distance(n->x, n->y, target->x, target->y);
+					n->globalDist = goals[n] + Math::distanceNoSqrt(n->x, n->y, target->x, target->y);
 				}
 
 			}

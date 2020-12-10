@@ -11,5 +11,9 @@ struct Math
 	{
 		return sqrt((Ax - Bx) * (Ax - Bx) + (Ay - By) * (Ay - By));
 	}
+	static float distanceNoSqrt(float Ax, float Ay, float Bx, float By)
+	{
+		return (Ax - Bx) * (Ax - Bx) + (Ay - By) * (Ay - By);
+	}
 
 };

@@ -88,7 +88,14 @@ void Game::Init(const char * title, int xpos, int ypos, int width, int height, b
 		for (int j = 0; j < 20; j++)
 		{
 			Entity& agent = assets->CreateAgent(Vector2D(i * 20, j * 20), 90, 90, 0.25f);
+
+			auto start = high_resolution_clock::now(); //
 			agent.GetComponent<PathfindingComponent>().FindPath(Vector2D(600-(i*20), 600-(j*20)));
+
+			auto stop = high_resolution_clock::now(); //
+			auto duration = duration_cast<microseconds>(stop - start);
+			std::cout << "manager " << duration.count() << std::endl;
+
 			collisionMan.AddAgent(agent);
 		}
 	}

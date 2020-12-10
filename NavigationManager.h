@@ -15,7 +15,7 @@ public:
 	void LoadMesh(const char *path, int sX, int sY, int sTileX, int sTileY, int scale);
 	std::stack<Vector2D> CalculatePath(Vector2D curLoc, Vector2D targetLoc);
 
-	void Clean();
+	void Restart();
 
 private:
 	NavMesh navMesh;

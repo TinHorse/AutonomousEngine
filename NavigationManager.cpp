@@ -1,14 +1,7 @@
 #include "NavigationManager.h"
 #include <fstream>
-#include <list>
-#include <map>
 #include <queue>
 #include "Math.h"
-#include "Vector2D.h"
-#include <array>
-#include <vector>
-#include <chrono>
-using namespace std::chrono;
 
 NavigationManager::NavigationManager()
 {
@@ -48,7 +41,6 @@ void NavigationManager::LoadMesh(const char * path, int sX, int sY, int sTileX, 
 			stream.get(c);
 			if (c == '1')
 			{
-				///navMesh(x, y) = atoi(&c);
 				navMesh.mesh.push_back(new Node(x,y, true));
 			}
 			else
@@ -64,16 +56,8 @@ void NavigationManager::LoadMesh(const char * path, int sX, int sY, int sTileX, 
 
 std::stack<Vector2D> NavigationManager::CalculatePath(Vector2D curLoc, Vector2D targetLoc)
 {
-	//UPGRADES:
-	// NEIGHBOURS STORAGE IN NODES
-	auto start = high_resolution_clock::now();
-
-	//std::queue<Vector2D> path;
-	//path.push(curLoc);
 	int closestX = (curLoc.x / tileSizeX);
 	int closestY = (curLoc.y / tileSizeY);
-
-	//path.push(Vector2D(closestX * tileSizeX, closestY * tileSizeY));
 
 	int closestXTarget = (targetLoc.x / tileSizeX);
 	int closestYTarget = (targetLoc.y / tileSizeY);
@@ -91,30 +75,19 @@ std::stack<Vector2D> NavigationManager::CalculatePath(Vector2D curLoc, Vector2D 
 		return path;
 	}
 
-
-
 	// list yet to be tested
 	std::priority_queue<Node*, std::vector<Node*>, NodeCompare> not_tested;
 	not_tested.push(current);
 
-	
 	// set up data structures
-	Clean();
+	Restart();
 
 	// Initialize currrent
 	goals[current] = Math::distanceNoSqrt(current->x, current->y, target->x, target->y);
 
 	// while there are nodes not yet tested
-
-	int numCalls = 0;
-
 	while (!not_tested.empty() && current != target)
 	{
-
-		// sort list by global goal (min). Note that global goal is distance to target
-		///not_tested.sort([](const Node* nA, const Node* nB) {return nA->fGlobal < nB->fGlobal; });
-		//not_tested.([goals](Node* nA, Node* nB) {return goals.at(nA).second < goals.at(nB).second; });
-
 		// if the node has been visited, remove it
 		while (!not_tested.empty() && visited[not_tested.top()->ID])
 		{
@@ -135,7 +108,6 @@ std::stack<Vector2D> NavigationManager::CalculatePath(Vector2D curLoc, Vector2D 
 		// check all neighbours
 		for (Node * n : navMesh.getNeighbours(current->x, current->y))
 		{
-			numCalls++;
 			if (n != nullptr)
 			{
 				// check if neighbour has already been visited and make sure it is not an obstacle
@@ -162,15 +134,9 @@ std::stack<Vector2D> NavigationManager::CalculatePath(Vector2D curLoc, Vector2D 
 					// set the neighbour's global goal to the local goal plus the distance to the target
 					n->globalDist = goals[n] + Math::distanceNoSqrt(n->x, n->y, target->x, target->y);
 				}
-
 			}
-
 		}
-
-
 	}
-
-
 
 	// Backtrack through the parent map to find the final path
 	if (current != nullptr)
@@ -183,17 +149,10 @@ std::stack<Vector2D> NavigationManager::CalculatePath(Vector2D curLoc, Vector2D 
 	}
 	path.pop();
 	path.push(curLoc);
-
-
-
-	auto stop = high_resolution_clock::now();
-	auto duration = duration_cast<microseconds>(stop - start);
-	std::cout << "manager " << duration.count() << std::endl;
-
 	return path;
 }
 
-void NavigationManager::Clean()
+void NavigationManager::Restart()
 {
 	for (auto it = visited.begin(); it != visited.end(); ++it)
 	{

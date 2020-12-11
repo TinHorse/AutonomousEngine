@@ -57,7 +57,7 @@ public:
 
 	void addNode(ColliderComponent* comp)
 	{
-		nodes.insert(std::make_pair(matIndex++, comp));
+		nodes.insert(std::make_pair(++matIndex, comp));
 	}
 
 	int cols, rows;

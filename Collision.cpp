@@ -62,10 +62,6 @@ Vector2D Collision::CalculateOpposingForce(const SDL_Rect & rectA, const SDL_Rec
 	{
 		return Vector2D(0, -1);
 	}
-	else
-	{
-		return Vector2D(rectA.x + (rectA.w / 2.f) - rectB.x + (rectB.w / 2.f),rectA.y + (rectA.h / 2.f) - rectB.y + (rectB.h / 2.f)).Normalize();
-	}
 
 }
 

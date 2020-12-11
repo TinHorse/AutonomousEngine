@@ -77,17 +77,17 @@ void Game::Init(const char * title, int xpos, int ypos, int width, int height, b
 	navigationMan.LoadMesh("assets/collisionmap.txt", 40, 40, 32, 32, 1);
 	navigationMan.Init();
 
-	player = &assets->CreatePlayer(Vector2D(200,200), 90, 90, 0.25f);
+	player = &assets->CreatePlayer(Vector2D(225,200), 90, 90, 0.25f);
 
 	// Load collision
 	collisionMan.LoadMesh("assets/collisionmap.txt", 40, 40, 32, 32, 1);
 
-	for (int i = 0; i < 1; i++)
+	for (int i = 0; i < 5; i++)
 	{
-		for (int j = 0; j < 1; j++)
+		for (int j = 0; j < 5; j++)
 		{
 			Entity& agent = assets->CreateAgent(Vector2D(i * 20, j * 20), 90, 90, 0.25f);
-			agent.GetComponent<PathfindingComponent>().FindPath(Vector2D(600-(i*50), 600-(j*50)));
+			agent.GetComponent<PathfindingComponent>().FindPath(Vector2D(600,600));
 		}
 	}
 }

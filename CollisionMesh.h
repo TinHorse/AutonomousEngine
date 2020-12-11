@@ -25,33 +25,15 @@ public:
 	}
 	const std::vector<ColliderComponent*>& getRegion(const int& x, const int& y)
 	{
-		if (DoesNodeExist((y)* cols + x)) {
-			neighbours[0] = nodes[(mesh[y* cols + x])];
-		}
-		if (DoesNodeExist((y)* cols + x + 1)) {
-			neighbours[1] = nodes[(mesh[(y)* cols + x + 1])];
-		}
-		if (DoesNodeExist((y + 1) * cols + x + 1)) {
-			neighbours[2] = nodes[(mesh[(y + 1) * cols + x + 1])];
-		}
-		if (DoesNodeExist((y + 1) * cols + x)) {
-			neighbours[3] = nodes[(mesh[(y + 1) * cols + x])];
-		}
-		if (DoesNodeExist((y + 1) * cols + x - 1)) {
-			neighbours[4] = nodes[(mesh[(y + 1) * cols + x - 1])];
-		}
-		if (DoesNodeExist((y)* cols + x - 1)) {
-			neighbours[5] = nodes[(mesh[(y)* cols + x - 1])];
-		}
-		if (DoesNodeExist((y - 1) * cols + x - 1)) {
-			neighbours[6] = nodes[(mesh[(y - 1) * cols + x - 1])];
-		}
-		if (DoesNodeExist((y - 1) * cols + x)) {
-			neighbours[7] = nodes[(mesh[(y - 1) * cols + x])];
-		}
-		if (DoesNodeExist((y - 1) * cols + x + 1)) {
-			neighbours[8] = nodes[(mesh[(y - 1) * cols + x + 1])];
-		}
+			neighbours[0] = GetNodeAtPosition(y* cols + x);
+			neighbours[1] = GetNodeAtPosition(y* cols + x + 1);
+			neighbours[2] = GetNodeAtPosition((y + 1) * cols + x + 1);
+			neighbours[3] = GetNodeAtPosition((y + 1) * cols + x);
+			neighbours[4] = GetNodeAtPosition((y + 1) * cols + x - 1);
+			neighbours[5] = GetNodeAtPosition(y* cols + x - 1);
+			neighbours[6] = GetNodeAtPosition((y - 1) * cols + x - 1);
+			neighbours[7] = GetNodeAtPosition((y - 1) * cols + x);
+			neighbours[8] = GetNodeAtPosition((y - 1) * cols + x + 1);
 
 		return neighbours;
 	}
@@ -63,6 +45,14 @@ public:
 	bool DoesNodeExist(const int& index)
 	{
 		return (index >= 0 && index < mesh.size() && mesh[index] != 0);
+	}
+	ColliderComponent* GetNodeAtPosition(const int& index)
+	{
+		if (index >= 0 && index < mesh.size() && mesh[index] != 0)
+		{
+			return nodes[(mesh[index])];
+		}
+		return nullptr;
 	}
 
 	void addNode(ColliderComponent* comp)

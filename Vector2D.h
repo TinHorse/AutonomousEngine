@@ -16,10 +16,10 @@ public:
 	
 	// v1 = v1 + v2;
 	// NOTE: 
-	friend Vector2D& operator+(Vector2D v1, const Vector2D& v2);
-	friend Vector2D& operator-(Vector2D v1, const Vector2D& v2);
-	friend Vector2D& operator*(Vector2D v1, const Vector2D& v2);
-	friend Vector2D& operator/(Vector2D v1, const Vector2D& v2);
+	friend Vector2D& operator+(Vector2D& v1, const Vector2D& v2);
+	friend Vector2D& operator-(Vector2D& v1, const Vector2D& v2);
+	friend Vector2D& operator*(Vector2D& v1, const Vector2D& v2);
+	friend Vector2D& operator/(Vector2D& v1, const Vector2D& v2);
 
 	// v1 += v2;
 	Vector2D& operator+=(const Vector2D& vec);
@@ -31,14 +31,13 @@ public:
 	Vector2D& operator=(const Vector2D vec);
 
 	// v1 * int
-	Vector2D& operator*(const float f);
-
-
+	Vector2D& operator*(const float& f);
 	Vector2D& operator*(const int& i);
+
+	Vector2D& operator+(const float& f);
+
 	Vector2D& Zero();
 	Vector2D& Normalize();
 
 	friend std::ostream& operator<<(std::ostream& stream, const Vector2D& vec);
-
-	Vector2D& Dot(const Vector2D& v);
 };

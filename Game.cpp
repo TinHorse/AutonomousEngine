@@ -15,7 +15,8 @@ Map *map;
 SDL_Renderer *Game::renderer = nullptr;
 SDL_Event Game::event;
 EntityManager manager;
-Camera Game::camera = Camera(0, 0, 800, 640);
+
+Camera Game::camera = Camera();
 
 AssetManager *Game::assets = new AssetManager(&manager);
 NavigationManager navigationMan;
@@ -63,13 +64,13 @@ void Game::Init(const char * title, int xpos, int ypos, int width, int height, b
 		isRunning = false;
 	}
 
-	// load assets
+	// Load assets
 	assets->AddTexture("terrain", "assets/tileset.png");
 	assets->AddTexture("player", "assets/player_animated.png");
 	assets->AddTexture("collider", "assets/colliderTex.png");
 
 
-	// load map
+	// Load map
 	map = new Map("terrain", 32, 1);
 	map->LoadMap("assets/tilemap.txt", 40, 40);
 
@@ -82,6 +83,12 @@ void Game::Init(const char * title, int xpos, int ypos, int width, int height, b
 	// Load collision
 	collisionMan.LoadMesh("assets/collisionmap.txt", 40, 40, 32, 32, 1);
 
+	// Initialize camera
+	auto& t = player->GetComponent<TransformComponent>();
+	camera.Init(t.position.x, t.position.y, 800, 600);
+
+
+	// Pathfinding example
 	for (int i = 0; i < 5; i++)
 	{
 		for (int j = 0; j < 5; j++)
@@ -115,26 +122,8 @@ void Game::Update()
 	cnt++;
 	manager.Refresh();
 	manager.Update();
-	camera.camRect.x;
-	camera.camRect.x = player->GetComponent<TransformComponent>().position.x - 400;
-	camera.camRect.y = player->GetComponent<TransformComponent>().position.y - 320;
 
-	if (camera.camRect.x < 0)
-	{
-		camera.camRect.x = 0;
-	}
-	if (camera.camRect.y < 0)
-	{
-		camera.camRect.y = 0;
-	}
-	if (camera.camRect.x > camera.camRect.w)
-	{
-		camera.camRect.x = camera.camRect.w;
-	}
-	if (camera.camRect.y > camera.camRect.h)
-	{
-		camera.camRect.y = camera.camRect.h;
-	}
+	camera.Update(player->GetComponent<TransformComponent>().position.x - 400, player->GetComponent<TransformComponent>().position.y - 300);
 
 	// Collision
 	collisionMan.CalculateCollision();

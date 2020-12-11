@@ -39,8 +39,8 @@ public:
 
 	void Update() override
 	{
-		destRect.x = position.x - Game::camera.camRect.x;
-		destRect.y = position.y - Game::camera.camRect.y;
+		destRect.x = position.x - Game::camera.getX();
+		destRect.y = position.y - Game::camera.getY();
 	}
 
 	void Draw() override

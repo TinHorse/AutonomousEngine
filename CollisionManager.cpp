@@ -76,12 +76,26 @@ void CollisionManager::CalculateCollision()
 			}
 		}
 
+		for (Entity* dynCol2 : manager.GetGroup(Game::groupPlayers))
+		{
+			if (dynCol != dynCol2)
+			{
+				if (Collision::AABB(dynCol->GetComponent<ColliderComponent>(), dynCol2->GetComponent<ColliderComponent>()))
+				{
+					force += Collision::CalculateOpposingForce(dynCol->GetComponent<ColliderComponent>(), dynCol2->GetComponent<ColliderComponent>());
+				}
+			}
+		}
+
 		dynCol->GetComponent<TransformComponent>().velocity += force;
 		dynCol->GetComponent<TransformComponent>().velocity.Normalize();
 	}
 
+
+
 	for (Entity* dynCol : manager.GetGroup(Game::groupPlayers))
 	{
+		bool colliding = false;
 		// determine node position
 		x = dynCol->GetComponent<ColliderComponent>().transform->position.x / tileSizeX;
 		y = dynCol->GetComponent<ColliderComponent>().transform->position.y / tileSizeY;

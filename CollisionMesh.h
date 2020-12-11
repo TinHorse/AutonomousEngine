@@ -59,7 +59,7 @@ public:
 	{
 		nodes.insert(std::make_pair(++matIndex, comp));
 	}
-
+	
 	int cols, rows;
 	static int matIndex;
 	int index;

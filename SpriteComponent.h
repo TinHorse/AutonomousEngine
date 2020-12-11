@@ -57,8 +57,8 @@ public:
 		}
 
 		srcRect.y = animationIndex * transform->height;
-		destRect.x = static_cast<int>(transform->position.x) - Game::camera.camRect.x; // static cast to int, because destRect is expecting an int
-		destRect.y = static_cast<int>(transform->position.y) - Game::camera.camRect.y;
+		destRect.x = static_cast<int>(transform->position.x) - Game::camera.getX(); // static cast to int, because destRect is expecting an int
+		destRect.y = static_cast<int>(transform->position.y) - Game::camera.getY();
 		destRect.w = transform->width * transform->scale;
 		destRect.h = transform->height * transform->scale;
 	}

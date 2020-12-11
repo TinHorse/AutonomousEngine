@@ -45,34 +45,22 @@ bool Collision::SAT(const ColliderComponent & colA, const ColliderComponent & co
 
 Vector2D Collision::CalculateOpposingForce(const SDL_Rect & rectA, const SDL_Rect & rectB)
 {
-	if (
-		rectA.x + rectA.w > rectB.x &&
-		rectA.y + rectA.h > rectB.y &&
-		rectB.x + rectB.w > rectA.x &&
-		rectB.y + rectB.h > rectA.y
-		) {
-	}
-
-	//Vector2D force;
-	if (rectA.x + rectA.w > rectB.x + rectB.w && rectA.y > rectB.y)
+	Vector2D mid(rectA.x + (rectA.w / 2.f), rectA.y + (rectA.h / 2.f));
+	if (mid.x > rectB.x + rectB.w)
 	{
-		return Vector2D(1.5f, 0);
+		return Vector2D(1, 0);
 	}
-	else if (rectA.y + rectA.h > rectB.y + rectB.h && rectA.x +rectA.w < rectB.x + rectB.w)
+	if (mid.x < rectB.x)
 	{
-		return Vector2D(0, 1.5f);
+		return Vector2D(-1, 0);
 	}
-	else if (rectA.x < rectB.x && rectA.y + rectA.h < rectB.y + rectB.h)
+	if (mid.y > rectB.y + rectB.h)
 	{
-		return Vector2D(-1.5f, 0);
+		return Vector2D(0, 1);
 	}
-	else if (rectA.y < rectB.y && rectA.x > rectB.x)
+	if (mid.y < rectB.y)
 	{
-		return Vector2D(0, -1.5f);
-	}
-	else
-	{
-		return Vector2D(0, 0);
+		return Vector2D(0, -1);
 	}
 
 }

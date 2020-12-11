@@ -48,7 +48,6 @@ void CollisionManager::CalculateCollision()
 		int y = dynCol->GetComponent<ColliderComponent>().transform->position.y / tileSizeY;
 		
 		// check collision with static colliders
-		
 		Vector2D force;
 		for (auto *n : colMat.getRegion(x, y))
 		{
@@ -56,12 +55,10 @@ void CollisionManager::CalculateCollision()
 			{
 				if (Collision::AABB(dynCol->GetComponent<ColliderComponent>(), *n))
 				{
-					force += Collision::CalculateOpposingForce(dynCol->GetComponent<ColliderComponent>(), *n);
+					force += Collision::CalculateOpposingForce(dynCol->GetComponent<ColliderComponent>(), *n) * 1000.f;
 				}
 			}			
 		}
-		dynCol->GetComponent<TransformComponent>().velocity += force;
-		dynCol->GetComponent<TransformComponent>().velocity.Normalize() * dynCol->GetComponent<TransformComponent>().speed;
 		
 
 		for (Entity* dynCol2 : manager.GetGroup(Game::groupAgents))
@@ -70,10 +67,13 @@ void CollisionManager::CalculateCollision()
 			{
 				if (Collision::AABB(dynCol->GetComponent<ColliderComponent>(), dynCol2->GetComponent<ColliderComponent>()))
 				{
-					//dynCol->GetComponent<TransformComponent>().velocity * -1;
+					force += Collision::CalculateOpposingForce(dynCol->GetComponent<ColliderComponent>(), dynCol2->GetComponent<ColliderComponent>());
 				}
 			}
 		}
+
+		dynCol->GetComponent<TransformComponent>().velocity += force;
+		dynCol->GetComponent<TransformComponent>().velocity.Normalize() * dynCol->GetComponent<TransformComponent>().speed;
 	}
 
 	for (Entity* dynCol : manager.GetGroup(Game::groupPlayers))
@@ -91,23 +91,20 @@ void CollisionManager::CalculateCollision()
 			{
 				if (Collision::AABB(dynCol->GetComponent<ColliderComponent>(), *n))
 				{
-					//dynCol->GetComponent<TransformComponent>().velocity += Collision::CalculateOpposingForce(dynCol->GetComponent<ColliderComponent>(), *n).Normalize();
+					dynCol->GetComponent<TransformComponent>().velocity = Collision::CalculateOpposingForce(dynCol->GetComponent<ColliderComponent>(), *n);
 				}
 			}
 		}
 
-		Vector2D force;
 		for (Entity* dynCol2 : manager.GetGroup(Game::groupColliders))
 		{
 			if (dynCol != dynCol2)
 			{
 				if (Collision::AABB(dynCol->GetComponent<ColliderComponent>(), dynCol2->GetComponent<ColliderComponent>()))
 				{
-					force += Collision::CalculateOpposingForce(dynCol->GetComponent<ColliderComponent>(), dynCol2->GetComponent<ColliderComponent>());
+					dynCol->GetComponent<TransformComponent>().velocity = Collision::CalculateOpposingForce(dynCol->GetComponent<ColliderComponent>(), dynCol2->GetComponent<ColliderComponent>());
 				}
 			}
 		}
-		dynCol->GetComponent<TransformComponent>().velocity += force;
-		dynCol->GetComponent<TransformComponent>().velocity.Normalize() * dynCol->GetComponent<TransformComponent>().speed;
 	}
 }

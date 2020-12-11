@@ -24,8 +24,7 @@ public:
 		transform->velocity = { 0,0 };
 		if (moving)
 		{
-			next = path.top();
-			transform->velocity = (next - transform->position).Normalize() * transform->speed;
+			transform->velocity = Vector2D(path.top() - transform->position).Normalize() * transform->speed;
 			if (Math::distance(transform->position, path.top()) < 10)
 			{
 				// else, pull up next target
@@ -45,6 +44,7 @@ public:
 		if (!path.empty())
 		{
 			path.pop();
+			next = path.top();
 			moving = true;
 		}
 	}

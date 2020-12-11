@@ -33,7 +33,7 @@ public:
 	{
 		if (!entity->HasComponent<TransformComponent>())
 		{
-			entity->AddComponent<TransformComponent>(collider.x, collider.y);
+			entity->AddComponent<TransformComponent>();
 		}
 		transform = &entity->GetComponent<TransformComponent>();
 

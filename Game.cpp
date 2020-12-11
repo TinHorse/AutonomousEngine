@@ -54,7 +54,7 @@ void Game::Init(const char * title, int xpos, int ypos, int width, int height, b
 		renderer = SDL_CreateRenderer(window, -1, 0);
 		if (renderer)
 		{
-			SDL_SetRenderDrawColor(renderer, 255,255,255,255);
+			SDL_SetRenderDrawColor(renderer, 0,0,0,255);
 			std::cout << "renderer created \n";
 		}
 		isRunning = true;
@@ -101,7 +101,7 @@ void Game::Init(const char * title, int xpos, int ypos, int width, int height, b
 
 auto& players(manager.GetGroup(Game::groupPlayers));
 auto& colliders(manager.GetGroup(Game::groupColliders));
-auto& tiles(manager.GetGroup(Game::groupMap));
+auto& tiles(manager.GetGroup(Game::groupTiles));
 auto& agents(manager.GetGroup(Game::groupAgents));
 
 void Game::HandleEvents()
@@ -123,7 +123,8 @@ void Game::Update()
 	manager.Refresh();
 	manager.Update();
 
-	camera.Update(player->GetComponent<TransformComponent>().position.x - 400, player->GetComponent<TransformComponent>().position.y - 300);
+	Vector2D offset(-400, -300);
+	camera.Update(offset + player->GetComponent<TransformComponent>().position);
 
 	// Collision
 	collisionMan.CalculateCollision();
@@ -134,7 +135,10 @@ void Game::Render() // note that all draw function have to be called inside the 
 	SDL_RenderClear(renderer);
 	for (auto& t : tiles)
 	{
-		t->Draw();
+		if (Math::distance(t->GetComponent<TileComponent>().position, player->GetComponent<TransformComponent>().position) < 300)
+		{
+			t->Draw();
+		}
 	}
 	for (auto& p : players)
 	{
@@ -142,11 +146,17 @@ void Game::Render() // note that all draw function have to be called inside the 
 	}
 	for (auto& c : colliders)
 	{
-		c->Draw();
+		if (Math::distance(c->GetComponent<TransformComponent>().position, player->GetComponent<TransformComponent>().position) < 300)
+		{
+			c->Draw();
+		}
 	}
 	for (auto& a : agents)
 	{
-		a->Draw();
+		if (Math::distance(a->GetComponent<TransformComponent>().position, player->GetComponent<TransformComponent>().position) < 300)
+		{
+			a->Draw();
+		}
 	}
 
 	SDL_RenderPresent(renderer);

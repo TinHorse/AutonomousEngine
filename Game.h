@@ -33,7 +33,7 @@ public:
 
 	enum groupLabels : std::size_t // enums allow users to define their own datatype. 
 	{
-		groupMap,
+		groupTiles,
 		groupPlayers,
 		groupColliders,
 		groupAgents

@@ -1,5 +1,6 @@
 #pragma once
 #include "SDL.h"
+#include "Vector2D.h"
 
 class Camera
 {
@@ -13,36 +14,40 @@ public:
 		camRect.h = mHeight;
 	}
 
-	void Update(int xpos, int ypos)
+	void Update(const Vector2D& pos)
 	{
-		camRect.x = xpos;
-		camRect.y = ypos;
-		if (camRect.x < 0)
+		position = pos;
+		if (position.x < 0)
 		{
-			camRect.x = 0;
+			position.x = 0;
 		}
-		if (camRect.y < 0)
+		if (position.y < 0)
 		{
-			camRect.y = 0;
+			position.y = 0;
 		}
-		if (camRect.x > camRect.w)
+		if (position.x > camRect.w)
 		{
-			camRect.x = camRect.w;
+			position.x = camRect.w;
 		}
-		if (camRect.y > camRect.h)
+		if (position.y > camRect.h)
 		{
-			camRect.y = camRect.h;
+			position.y = camRect.h;
 		}
 	}
 	int getX()
 	{
-		return camRect.x;
+		return position.x;
 	}
 	int getY()
 	{
-		return camRect.y;
+		return position.y;
+	}
+	Vector2D GetPosition()
+	{
+		return position;
 	}
 
 private:
 	SDL_Rect camRect;
+	Vector2D position;
 };

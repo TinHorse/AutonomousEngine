@@ -20,7 +20,7 @@ void Map::AddTile(int srcX, int srcY, int xpos, int ypos)
 {
 	auto& tile(manager.AddEntity());
 	tile.AddComponent<TileComponent>(srcX, srcY, xpos, ypos, mapScale, tileSize, texID);
-	tile.AddToGroup(Game::groupMap);
+	tile.AddToGroup(Game::groupTiles);
 }
 
 

@@ -6,3 +6,4 @@
 #include "ColliderComponent.h"
 #include "TileComponent.h"
 #include "PathfindingComponent.h"
+#include "AIControllerComponent.h"

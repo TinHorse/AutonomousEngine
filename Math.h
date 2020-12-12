@@ -15,5 +15,9 @@ struct Math
 	{
 		return (Ax - Bx) * (Ax - Bx) + (Ay - By) * (Ay - By);
 	}
+	static float distanceNoSqrt(const Vector2D& vA, const Vector2D& vB)
+	{
+		return (vA.x - vB.x) * (vA.x - vB.x) + (vA.y - vB.y) * (vA.y - vB.y);
+	}
 
 };

@@ -17,6 +17,7 @@ Entity& AssetManager::CreatePlayer(Vector2D position, int sizeX, int sizeY, floa
 	player.AddComponent<SpriteComponent>("player", true);
 	player.AddComponent<ColliderComponent>("player");
 	player.AddComponent<KeyboardController>();
+	//player.AddComponent<AIControllerComponent>();
 	player.AddToGroup(Game::groupPlayers);
 	return player;
 }
@@ -28,6 +29,7 @@ Entity& AssetManager::CreateAgent(Vector2D position, int sizeX, int sizeY, float
 	agent.AddComponent<SpriteComponent>("player", false);
 	agent.AddComponent<ColliderComponent>("agent");
 	agent.AddComponent<PathfindingComponent>();
+	agent.AddComponent<AIControllerComponent>();
 	agent.AddToGroup(Game::groupAgents);
 	return agent;
 }

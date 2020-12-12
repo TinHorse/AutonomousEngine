@@ -52,6 +52,8 @@ void CollisionManager::CalculateCollision()
 
 		// check collision with static colliders
 		force.Zero();
+		bool staticCol = false;
+
 		for (auto *n : colMat.getRegion(x, y))
 		{
 			if (n != nullptr)
@@ -59,19 +61,22 @@ void CollisionManager::CalculateCollision()
 				if (Collision::AABB(dynCol->GetComponent<ColliderComponent>(), *n))
 				{
 					force += Collision::CalculateOpposingForce(dynCol->GetComponent<ColliderComponent>(), *n);
-
+					staticCol = true;
 				}
 			}
 		}
 
 		// check collision with other agents
-		for (Entity* dynCol2 : manager.GetGroup(Game::groupAgents))
+		if (!staticCol)
 		{
-			if (dynCol != dynCol2)
+			for (Entity* dynCol2 : manager.GetGroup(Game::groupAgents))
 			{
-				if (Collision::AABB(dynCol->GetComponent<ColliderComponent>(), dynCol2->GetComponent<ColliderComponent>()))
+				if (dynCol != dynCol2)
 				{
-					force += Collision::CalculateOpposingForce(dynCol->GetComponent<ColliderComponent>(), dynCol2->GetComponent<ColliderComponent>());
+					if (Collision::AABB(dynCol->GetComponent<ColliderComponent>(), dynCol2->GetComponent<ColliderComponent>()))
+					{
+						force += Collision::CalculateOpposingForce(dynCol->GetComponent<ColliderComponent>(), dynCol2->GetComponent<ColliderComponent>());
+					}
 				}
 			}
 		}

@@ -16,7 +16,7 @@ public:
 	SDL_Rect srcRect, destRect;
 
 	TransformComponent *transform;
-
+	ColliderComponent() = default;
 	ColliderComponent(std::string mTag)
 	{
 		tag = mTag;

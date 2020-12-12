@@ -135,10 +135,10 @@ void Game::Render() // note that all draw function have to be called inside the 
 	SDL_RenderClear(renderer);
 	for (auto& t : tiles)
 	{
-		if (Math::distance(t->GetComponent<TileComponent>().position, player->GetComponent<TransformComponent>().position) < 300)
-		{
+		//if (Math::distance(t->GetComponent<TileComponent>().position, player->GetComponent<TransformComponent>().position) < 300)
+		//{
 			t->Draw();
-		}
+		//}
 	}
 	for (auto& p : players)
 	{
@@ -146,17 +146,17 @@ void Game::Render() // note that all draw function have to be called inside the 
 	}
 	for (auto& c : colliders)
 	{
-		if (Math::distance(c->GetComponent<TransformComponent>().position, player->GetComponent<TransformComponent>().position) < 300)
-		{
+		//if (Math::distance(c->GetComponent<TransformComponent>().position, player->GetComponent<TransformComponent>().position) < 300)
+		//{
 			c->Draw();
-		}
+		//}
 	}
 	for (auto& a : agents)
 	{
-		if (Math::distance(a->GetComponent<TransformComponent>().position, player->GetComponent<TransformComponent>().position) < 300)
-		{
+		//if (Math::distance(a->GetComponent<TransformComponent>().position, player->GetComponent<TransformComponent>().position) < 300)
+		//{
 			a->Draw();
-		}
+		//}
 	}
 
 	SDL_RenderPresent(renderer);

@@ -17,7 +17,6 @@ Entity& AssetManager::CreatePlayer(Vector2D position, int sizeX, int sizeY, floa
 	player.AddComponent<SpriteComponent>("player", true);
 	player.AddComponent<ColliderComponent>("player");
 	player.AddComponent<KeyboardController>();
-	//player.AddComponent<AIControllerComponent>();
 	player.AddToGroup(Game::groupPlayers);
 	return player;
 }

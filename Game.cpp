@@ -89,12 +89,12 @@ void Game::Init(const char * title, int xpos, int ypos, int width, int height, b
 
 
 	// Pathfinding example
-	for (int i = 0; i < 25; i++)
+	for (int i = 0; i < 1; i++)
 	{
-		for (int j = 0; j < 4; j++)
+		for (int j = 0; j < 1; j++)
 		{
-			Entity& agent = assets->CreateAgent(Vector2D(i * 20, j * 20), 90, 90, 0.25f);
-			agent.GetComponent<PathfindingComponent>().FindPath(Vector2D(600,600));
+			Entity& agent = assets->CreateAgent(Vector2D(300+i * 20, 300+j * 20), 90, 90, 0.25f);
+			//agent.GetComponent<PathfindingComponent>().FindPath(Vector2D(600,600));
 		}
 	}
 }

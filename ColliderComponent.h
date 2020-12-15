@@ -31,10 +31,10 @@ public:
 
 	void Init() override
 	{
-		if (!entity->HasComponent<TransformComponent>())
-		{
-			entity->AddComponent<TransformComponent>(collider.x, collider.y);
-		}
+		//if (!entity->HasComponent<TransformComponent>())
+		//{
+			//entity->AddComponent<TransformComponent>(collider.x, collider.y, collider.w, collider.h);
+		//}
 		transform = &entity->GetComponent<TransformComponent>();
 
 		texture = TextureManager::LoadTexture("assets/colliderTex.png");

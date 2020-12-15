@@ -11,6 +11,8 @@ extern NavigationManager navigationMan;
 class PathfindingComponent : public Component
 {
 public:
+	bool moving;
+
 	PathfindingComponent() {}
 	~PathfindingComponent() {}
 
@@ -45,14 +47,21 @@ public:
 		if (!path.empty())
 		{
 			path.pop();
-			moving = true;
+			if (!path.empty())
+			{
+				moving = true;
+			}
 		}
+	}
+
+	bool PathIsEmpty()
+	{
+		return path.empty();
 	}
 
 private:
 	TransformComponent *transform;
 	std::stack<Vector2D> path;
 	Vector2D next;
-	bool moving;
 
 };

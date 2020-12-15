@@ -10,6 +10,8 @@
 #include <chrono>
 using namespace std::chrono;
 
+float average_time = 0;
+
 Map *map;
 
 SDL_Renderer *Game::renderer = nullptr;
@@ -89,11 +91,11 @@ void Game::Init(const char * title, int xpos, int ypos, int width, int height, b
 
 
 	// Pathfinding example
-	for (int i = 0; i < 1; i++)
+	for (int i = 0; i < 10; i++)
 	{
-		for (int j = 0; j < 1; j++)
+		for (int j = 0; j < 20; j++)
 		{
-			Entity& agent = assets->CreateAgent(Vector2D(300+i * 20, 300+j * 20), 90, 90, 0.25f);
+			Entity& agent = assets->CreateAgent(Vector2D(300+i * 40, 300+j * 40), 90, 90, 0.25f);
 			//agent.GetComponent<PathfindingComponent>().FindPath(Vector2D(600,600));
 		}
 	}
@@ -119,15 +121,25 @@ void Game::HandleEvents()
 
 void Game::Update()
 {
+	auto start = std::chrono::high_resolution_clock().now();
 	cnt++;
 	manager.Refresh();
+	
 	manager.Update();
-
+	
 	Vector2D offset(-400, -300);
 	camera.Update(offset + player->GetComponent<TransformComponent>().position);
-
+	auto end = std::chrono::high_resolution_clock().now();
 	// Collision
+	
 	collisionMan.CalculateCollision();
+	
+	auto totaltime = std::chrono::duration_cast<milliseconds>(end - start);
+	if (totaltime.count() < 500)
+	{
+		//average_time += totaltime.count();
+	}
+	//std::cout << average_time / cnt << std::endl;
 }
 
 void Game::Render() // note that all draw function have to be called inside the SDL Renderer

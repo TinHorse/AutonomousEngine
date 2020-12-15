@@ -1,24 +1,27 @@
 #pragma once
 #include "ECS.h"
 #include "Components.h"
-
+#include <random>
 extern EntityManager manager;
+
+enum BehaviourState : std::size_t
+{
+	exploring,
+	following,
+	fleeing,
+	returning,
+	attacking,
+	idle
+};
 
 class AIControllerComponent : public Component
 {
 public:
 	Vector2D origin;
-	enum BehaviourState : std::size_t
-	{
-		exploring,
-		following,
-		fleeing,
-		returning,
-		attacking,
-		idle
-	};
-
 	BehaviourState behaviour;
+
+	// randomizer
+	std::random_device rd;
 
 	AIControllerComponent() {}
 	void Init() override
@@ -30,9 +33,13 @@ public:
 
 	void Update() override
 	{
-		if (behaviour == exploring)
+		switch (behaviour)
 		{
+		case exploring:
 			Explore();
+			break;
+		default:
+			break;
 		}
 	}
 
@@ -49,17 +56,34 @@ public:
 		return entities;
 	}
 
+	Vector2D FindRandomPointInRadius(const Vector2D& position, float radius)
+	{
+		std::uniform_real_distribution<double> rng(-radius, radius);
+		float r1 = rng(rd);
+		if (abs(r1) < radius / 2.f)
+		{
+			r1 *= (radius / r1);
+		}
+		float r2 = rng(rd);
+		if (abs(r2) < radius / 4.f)
+		{
+			r2 *= (radius / r2);
+		}
+
+		Vector2D v(r1, r2);
+		v += position;
+		return Vector2D(v);
+	}
+
 	void Explore()
 	{
 		if (!pathfinder->moving)
 		{
-			Vector2D pos = entity->GetComponent<TransformComponent>().position;
-			Vector2D target = (pos - origin).Normalize() * 200.f;
-			target += entity->GetComponent<TransformComponent>().position;
-			pathfinder->FindPath(target);
-			std::cout << "finding" << std::endl;
+			pathfinder->FindPath(FindRandomPointInRadius(entity->GetComponent<TransformComponent>().position, 500.f));
 		}
 	}
+
+	
 	
 	void SwitchState()
 	{

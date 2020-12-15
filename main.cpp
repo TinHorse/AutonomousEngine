@@ -26,6 +26,7 @@ int main(int argc,  char *argv[])
 		{
 			SDL_Delay(frameDelay - frameTime); // delay the next frame by 13 - frameTime
 		}
+		std::cout << frameDelay - frameTime << std::endl;
 	}
 	game->Clean(); // delete game memory
 

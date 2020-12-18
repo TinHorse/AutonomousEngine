@@ -43,16 +43,16 @@ void CollisionManager::CalculateCollision()
 	int colcount = 0;
 	Vector2D force;
 	int x, y;
+	bool staticCol = false;
 	for (Entity* dynCol : manager.GetGroup(Game::groupAgents))
 	{
-
 		// determine node position
 		x = dynCol->GetComponent<ColliderComponent>().transform->position.x / tileSizeX;
 		y = dynCol->GetComponent<ColliderComponent>().transform->position.y / tileSizeY;
 
 		// check collision with static colliders
 		force.Zero();
-		bool staticCol = false;
+		staticCol = false;
 
 		for (auto *n : colMat.getRegion(x, y))
 		{
@@ -100,7 +100,8 @@ void CollisionManager::CalculateCollision()
 
 	for (Entity* dynCol : manager.GetGroup(Game::groupPlayers))
 	{
-		bool colliding = false;
+		staticCol = false;
+
 		// determine node position
 		x = dynCol->GetComponent<ColliderComponent>().transform->position.x / tileSizeX;
 		y = dynCol->GetComponent<ColliderComponent>().transform->position.y / tileSizeY;
@@ -119,13 +120,16 @@ void CollisionManager::CalculateCollision()
 		}
 		
 		// check collision with other agents
-		for (Entity* dynCol2 : manager.GetGroup(Game::groupAgents))
+		if (!staticCol)
 		{
-			if (dynCol != dynCol2)
+			for (Entity* dynCol2 : manager.GetGroup(Game::groupAgents))
 			{
-				if (Collision::AABB(dynCol->GetComponent<ColliderComponent>(), dynCol2->GetComponent<ColliderComponent>()))
+				if (dynCol != dynCol2)
 				{
-					force += Collision::CalculateOpposingForce(dynCol->GetComponent<ColliderComponent>(), dynCol2->GetComponent<ColliderComponent>());
+					if (Collision::AABB(dynCol->GetComponent<ColliderComponent>(), dynCol2->GetComponent<ColliderComponent>()))
+					{
+						force += Collision::CalculateOpposingForce(dynCol->GetComponent<ColliderComponent>(), dynCol2->GetComponent<ColliderComponent>());
+					}
 				}
 			}
 		}

@@ -16,7 +16,6 @@ public:
 	}
 	void Update() override
 	{
-		transform->velocity.Zero();
 		const Uint8* keystate = SDL_GetKeyboardState(NULL);
 		if (keystate)
 		{

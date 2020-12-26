@@ -1,8 +1,11 @@
 #pragma once
 #include <vector>
 #include <iostream>
+#include <stack>
+#include <map>
 
-static int NodeID = 0;
+class Vector2D;
+
 struct Node
 {
 	Node()
@@ -22,19 +25,20 @@ struct Node
 	int ID;
 	bool isObstacle;
 	int globalDist = INT_MAX;
+	static int NodeID;
 };
 
 struct NavMesh
 {
 public:
-	NavMesh() = default;
+	NavMesh();
+	~NavMesh();
 
-	void Init(int mCols, int mRows)
-	{
-		cols = mCols;
-		rows = mRows;
-		neighbours = std::vector<Node*>(8);
-	}
+	void Init(int mCols, int mRows);
+	void LoadMesh(const char *path, int sX, int sY, int sTileX, int sTileY, int scale);
+	std::stack<Vector2D> CalculatePath(Vector2D curLoc, Vector2D targetLoc);
+	void ClearMesh();
+
 	Node* operator()(const int& x, const int& y)
 	{
 		if (boundsCheck(y * cols + x))
@@ -46,6 +50,19 @@ public:
 			return nullptr;
 		}
 	}
+
+	Node *getNodeAt(const int& x, const int& y)
+	{
+		if (boundsCheck(y * cols + x))
+		{
+			return mesh[y * cols + x];
+		}
+		else
+		{
+			return nullptr;
+		}
+	}
+
 	const std::vector<Node*>& getNeighbours(const int& x, const int& y)
 	{
 		if (boundsCheck((y) * cols + x + 1)) {
@@ -82,6 +99,18 @@ public:
 	}
 
 	int cols, rows;
+private:
+	int tileSizeX, tileSizeY;
+
+	// visited map
+	std::map<int, bool> visited;
+
+	// current parent node map
+	std::map<Node*, Node*> parents;
+
+	// fLocal and fGlobal map
+	std::map<Node*, int> goals;
+
 	std::vector<Node*> mesh;
 	std::vector<Node*> neighbours;
 };

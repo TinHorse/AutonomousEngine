@@ -1,33 +1,38 @@
-#include "NavigationManager.h"
+#include "NavMesh.h"
 #include <fstream>
 #include <queue>
 #include "Math.h"
 
-NavigationManager::NavigationManager()
+int Node::NodeID = 0;
+
+NavMesh::NavMesh()
 {
-	
+
 }
 
-NavigationManager::~NavigationManager()
+NavMesh::~NavMesh()
 {
 }
 
-void NavigationManager::Init()
+void NavMesh::Init(int mCols, int mRows)
 {
-	for (int y = 0; y < navMesh.cols; y++)
+	for (int y = 0; y < cols; y++)
 	{
-		for (int x = 0; x < navMesh.rows; x++)
+		for (int x = 0; x < rows; x++)
 		{
-			visited[navMesh(x, y)->ID] = false;
-			parents[navMesh(x, y)] = nullptr;
-			goals[navMesh(x, y)] = INT_MAX;
+			visited[getNodeAt(x, y)->ID] = false;
+			parents[getNodeAt(x, y)] = nullptr;
+			goals[getNodeAt(x, y)] = INT_MAX;
 		}
 	}
+	cols = mCols;
+	rows = mRows;
+	neighbours = std::vector<Node*>(8);
 }
 
-void NavigationManager::LoadMesh(const char * path, int sX, int sY, int sTileX, int sTileY, int scale)
+void NavMesh::LoadMesh(const char * path, int sX, int sY, int sTileX, int sTileY, int scale)
 {
-	navMesh.Init(sX, sY);
+	Init(sX, sY);
 	tileSizeX = sTileX * scale;
 	tileSizeY = sTileY * scale;
 
@@ -41,11 +46,11 @@ void NavigationManager::LoadMesh(const char * path, int sX, int sY, int sTileX, 
 			stream.get(c);
 			if (c == '1')
 			{
-				navMesh.mesh.push_back(new Node(x,y, true));
+				mesh.push_back(new Node(x, y, true));
 			}
 			else
 			{
-				navMesh.mesh.push_back(new Node(x, y, false));
+				mesh.push_back(new Node(x, y, false));
 			}
 
 			stream.ignore();
@@ -54,7 +59,7 @@ void NavigationManager::LoadMesh(const char * path, int sX, int sY, int sTileX, 
 	stream.close();
 }
 
-std::stack<Vector2D> NavigationManager::CalculatePath(Vector2D curLoc, Vector2D targetLoc)
+std::stack<Vector2D> NavMesh::CalculatePath(Vector2D curLoc, Vector2D targetLoc)
 {
 	int closestX = (curLoc.x / tileSizeX);
 	int closestY = (curLoc.y / tileSizeY);
@@ -64,8 +69,8 @@ std::stack<Vector2D> NavigationManager::CalculatePath(Vector2D curLoc, Vector2D 
 
 	// A*
 	// Initialize start and end node
-	Node* current = navMesh(closestX, closestY);
-	Node* target = navMesh(closestXTarget, closestYTarget);
+	Node* current = getNodeAt(closestX, closestY);
+	Node* target = getNodeAt(closestXTarget, closestYTarget);
 
 
 	// check if start or target are out of bounds, check if target is obstacle
@@ -80,7 +85,7 @@ std::stack<Vector2D> NavigationManager::CalculatePath(Vector2D curLoc, Vector2D 
 	not_tested.push(current);
 
 	// set up data structures
-	Restart();
+	ClearMesh();
 
 	// Initialize currrent
 	goals[current] = Math::distanceNoSqrt(current->x, current->y, target->x, target->y);
@@ -106,7 +111,7 @@ std::stack<Vector2D> NavigationManager::CalculatePath(Vector2D curLoc, Vector2D 
 
 
 		// check all neighbours
-		for (Node * n : navMesh.getNeighbours(current->x, current->y))
+		for (Node * n : getNeighbours(current->x, current->y))
 		{
 			if (n != nullptr)
 			{
@@ -153,7 +158,7 @@ std::stack<Vector2D> NavigationManager::CalculatePath(Vector2D curLoc, Vector2D 
 	return path;
 }
 
-void NavigationManager::Restart()
+void NavMesh::ClearMesh()
 {
 	for (auto it = visited.begin(); it != visited.end(); ++it)
 	{
@@ -167,8 +172,8 @@ void NavigationManager::Restart()
 	{
 		it->second = INT_MAX;
 	}
-	for (int n = 0; n < navMesh.mesh.size(); ++n)
+	for (int n = 0; n < mesh.size(); ++n)
 	{
-		navMesh.mesh[n]->globalDist = INT_MAX;
+		mesh[n]->globalDist = INT_MAX;
 	}
 }

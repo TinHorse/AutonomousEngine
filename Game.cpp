@@ -5,7 +5,7 @@
 #include "Components.h"
 #include "Collision.h"
 #include "AssetManager.h"
-#include "NavigationManager.h"
+#include "NavMesh.h"
 #include "CollisionManager.h"
 #include <chrono>
 using namespace std::chrono;
@@ -21,7 +21,7 @@ EntityManager manager;
 Camera Game::camera = Camera();
 
 AssetManager *Game::assets = new AssetManager(&manager);
-NavigationManager navigationMan;
+NavMesh navigation;
 CollisionManager collisionMan;
 
 
@@ -77,8 +77,7 @@ void Game::Init(const char * title, int xpos, int ypos, int width, int height, b
 	map->LoadMap("assets/tilemap.txt", 40, 40);
 
 	// Load navigation
-	navigationMan.LoadMesh("assets/collisionmap.txt", 40, 40, 32, 32, 1);
-	navigationMan.Init();
+	navigation.LoadMesh("assets/collisionmap.txt", 40, 40, 32, 32, 1);
 
 	player = &assets->CreatePlayer(Vector2D(225,200), 90, 90, 0.25f);
 

@@ -2,11 +2,11 @@
 #include "Components.h"
 #include "Vector2D.h"
 #include <vector>
-#include "NavigationManager.h"
+#include "NavMesh.h"
 #include <stack>
 #include "Math.h"
 
-extern NavigationManager navigationMan;
+extern NavMesh navigation;
 
 class PathfindingComponent : public Component
 {
@@ -43,7 +43,7 @@ public:
 
 	void FindPath(Vector2D target)
 	{
-		path = std::move(navigationMan.CalculatePath(transform->position, target));
+		path = std::move(navigation.CalculatePath(transform->position, target));
 		if (!path.empty())
 		{
 			path.pop();

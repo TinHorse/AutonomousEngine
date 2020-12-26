@@ -2,6 +2,8 @@
 #include <fstream>
 #include <queue>
 #include "Math.h"
+#include <chrono>
+using namespace std::chrono;
 
 int Node::NodeID = 0;
 
@@ -61,6 +63,8 @@ void Navmesh::LoadMesh(const char * path, int sX, int sY, int sTileX, int sTileY
 
 std::stack<Vector2D> Navmesh::CalculatePath(Vector2D curLoc, Vector2D targetLoc)
 {
+	auto start = std::chrono::high_resolution_clock().now();
+
 	int closestX = (curLoc.x / tileSizeX);
 	int closestY = (curLoc.y / tileSizeY);
 
@@ -155,6 +159,11 @@ std::stack<Vector2D> Navmesh::CalculatePath(Vector2D curLoc, Vector2D targetLoc)
 	path.pop();
 	path.push(curLoc);
 
+	auto end = std::chrono::high_resolution_clock().now();
+
+	auto totaltime = std::chrono::duration_cast<milliseconds>(end - start);
+	std::cout << totaltime.count() << std::endl;
+
 	return path;
 }
 
@@ -192,9 +201,10 @@ Node * Navmesh::operator()(const int& x, const int& y)
 
 Node * Navmesh::getNodeAt(const int& x, const int& y)
 {
-	if (boundsCheck(y * cols + x))
+	int index = y * cols + x;
+	if (index >= 0 && index < mesh.size())
 	{
-		return mesh[y * cols + x];
+		return mesh[index];
 	}
 	else
 	{
@@ -204,29 +214,37 @@ Node * Navmesh::getNodeAt(const int& x, const int& y)
 
 const std::vector<Node*>& Navmesh::getNeighbours(const int& x, const int& y)
 {
-	if (boundsCheck((y)* cols + x + 1)) {
-		neighbours[0] = (mesh[(y)* cols + x + 1]);
+	int index = y * cols + x + 1;
+	if (index >= 0 && index < mesh.size()) {
+		neighbours[0] = (mesh[index]);
 	}
-	if (boundsCheck((y + 1) * cols + x + 1)) {
-		neighbours[1] = (mesh[(y + 1) * cols + x + 1]);
+	index = (y + 1) * cols + x + 1;
+	if (index >= 0 && index < mesh.size()) {
+		neighbours[1] = (mesh[index]);
 	}
-	if (boundsCheck((y + 1) * cols + x)) {
-		neighbours[2] = (mesh[(y + 1) * cols + x]);
+	index = (y + 1) * cols + x;
+	if (index >= 0 && index < mesh.size()) {
+		neighbours[2] = (mesh[index]);
 	}
-	if (boundsCheck((y + 1) * cols + x - 1)) {
-		neighbours[3] = (mesh[(y + 1) * cols + x - 1]);
+	index = (y + 1) * cols + x - 1;
+	if (index >= 0 && index < mesh.size()) {
+		neighbours[3] = (mesh[index]);
 	}
-	if (boundsCheck((y)* cols + x - 1)) {
-		neighbours[4] = (mesh[(y)* cols + x - 1]);
+	index = (y)* cols + x - 1;
+	if (index >= 0 && index < mesh.size()) {
+		neighbours[4] = (mesh[index]);
 	}
-	if (boundsCheck((y - 1) * cols + x - 1)) {
-		neighbours[5] = (mesh[(y - 1) * cols + x - 1]);
+	index = (y - 1) * cols + x - 1;
+	if (index >= 0 && index < mesh.size()) {
+		neighbours[5] = (mesh[index]);
 	}
-	if (boundsCheck((y - 1) * cols + x)) {
-		neighbours[6] = (mesh[(y - 1) * cols + x]);
+	index = (y - 1) * cols + x;
+	if (index >= 0 && index < mesh.size()) {
+		neighbours[6] = (mesh[index]);
 	}
-	if (boundsCheck((y - 1) * cols + x + 1)) {
-		neighbours[7] = (mesh[(y - 1) * cols + x + 1]);
+	index = (y - 1) * cols + x + 1;
+	if (index >= 0 && index < mesh.size()) {
+		neighbours[7] = (mesh[index]);
 	}
 
 	return neighbours;

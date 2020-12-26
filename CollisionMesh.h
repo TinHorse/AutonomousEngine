@@ -1,67 +1,24 @@
 #pragma once
 #include "Components.h"
 
-struct CollisionMesh
+struct Collisionmesh
 {
 public:
-	CollisionMesh() = default;
+	Collisionmesh() = default;
 
-	void Init(int mCols, int mRows)
-	{
-		cols = mCols;
-		rows = mRows;
-		neighbours = std::vector<ColliderComponent*>(9);
-	}
-	int operator()(const int& x, const int& y)
-	{
-		if (boundsCheck(y * cols + x))
-		{
-			return mesh[y * cols + x];
-		}
-		else
-		{
-			return 0;
-		}
-	}
+	void LoadMesh(const char * path, int sX, int sY, int sTileX, int sTileY, int scale);
+	int operator()(const int& x, const int& y);
 
-	const std::vector<ColliderComponent*>& getRegion(const int& x, const int& y)
-	{
-			neighbours[0] = GetNodeAtPosition(y* cols + x);
-			neighbours[1] = GetNodeAtPosition(y* cols + x + 1);
-			neighbours[2] = GetNodeAtPosition((y + 1) * cols + x + 1);
-			neighbours[3] = GetNodeAtPosition((y + 1) * cols + x);
-			neighbours[4] = GetNodeAtPosition((y + 1) * cols + x - 1);
-			neighbours[5] = GetNodeAtPosition(y* cols + x - 1);
-			neighbours[6] = GetNodeAtPosition((y - 1) * cols + x - 1);
-			neighbours[7] = GetNodeAtPosition((y - 1) * cols + x);
-			neighbours[8] = GetNodeAtPosition((y - 1) * cols + x + 1);
+	const std::vector<ColliderComponent*>& getRegion(const int& x, const int& y);
+	void CalculateCollision();
+	bool boundsCheck(const int& index);
+	bool doesNodeExist(const int& index);
+	ColliderComponent* getNodeAtPosition(const int& index);
 
-		return neighbours;
-	}
-
-	bool boundsCheck(const int& index)
-	{
-		return (index >= 0 && index < mesh.size());
-	}
-	bool DoesNodeExist(const int& index)
-	{
-		return (index >= 0 && index < mesh.size() && mesh[index] != 0);
-	}
-	ColliderComponent* GetNodeAtPosition(const int& index)
-	{
-		if (index >= 0 && index < mesh.size() && mesh[index] != 0)
-		{
-			return nodes[(mesh[index])];
-		}
-		return nullptr;
-	}
-
-	void addNode(ColliderComponent* comp)
-	{
-		nodes.insert(std::make_pair(++matIndex, comp));
-	}
+	void addNode(ColliderComponent* comp);
 	
 	int cols, rows;
+	int tileSizeX, tileSizeY;
 	static int matIndex;
 	int index;
 	std::vector<int> mesh;

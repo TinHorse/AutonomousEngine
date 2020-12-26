@@ -6,7 +6,7 @@
 #include "Collision.h"
 #include "AssetManager.h"
 #include "NavMesh.h"
-#include "CollisionManager.h"
+#include "Collisionmesh.h"
 #include <chrono>
 using namespace std::chrono;
 
@@ -22,7 +22,7 @@ Camera Game::camera = Camera();
 
 AssetManager *Game::assets = new AssetManager(&manager);
 Navmesh navigation;
-CollisionManager collisionMan;
+Collisionmesh collision;
 
 
 bool Game::isRunning = false;
@@ -82,7 +82,7 @@ void Game::Init(const char * title, int xpos, int ypos, int width, int height, b
 	player = &assets->CreatePlayer(Vector2D(225,200), 90, 90, 0.25f);
 
 	// Load collision
-	collisionMan.LoadMesh("assets/collisionmap.txt", 40, 40, 32, 32, 1);
+	collision.LoadMesh("assets/collisionmap.txt", 40, 40, 32, 32, 1);
 
 	// Initialize camera
 	auto& t = player->GetComponent<TransformComponent>();
@@ -120,19 +120,18 @@ void Game::HandleEvents()
 
 void Game::Update()
 {
-	auto start = std::chrono::high_resolution_clock().now();
 	cnt++;
 	manager.Refresh();
-	
+	auto start = std::chrono::high_resolution_clock().now();
 	manager.Update();
-	
+	auto end = std::chrono::high_resolution_clock().now();
+
 	Vector2D offset(-400, -300);
 	camera.Update(offset + player->GetComponent<TransformComponent>().position);
-	auto end = std::chrono::high_resolution_clock().now();
+	
 	// Collision
 	
-	collisionMan.CalculateCollision();
-	
+	collision.CalculateCollision();
 	auto totaltime = std::chrono::duration_cast<milliseconds>(end - start);
 	if (totaltime.count() < 500)
 	{

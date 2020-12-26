@@ -39,7 +39,7 @@ public:
 	std::stack<Vector2D> CalculatePath(Vector2D curLoc, Vector2D targetLoc);
 	void ClearMesh();
 
-	Node* operator()(const int& x, const int& y);
+	Node *operator()(const int& x, const int& y);
 	Node *getNodeAt(const int& x, const int& y);
 	const std::vector<Node*>& getNeighbours(const int& x, const int& y);
 	bool boundsCheck(const int& index);

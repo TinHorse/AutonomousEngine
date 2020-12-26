@@ -124,19 +124,26 @@ void Game::Update()
 	auto start = std::chrono::high_resolution_clock().now();
 	manager.Update();
 	auto end = std::chrono::high_resolution_clock().now();
-
-	Vector2D offset(-400, -300);
-	camera.Update(offset + player->GetComponent<TransformComponent>().position);
-	
-	// Collision
-	
-	collision.CalculateCollision();
 	auto totaltime = std::chrono::duration_cast<milliseconds>(end - start);
 	if (totaltime.count() < 500)
 	{
 		average_time += totaltime.count();
 	}
 	std::cout << average_time / cnt << std::endl;
+
+	Vector2D offset(-400, -300);
+	camera.Update(offset + player->GetComponent<TransformComponent>().position);
+	
+	// Collision
+	start = std::chrono::high_resolution_clock().now();
+	collision.CalculateCollision();
+	end = std::chrono::high_resolution_clock().now();
+	totaltime = std::chrono::duration_cast<milliseconds>(end - start);
+	if (totaltime.count() < 500)
+	{
+		//average_time += totaltime.count();
+	}
+	//std::cout << average_time / cnt << std::endl;
 }
 
 void Game::Render() // note that all draw function have to be called inside the SDL Renderer

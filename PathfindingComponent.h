@@ -41,9 +41,9 @@ public:
 		}
 	}
 
-	void FindPath(Vector2D target)
+	void FindPath(const Vector2D& target)
 	{
-		path = std::move(navigation.CalculatePath(transform->position, target));
+		path = std::move(navigation.CalculatePath(transform->position, target, true));
 		if (!path.empty())
 		{
 			path.pop();

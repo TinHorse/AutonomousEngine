@@ -36,13 +36,14 @@ public:
 
 	void Init(int mCols, int mRows);
 	void LoadMesh(const char *path, int sX, int sY, int sTileX, int sTileY, int scale);
-	std::stack<Vector2D> CalculatePath(Vector2D curLoc, Vector2D targetLoc);
+	std::stack<Vector2D> CalculatePath(const Vector2D& curLoc, const Vector2D& targetLoc, bool earlyExit);
 	void ClearMesh();
 
 	Node *operator()(const int& x, const int& y);
 	Node *getNodeAt(const int& x, const int& y);
 	const std::vector<Node*>& getNeighbours(const int& x, const int& y);
 	bool boundsCheck(const int& index);
+
 private:
 	int tileSizeX, tileSizeY;
 	int cols, rows;
@@ -66,5 +67,4 @@ struct NodeCompare
 	{
 		return nA->globalDist > nB->globalDist;
 	}
-
 };

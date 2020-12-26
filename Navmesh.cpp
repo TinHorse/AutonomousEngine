@@ -61,9 +61,9 @@ void Navmesh::LoadMesh(const char * path, int sX, int sY, int sTileX, int sTileY
 	stream.close();
 }
 
-std::stack<Vector2D> Navmesh::CalculatePath(Vector2D curLoc, Vector2D targetLoc)
+std::stack<Vector2D> Navmesh::CalculatePath(const Vector2D& curLoc, const Vector2D& targetLoc, bool earlyExit)
 {
-	auto start = std::chrono::high_resolution_clock().now();
+	
 	int totalNodes = 0;
 
 	int closestX = (curLoc.x / tileSizeX);
@@ -95,14 +95,18 @@ std::stack<Vector2D> Navmesh::CalculatePath(Vector2D curLoc, Vector2D targetLoc)
 	goals[current] = Math::distanceNoSqrt(current->x, current->y, target->x, target->y);
 
 	// Initialize distance from position to target in a straight line
-	int straight_line_distance = goals[current] / 2;
-
+	int straight_line_distance = goals[current];
+	auto start = std::chrono::high_resolution_clock().now();
 	// while there are nodes not yet tested
 	while (!not_tested.empty() && current != target)
 	{
 		totalNodes++;
 		if (totalNodes > straight_line_distance)
 		{
+			auto end = std::chrono::high_resolution_clock().now();
+
+			auto totaltime = std::chrono::duration_cast<milliseconds>(end - start);
+			std::cout << totaltime.count() << " with path size " << path.size() << " total nodes " << totalNodes << std::endl;
 			return path;
 		}
 
@@ -171,7 +175,7 @@ std::stack<Vector2D> Navmesh::CalculatePath(Vector2D curLoc, Vector2D targetLoc)
 	auto end = std::chrono::high_resolution_clock().now();
 
 	auto totaltime = std::chrono::duration_cast<milliseconds>(end - start);
-	//std::cout << totaltime.count() << " with path size " << path.size() << " total nodes " << totalNodes << std::endl;
+	std::cout << totaltime.count() << " with path size " << path.size() << " total nodes " << totalNodes << std::endl;
 
 	return path;
 }

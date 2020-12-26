@@ -23,6 +23,7 @@ public:
 			return 0;
 		}
 	}
+
 	const std::vector<ColliderComponent*>& getRegion(const int& x, const int& y)
 	{
 			neighbours[0] = GetNodeAtPosition(y* cols + x);

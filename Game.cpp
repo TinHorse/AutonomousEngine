@@ -21,7 +21,7 @@ EntityManager manager;
 Camera Game::camera = Camera();
 
 AssetManager *Game::assets = new AssetManager(&manager);
-NavMesh navigation;
+Navmesh navigation;
 CollisionManager collisionMan;
 
 

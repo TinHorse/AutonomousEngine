@@ -28,75 +28,21 @@ struct Node
 	static int NodeID;
 };
 
-struct NavMesh
+struct Navmesh
 {
 public:
-	NavMesh();
-	~NavMesh();
+	Navmesh();
+	~Navmesh();
 
 	void Init(int mCols, int mRows);
 	void LoadMesh(const char *path, int sX, int sY, int sTileX, int sTileY, int scale);
 	std::stack<Vector2D> CalculatePath(Vector2D curLoc, Vector2D targetLoc);
 	void ClearMesh();
 
-	Node* operator()(const int& x, const int& y)
-	{
-		if (boundsCheck(y * cols + x))
-		{
-			return mesh[y * cols + x];
-		}
-		else
-		{
-			return nullptr;
-		}
-	}
-
-	Node *getNodeAt(const int& x, const int& y)
-	{
-		if (boundsCheck(y * cols + x))
-		{
-			return mesh[y * cols + x];
-		}
-		else
-		{
-			return nullptr;
-		}
-	}
-
-	const std::vector<Node*>& getNeighbours(const int& x, const int& y)
-	{
-		if (boundsCheck((y) * cols + x + 1)) {
-			neighbours[0] = (mesh[(y)* cols + x + 1]);
-		}
-		if (boundsCheck((y + 1) * cols + x + 1)) {
-			neighbours[1] = (mesh[(y + 1) * cols + x + 1]);
-		}
-		if (boundsCheck((y + 1) * cols + x)) {
-			neighbours[2] = (mesh[(y + 1) * cols + x]);
-		}
-		if (boundsCheck((y + 1) * cols + x - 1)) {
-			neighbours[3] = (mesh[(y + 1) * cols + x - 1]);
-		}
-		if (boundsCheck((y) * cols + x - 1)) {
-			neighbours[4] = (mesh[(y)* cols + x - 1]);
-		}
-		if (boundsCheck((y - 1) * cols + x - 1)) {
-			neighbours[5] = (mesh[(y - 1) * cols + x - 1]);
-		}
-		if (boundsCheck((y - 1) * cols + x)) {
-			neighbours[6] = (mesh[(y - 1) * cols + x]);
-		}
-		if (boundsCheck((y - 1) * cols + x + 1)) {
-			neighbours[7] = (mesh[(y - 1) * cols + x + 1]);
-		}
-
-		return neighbours;
-	}
-	
-	bool boundsCheck(const int& index)
-	{
-		return (index >= 0 && index < mesh.size());
-	}
+	Node* operator()(const int& x, const int& y);
+	Node *getNodeAt(const int& x, const int& y);
+	const std::vector<Node*>& getNeighbours(const int& x, const int& y);
+	bool boundsCheck(const int& index);
 
 	int cols, rows;
 private:

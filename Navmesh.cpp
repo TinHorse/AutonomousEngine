@@ -1,20 +1,20 @@
-#include "NavMesh.h"
+#include "Navmesh.h"
 #include <fstream>
 #include <queue>
 #include "Math.h"
 
 int Node::NodeID = 0;
 
-NavMesh::NavMesh()
+Navmesh::Navmesh()
 {
 
 }
 
-NavMesh::~NavMesh()
+Navmesh::~Navmesh()
 {
 }
 
-void NavMesh::Init(int mCols, int mRows)
+void Navmesh::Init(int mCols, int mRows)
 {
 	for (int y = 0; y < cols; y++)
 	{
@@ -30,7 +30,7 @@ void NavMesh::Init(int mCols, int mRows)
 	neighbours = std::vector<Node*>(8);
 }
 
-void NavMesh::LoadMesh(const char * path, int sX, int sY, int sTileX, int sTileY, int scale)
+void Navmesh::LoadMesh(const char * path, int sX, int sY, int sTileX, int sTileY, int scale)
 {
 	Init(sX, sY);
 	tileSizeX = sTileX * scale;
@@ -59,7 +59,7 @@ void NavMesh::LoadMesh(const char * path, int sX, int sY, int sTileX, int sTileY
 	stream.close();
 }
 
-std::stack<Vector2D> NavMesh::CalculatePath(Vector2D curLoc, Vector2D targetLoc)
+std::stack<Vector2D> Navmesh::CalculatePath(Vector2D curLoc, Vector2D targetLoc)
 {
 	int closestX = (curLoc.x / tileSizeX);
 	int closestY = (curLoc.y / tileSizeY);
@@ -158,7 +158,7 @@ std::stack<Vector2D> NavMesh::CalculatePath(Vector2D curLoc, Vector2D targetLoc)
 	return path;
 }
 
-void NavMesh::ClearMesh()
+void Navmesh::ClearMesh()
 {
 	for (auto it = visited.begin(); it != visited.end(); ++it)
 	{
@@ -176,4 +176,63 @@ void NavMesh::ClearMesh()
 	{
 		mesh[n]->globalDist = INT_MAX;
 	}
+}
+
+Node * Navmesh::operator()(const int& x, const int& y)
+{
+	if (boundsCheck(y * cols + x))
+	{
+		return mesh[y * cols + x];
+	}
+	else
+	{
+		return nullptr;
+	}
+}
+
+Node * Navmesh::getNodeAt(const int& x, const int& y)
+{
+	if (boundsCheck(y * cols + x))
+	{
+		return mesh[y * cols + x];
+	}
+	else
+	{
+		return nullptr;
+	}
+}
+
+const std::vector<Node*>& Navmesh::getNeighbours(const int& x, const int& y)
+{
+	if (boundsCheck((y)* cols + x + 1)) {
+		neighbours[0] = (mesh[(y)* cols + x + 1]);
+	}
+	if (boundsCheck((y + 1) * cols + x + 1)) {
+		neighbours[1] = (mesh[(y + 1) * cols + x + 1]);
+	}
+	if (boundsCheck((y + 1) * cols + x)) {
+		neighbours[2] = (mesh[(y + 1) * cols + x]);
+	}
+	if (boundsCheck((y + 1) * cols + x - 1)) {
+		neighbours[3] = (mesh[(y + 1) * cols + x - 1]);
+	}
+	if (boundsCheck((y)* cols + x - 1)) {
+		neighbours[4] = (mesh[(y)* cols + x - 1]);
+	}
+	if (boundsCheck((y - 1) * cols + x - 1)) {
+		neighbours[5] = (mesh[(y - 1) * cols + x - 1]);
+	}
+	if (boundsCheck((y - 1) * cols + x)) {
+		neighbours[6] = (mesh[(y - 1) * cols + x]);
+	}
+	if (boundsCheck((y - 1) * cols + x + 1)) {
+		neighbours[7] = (mesh[(y - 1) * cols + x + 1]);
+	}
+
+	return neighbours;
+}
+
+bool Navmesh::boundsCheck(const int& index)
+{
+	return (index >= 0 && index < mesh.size());
 }

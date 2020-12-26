@@ -6,7 +6,7 @@
 #include <stack>
 #include "Math.h"
 
-extern NavMesh navigation;
+extern Navmesh navigation;
 
 class PathfindingComponent : public Component
 {

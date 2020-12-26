@@ -2,7 +2,7 @@
 #include <vector>
 #include <iostream>
 #include <stack>
-#include <map>
+#include <unordered_map>
 
 class Vector2D;
 
@@ -43,19 +43,18 @@ public:
 	Node *getNodeAt(const int& x, const int& y);
 	const std::vector<Node*>& getNeighbours(const int& x, const int& y);
 	bool boundsCheck(const int& index);
-
-	int cols, rows;
 private:
 	int tileSizeX, tileSizeY;
+	int cols, rows;
 
 	// visited map
-	std::map<int, bool> visited;
+	std::unordered_map<int, bool> visited;
 
 	// current parent node map
-	std::map<Node*, Node*> parents;
+	std::unordered_map<Node*, Node*> parents;
 
 	// fLocal and fGlobal map
-	std::map<Node*, int> goals;
+	std::unordered_map<Node*, int> goals;
 
 	std::vector<Node*> mesh;
 	std::vector<Node*> neighbours;

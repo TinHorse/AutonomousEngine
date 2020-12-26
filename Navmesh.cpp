@@ -162,7 +162,7 @@ std::stack<Vector2D> Navmesh::CalculatePath(Vector2D curLoc, Vector2D targetLoc)
 	auto end = std::chrono::high_resolution_clock().now();
 
 	auto totaltime = std::chrono::duration_cast<milliseconds>(end - start);
-	std::cout << totaltime.count() << std::endl;
+	std::cout << totaltime.count() << " with path size " << path.size() << std::endl;
 
 	return path;
 }

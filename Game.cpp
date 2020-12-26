@@ -88,8 +88,7 @@ void Game::Init(const char * title, int xpos, int ypos, int width, int height, b
 	auto& t = player->GetComponent<TransformComponent>();
 	camera.Init(t.position.x, t.position.y, 800, 600);
 
-
-	// Pathfinding example
+	// Create Agents
 	for (int i = 0; i < 10; i++)
 	{
 		for (int j = 0; j < 20; j++)

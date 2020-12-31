@@ -19,9 +19,10 @@ public:
 	
 	int cols, rows;
 	int tileSizeX, tileSizeY;
-	static int matIndex;
+	static int mesh_index;
 	int index;
-	std::vector<int> mesh;
-	std::map<int, ColliderComponent*> nodes;
-	std::vector<ColliderComponent*> neighbours;
+
+	std::vector<int> collision_mesh;
+	std::map<int, ColliderComponent*> mesh_nodes;
+	std::vector<ColliderComponent*> mesh_neighbours;
 };

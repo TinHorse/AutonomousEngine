@@ -2,8 +2,6 @@
 #include <fstream>
 #include <queue>
 #include "Math.h"
-#include <chrono>
-using namespace std::chrono;
 
 int Node::NodeID = 0;
 
@@ -63,7 +61,6 @@ void Navmesh::LoadMesh(const char * path, int sX, int sY, int sTileX, int sTileY
 
 std::stack<Vector2D> Navmesh::CalculatePath(const Vector2D& curLoc, const Vector2D& targetLoc, bool earlyExit)
 {
-	
 	int totalNodes = 0;
 
 	int closestX = (curLoc.x / tileSizeX);
@@ -94,22 +91,9 @@ std::stack<Vector2D> Navmesh::CalculatePath(const Vector2D& curLoc, const Vector
 	// Initialize currrent
 	goals[current] = Math::distanceNoSqrt(current->x, current->y, target->x, target->y);
 
-	// Initialize distance from position to target in a straight line
-	int straight_line_distance = goals[current];
-	auto start = std::chrono::high_resolution_clock().now();
 	// while there are nodes not yet tested
 	while (!not_tested.empty() && current != target)
 	{
-		totalNodes++;
-		if (totalNodes > straight_line_distance)
-		{
-			auto end = std::chrono::high_resolution_clock().now();
-
-			auto totaltime = std::chrono::duration_cast<milliseconds>(end - start);
-			std::cout << totaltime.count() << " with path size " << path.size() << " total nodes " << totalNodes << std::endl;
-			return path;
-		}
-
 		// if the node has been visited, remove it
 		while (!not_tested.empty() && visited[not_tested.top()->ID])
 		{
@@ -171,11 +155,6 @@ std::stack<Vector2D> Navmesh::CalculatePath(const Vector2D& curLoc, const Vector
 	}
 	path.pop();
 	path.push(curLoc);
-
-	auto end = std::chrono::high_resolution_clock().now();
-
-	auto totaltime = std::chrono::duration_cast<milliseconds>(end - start);
-	std::cout << totaltime.count() << " with path size " << path.size() << " total nodes " << totalNodes << std::endl;
 
 	return path;
 }

@@ -74,9 +74,9 @@ void Collisionmesh::LoadMesh(const char * path, int sX, int sY, int sTileX, int 
 			if (c == '1')
 			{
 				auto& tileCol(manager.AddEntity());
-				auto& collider = tileCol.AddComponent<ColliderComponent>("terrain", x * tileSizeX, y * tileSizeY, tileSizeX);
+				tileCol.AddComponent<ColliderComponent>("terrain", x * tileSizeX, y * tileSizeY, tileSizeX);
 				tileCol.AddToGroup(Game::groupColliders);
-				addNode(&collider);
+				addNode(&tileCol.GetComponent<ColliderComponent>());
 				collision_mesh.push_back(mesh_index);
 			}
 			else

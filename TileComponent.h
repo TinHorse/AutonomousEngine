@@ -3,8 +3,6 @@
 #include "TransformComponent.h"
 #include "SpriteComponent.h"
 #include "SDL.h"
-#include "AssetManager.h"
-
 
 class TileComponent : public Component
 {

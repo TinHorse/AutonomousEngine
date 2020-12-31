@@ -2,6 +2,7 @@
 #include "TextureManager.h"
 #include "Map.h"
 #include "ECS.h"
+#include "EntityManager.h"
 #include "Components.h"
 #include "Collision.h"
 #include "AssetManager.h"

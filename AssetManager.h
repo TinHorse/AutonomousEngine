@@ -25,16 +25,16 @@ public:
 	{
 		ColliderComponent coll;
 		colliderComponents[collIndex] = coll;
-		entity.addColliderComponent<ColliderComponent>(colliderComponents[collIndex]);
+		//entity.addColliderComponent<ColliderComponent>(colliderComponents[collIndex]);
 		collIndex++;
 	}
 
 	void updateColliderComponents()
 	{
-		for (auto& c : colliderComponents)
-		{
-			c.Update();
-		}
+		//for (auto c : colliderComponents)
+		//{
+		//	c.Update();
+		//}
 	}
 	*/
 
@@ -42,6 +42,6 @@ private:
 	EntityManager *manager;
 	std::map<std::string, SDL_Texture*> textures;
 
-	//std::vector<ColliderComponent> colliderComponents = std::vector<ColliderComponent>(1000);
+	std::vector<ColliderComponent> colliderComponents = std::vector<ColliderComponent>(1000);
 	int collIndex = 0;
 };

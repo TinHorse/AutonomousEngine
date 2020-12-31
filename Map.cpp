@@ -3,6 +3,7 @@
 #include <fstream>
 #include "ECS.h"
 #include "Components.h"
+#include "EntityManager.h"
 
 extern EntityManager manager;
 
@@ -20,7 +21,7 @@ void Map::AddTile(int srcX, int srcY, int xpos, int ypos)
 {
 	auto& tile(manager.AddEntity());
 	tile.AddComponent<TileComponent>(srcX, srcY, xpos, ypos, mapScale, tileSize, texID);
-	tile.AddToGroup(Game::groupTiles);
+	manager.AddToGroup(&tile, Game::groupTiles);
 }
 
 

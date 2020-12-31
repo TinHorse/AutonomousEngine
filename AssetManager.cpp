@@ -1,5 +1,6 @@
 #include "AssetManager.h"
 #include "Components.h"
+#include "EntityManager.h"
 
 AssetManager::AssetManager(EntityManager *man) : manager(man)
 {
@@ -17,7 +18,7 @@ Entity& AssetManager::CreatePlayer(Vector2D position, int sizeX, int sizeY, floa
 	player.AddComponent<SpriteComponent>("player", true);
 	player.AddComponent<ColliderComponent>("player");
 	player.AddComponent<KeyboardController>();
-	player.AddToGroup(Game::groupPlayers);
+	manager->AddToGroup(&player, Game::groupPlayers);
 	return player;
 }
 
@@ -29,7 +30,7 @@ Entity& AssetManager::CreateAgent(Vector2D position, int sizeX, int sizeY, float
 	agent.AddComponent<ColliderComponent>("agent");
 	agent.AddComponent<PathfindingComponent>();
 	agent.AddComponent<AIControllerComponent>();
-	agent.AddToGroup(Game::groupAgents);
+	manager->AddToGroup(&agent, Game::groupAgents);
 	return agent;
 }
 

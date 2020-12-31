@@ -1,6 +1,8 @@
 #include "CollisionMesh.h"
 #include "Collision.h"
 #include <fstream>
+#include "EntityManager.h"
+extern EntityManager manager;
 
 int Collisionmesh::mesh_index = 1;
 
@@ -75,7 +77,7 @@ void Collisionmesh::LoadMesh(const char * path, int sX, int sY, int sTileX, int 
 			{
 				auto& tileCol(manager.AddEntity());
 				tileCol.AddComponent<ColliderComponent>("terrain", x * tileSizeX, y * tileSizeY, tileSizeX);
-				tileCol.AddToGroup(Game::groupColliders);
+				manager.AddToGroup(&tileCol, Game::groupColliders);
 				addNode(&tileCol.GetComponent<ColliderComponent>());
 				collision_mesh.push_back(mesh_index);
 			}

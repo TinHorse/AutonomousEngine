@@ -2,7 +2,7 @@
 #include "ECS.h"
 #include "Components.h"
 #include <random>
-extern EntityManager manager;
+//extern EntityManager manager;
 
 enum BehaviourState : std::size_t
 {
@@ -43,6 +43,7 @@ public:
 		}
 	}
 
+	/*
 	std::vector<Entity*> FindEntitiesInArea(Game::groupLabels l, float dist)
 	{
 		entities.clear();
@@ -55,6 +56,7 @@ public:
 		}
 		return entities;
 	}
+	*/
 
 	Vector2D FindRandomPointInRadius(const Vector2D& position, float radius)
 	{

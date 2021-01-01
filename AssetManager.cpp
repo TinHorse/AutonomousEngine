@@ -14,10 +14,10 @@ AssetManager::~AssetManager()
 Entity& AssetManager::CreatePlayer(Vector2D position, int sizeX, int sizeY, float scale)
 {
 	auto& player = manager->AddEntity();
-	player.AddComponent<TransformComponent>(position.x, position.y, sizeX, sizeY, scale);
-	player.AddComponent<SpriteComponent>("player", true);
-	player.AddComponent<ColliderComponent>("player");
-	player.AddComponent<KeyboardController>();
+	manager->addTransformComponent(player, position.x, position.y, sizeX, sizeY, scale);
+	manager->addSpriteComponent(player, "player", true);
+	//manager->addDynamicColliderComponent(player, "player");
+	manager->addKeyboardController(player);
 	manager->AddToGroup(&player, Game::groupPlayers);
 	return player;
 }
@@ -25,11 +25,12 @@ Entity& AssetManager::CreatePlayer(Vector2D position, int sizeX, int sizeY, floa
 Entity& AssetManager::CreateAgent(Vector2D position, int sizeX, int sizeY, float scale)
 {
 	auto& agent = manager->AddEntity();
-	agent.AddComponent<TransformComponent>(position.x, position.y, sizeX, sizeY, scale);
-	agent.AddComponent<SpriteComponent>("player", false);
-	agent.AddComponent<ColliderComponent>("agent");
-	agent.AddComponent<PathfindingComponent>();
-	agent.AddComponent<AIControllerComponent>();
+	manager->addTransformComponent(agent, position.x, position.y, sizeX, sizeY, scale);
+	manager->addSpriteComponent(agent, "player", false);
+	manager->addDynamicColliderComponent(agent,"agent");
+	manager->addPathfindingComponent(agent);
+	manager->addAIControllerComponent(agent);
+
 	manager->AddToGroup(&agent, Game::groupAgents);
 	return agent;
 }

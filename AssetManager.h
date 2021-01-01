@@ -18,25 +18,7 @@ public:
 	// Texture Management
 	void AddTexture(std::string texID, const char *path);
 	SDL_Texture *GetTexture(std::string texID);
-
-	/*
-	template<typename >
-	void addColliderComponent(Entity& entity)
-	{
-		ColliderComponent coll;
-		colliderComponents[collIndex] = coll;
-		//entity.addColliderComponent<ColliderComponent>(colliderComponents[collIndex]);
-		collIndex++;
-	}
-
-	void updateColliderComponents()
-	{
-		//for (auto c : colliderComponents)
-		//{
-		//	c.Update();
-		//}
-	}
-	*/
+	
 
 private:
 	EntityManager *manager;

@@ -120,26 +120,19 @@ void Game::HandleEvents()
 
 void Game::Update()
 {
+	auto start = std::chrono::high_resolution_clock().now();
 	cnt++;
 	manager.Refresh();
-	auto start = std::chrono::high_resolution_clock().now();
+	
 	manager.Update();
-	auto end = std::chrono::high_resolution_clock().now();
-	auto totaltime = std::chrono::duration_cast<milliseconds>(end - start);
-	if (totaltime.count() < 500)
-	{
-		//average_time += totaltime.count();
-	}
-	//std::cout << average_time / cnt << std::endl;
 
 	Vector2D offset(-400, -300);
 	camera.Update(offset + player->GetComponent<TransformComponent>().position);
 	
 	// Collision
-	start = std::chrono::high_resolution_clock().now();
 	collision.CalculateCollision();
-	end = std::chrono::high_resolution_clock().now();
-	totaltime = std::chrono::duration_cast<milliseconds>(end - start);
+	auto end = std::chrono::high_resolution_clock().now();
+	auto totaltime = std::chrono::duration_cast<milliseconds>(end - start);
 	if (totaltime.count() < 500)
 	{
 		average_time += totaltime.count();
@@ -152,10 +145,12 @@ void Game::Render() // note that all draw function have to be called inside the 
 	SDL_RenderClear(renderer);
 	for (auto& t : tiles)
 	{
-		//if (Math::distance(t->GetComponent<TileComponent>().position, player->GetComponent<TransformComponent>().position) < 300)
-		//{
-			t->Draw();
-		//}
+		std::cout << t->GetComponent<TileComponent>().entity << std::endl;
+		t->Draw();
+	}
+	for (auto& t : manager.compTile)
+	{
+		t.Draw();
 	}
 	for (auto& p : players)
 	{
@@ -175,7 +170,6 @@ void Game::Render() // note that all draw function have to be called inside the 
 			a->Draw();
 		//}
 	}
-
 	SDL_RenderPresent(renderer);
 }
 

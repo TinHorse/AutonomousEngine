@@ -13,7 +13,7 @@ class PathfindingComponent : public Component
 public:
 	bool moving;
 
-	PathfindingComponent() {}
+	PathfindingComponent() : moving(false) {}
 	~PathfindingComponent() {}
 
 	void Init() override

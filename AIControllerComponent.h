@@ -1,17 +1,17 @@
 #pragma once
 #include "ECS.h"
-#include "Components.h"
+//#include "Components.h"
 #include <random>
 //extern EntityManager manager;
 
 enum BehaviourState : std::size_t
 {
+	idle,
 	exploring,
 	following,
 	fleeing,
 	returning,
-	attacking,
-	idle
+	attacking
 };
 
 class AIControllerComponent : public Component
@@ -23,7 +23,7 @@ public:
 	// randomizer
 	std::random_device rd;
 
-	AIControllerComponent() {}
+	AIControllerComponent() = default;
 	void Init() override
 	{
 		pathfinder = &entity->GetComponent<PathfindingComponent>();
@@ -94,6 +94,14 @@ public:
 			Vector2D pos = entity->GetComponent<TransformComponent>().position;
 			origin = pos * 0.9f;
 		}
+	}
+
+	AIControllerComponent& operator=(const AIControllerComponent& comp)
+	{
+		entities = comp.entities;
+		pathfinder = comp.pathfinder;
+		behaviour = comp.behaviour;
+		return *this;
 	}
 
 private:

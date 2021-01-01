@@ -2,12 +2,38 @@
 
 void EntityManager::Update()
 {
-	for (auto& e : entities) e->Update();
-}
-
-void EntityManager::Draw()
-{
-	for (auto& e : entities) e->Draw();
+	for (int i = 0; i < index_tran; i++)
+	{
+		compTran[i].Update();
+	}
+	for (int i = 0; i < index_sprites; i++)
+	{
+		compSprite[i].Update();
+	}
+	for (int i = 0; i < index_keyboard; i++)
+	{
+		compKeyboard[i].Update();
+	}
+	for (int i = 0; i < index_static_coll; i++)
+	{
+		compStaticColl[i].Update();
+	}
+	for (int i = 0; i < index_dynamic_coll; i++)
+	{
+		compDynamicColl[i].Update();
+	}
+	for (int i = 0; i < index_tiles; i++)
+	{
+		compTile[i].Update();
+	}
+	for (int i = 0; i < index_path; i++)
+	{
+		compPath[i].Update();
+	}
+	for (int i = 0; i < index_ai; i++)
+	{
+		compAI[i].Update();
+	}
 }
 
 void EntityManager::Refresh()

@@ -76,7 +76,7 @@ void Collisionmesh::LoadMesh(const char * path, int sX, int sY, int sTileX, int 
 			if (c == '1')
 			{
 				auto& tileCol(manager.AddEntity());
-				tileCol.AddComponent<ColliderComponent>("terrain", x * tileSizeX, y * tileSizeY, tileSizeX);
+				manager.addStaticColliderComponent(tileCol, "terrain", x * tileSizeX, y * tileSizeY, tileSizeX);
 				manager.AddToGroup(&tileCol, Game::groupColliders);
 				addNode(&tileCol.GetComponent<ColliderComponent>());
 				collision_mesh.push_back(mesh_index);
@@ -98,14 +98,14 @@ void Collisionmesh::CalculateCollision()
 	Vector2D force;
 	int x, y;
 
-	for (Entity* dynCol : manager.GetGroup(Game::groupAgents))
+	for (int i = 0; i < manager.index_dynamic_coll; i++)
 	{
-		if (dynCol->GetComponent<PathfindingComponent>().moving)
+		auto& dynCol = manager.compDynamicColl[i];
+		if (dynCol.entity->GetComponent<PathfindingComponent>().moving)
 		{
 			// determine node position
-			auto& collider = dynCol->GetComponent<ColliderComponent>();
-			x = collider.transform->position.x / tileSizeX;
-			y = collider.transform->position.y / tileSizeY;
+			x = dynCol.transform->position.x / tileSizeX;
+			y = dynCol.transform->position.y / tileSizeY;
 
 			// check collision with static colliders
 			force.Zero();
@@ -115,9 +115,9 @@ void Collisionmesh::CalculateCollision()
 			{
 				if (n != nullptr)
 				{
-					if (Collision::AABB(collider, *n))
+					if (Collision::AABB(dynCol, *n))
 					{
-						force += Collision::CalculateOpposingForce(collider, *n);
+						force += Collision::CalculateOpposingForce(dynCol, *n);
 						staticCol = true;
 					}
 				}
@@ -126,69 +126,21 @@ void Collisionmesh::CalculateCollision()
 			// check collision with other agents
 			if (!staticCol)
 			{
-				for (Entity* dynCol2 : manager.GetGroup(Game::groupAgents))
+				for (int j = 0; j < manager.index_dynamic_coll; j++)
 				{
-					if (dynCol != dynCol2)
+					auto& dynCol2 = manager.compDynamicColl[j];
+					if (dynCol.entity != dynCol2.entity)
 					{
-						auto& collider_agent = dynCol2->GetComponent<ColliderComponent>();
-						if (Collision::AABB(collider, collider_agent))
+						if (Collision::AABB(dynCol, dynCol2))
 						{
-							force += Collision::CalculateOpposingForce(collider, collider_agent);
+							force += Collision::CalculateOpposingForce(dynCol, dynCol2);
 						}
 					}
 				}
 			}
 
-			for (Entity* dynCol2 : manager.GetGroup(Game::groupPlayers))
-			{
-				if (dynCol != dynCol2)
-				{
-					if (Collision::AABB(collider, dynCol2->GetComponent<ColliderComponent>()))
-					{
-						force += Collision::CalculateOpposingForce(collider, dynCol2->GetComponent<ColliderComponent>());
-					}
-				}
-			}
-
-			dynCol->GetComponent<TransformComponent>().velocity += force;
-			dynCol->GetComponent<TransformComponent>().velocity.Normalize();
+			dynCol.entity->GetComponent<TransformComponent>().velocity += force;
+			dynCol.entity->GetComponent<TransformComponent>().velocity.Normalize();
 		}
-	}
-
-
-
-	for (Entity* dynCol : manager.GetGroup(Game::groupPlayers))
-	{
-		bool colliding = false;
-		// determine node position
-		x = dynCol->GetComponent<ColliderComponent>().transform->position.x / tileSizeX;
-		y = dynCol->GetComponent<ColliderComponent>().transform->position.y / tileSizeY;
-
-		// check collision with static colliders
-		force.Zero();
-		for (auto *n : getRegion(x, y))
-		{
-			if (n != nullptr)
-			{
-				if (Collision::AABB(dynCol->GetComponent<ColliderComponent>(), *n))
-				{
-					force += Collision::CalculateOpposingForce(dynCol->GetComponent<ColliderComponent>(), *n);
-				}
-			}
-		}
-
-		// check collision with other agents
-		for (Entity* dynCol2 : manager.GetGroup(Game::groupAgents))
-		{
-			if (dynCol != dynCol2)
-			{
-				if (Collision::AABB(dynCol->GetComponent<ColliderComponent>(), dynCol2->GetComponent<ColliderComponent>()))
-				{
-					force += Collision::CalculateOpposingForce(dynCol->GetComponent<ColliderComponent>(), dynCol2->GetComponent<ColliderComponent>());
-				}
-			}
-		}
-		dynCol->GetComponent<ColliderComponent>().transform->velocity += force;
-		dynCol->GetComponent<ColliderComponent>().transform->velocity.Normalize();
 	}
 }

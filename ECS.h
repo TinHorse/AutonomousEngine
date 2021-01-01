@@ -65,7 +65,6 @@ class Entity
 {
 public:
 	Entity(EntityManager& mManager) : manager(mManager) {}
-	void Update();
 	void Draw();
 	bool IsActive() const;
 	void Destroy();
@@ -81,6 +80,7 @@ public:
 		return componentBitSet[GetComponentTypeID<T>()]; // Returns true if the queried component type (i.e. typename) is present. Since the BitSet stores bools for each component type, this code simply gets the component type ID of the queried component and checks the BitSet at that index.
 	}
 
+
 	template<typename T, typename ...TArgs> // adds a component T to the entity (TArgs are constructor arguments of the component)
 	// NOTE: "typename ... var" means that this is a variadic template. variadic templates take a variable number of arguments.
 	// If you want the template to only take a positive number of arguments (i.e. not 0), then you can write it like above, with the first argument "typename T," followed by the variadic arguments "typename ...TArgs"
@@ -88,13 +88,25 @@ public:
 	{
 		T *comp(new T(std::forward<TArgs>(mArgs)...)); // make new object of the specified component
 		comp->entity = this; // sets component's entity (owner) to the current entity
-		std::unique_ptr<Component> uPtr{ comp }; // make pointer to the new component
-		components.emplace_back(std::move(uPtr)); // emplace_back is like push_back, but for variadic templates
+		Component * uPtr{ comp }; // make pointer to the new component
+		components.push_back(uPtr); // emplace_back is like push_back, but for variadic templates
 
 		componentArray[GetComponentTypeID<T>()] = comp; // add component to the entity's component array
 		componentBitSet[GetComponentTypeID<T>()] = true; // set the hasComponent flag to true for this component
 
 		comp->Init(); // intialize component
+		return *comp;
+	}
+
+	template<typename T>
+	T & AddColliderComponent(T* comp)
+	{
+		comp->entity = this; // sets component's entity (owner) to the current entity
+		Component * uPtr{ comp };
+		components.push_back(uPtr); // emplace_back is like push_back, but for variadic templates
+		componentArray[GetComponentTypeID<T>()] = comp; // add component to the entity's component array
+		componentBitSet[GetComponentTypeID<T>()] = true; // set the hasComponent flag to true for this component
+
 		return *comp;
 	}
 	
@@ -117,7 +129,7 @@ public:
 private:
 	EntityManager& manager;
 	bool active = true;
-	std::vector<std::unique_ptr<Component>> components;
+	std::vector<Component*> components;
 
 	ComponentArray componentArray;
 	ComponentBitSet componentBitSet; // each Entity has a bitset that keeps track of all active components

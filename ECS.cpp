@@ -1,13 +1,5 @@
 #include "ECS.h"
 
-void Entity::Update()
-{
-	for (auto& comp : components)
-	{
-		comp->Update();
-	}
-}
-
 void Entity::Draw()
 {
 	for (auto& comp : components)

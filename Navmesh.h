@@ -1,8 +1,9 @@
 #pragma once
 #include <vector>
+#include <array>
 #include <iostream>
 #include <stack>
-#include <unordered_map>
+#include <map>
 
 class Vector2D;
 
@@ -39,9 +40,9 @@ public:
 	std::stack<Vector2D> CalculatePath(const Vector2D& curLoc, const Vector2D& targetLoc, bool earlyExit);
 	void ClearMesh();
 
-	Node *operator()(const int& x, const int& y);
+	Node &operator()(const int& x, const int& y);
 	Node *getNodeAt(const int& x, const int& y);
-	const std::vector<Node*>& getNeighbours(const int& x, const int& y);
+	const std::array<Node*, 8>& getNeighbours(const int& x, const int& y);
 	bool boundsCheck(const int& index);
 
 private:
@@ -49,16 +50,17 @@ private:
 	int cols, rows;
 
 	// visited map
-	std::unordered_map<int, bool> visited;
+	std::map<int, bool> visited;
 
 	// current parent node map
-	std::unordered_map<Node*, Node*> parents;
+	std::map<Node*, Node*> parents;
 
 	// fLocal and fGlobal map
-	std::unordered_map<Node*, int> goals;
+	std::map<Node*, int> goals;
 
-	std::vector<Node*> mesh;
-	std::vector<Node*> neighbours;
+	std::vector<Node> mesh;
+	std::array<Node*, 8> neighbours;
+	Node nullNode;
 };
 
 struct NodeCompare

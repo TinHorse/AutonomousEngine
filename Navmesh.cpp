@@ -16,6 +16,7 @@ Navmesh::~Navmesh()
 
 void Navmesh::Init(int mCols, int mRows)
 {
+	mesh = std::vector<Node>(mCols * mRows);
 	for (int y = 0; y < cols; y++)
 	{
 		for (int x = 0; x < rows; x++)
@@ -27,7 +28,6 @@ void Navmesh::Init(int mCols, int mRows)
 	}
 	cols = mCols;
 	rows = mRows;
-	neighbours = std::vector<Node*>(8);
 }
 
 void Navmesh::LoadMesh(const char * path, int sX, int sY, int sTileX, int sTileY, int scale)
@@ -46,11 +46,11 @@ void Navmesh::LoadMesh(const char * path, int sX, int sY, int sTileX, int sTileY
 			stream.get(c);
 			if (c == '1')
 			{
-				mesh.push_back(new Node(x, y, true));
+				mesh[(y*cols) + x] = Node(x,y,true);
 			}
 			else
 			{
-				mesh.push_back(new Node(x, y, false));
+				mesh[(y*cols) + x] = Node(x, y, false);
 			}
 
 			stream.ignore();
@@ -153,6 +153,7 @@ std::stack<Vector2D> Navmesh::CalculatePath(const Vector2D& curLoc, const Vector
 			target = parents[target];
 		}
 	}
+
 	path.pop();
 	path.push(curLoc);
 
@@ -161,25 +162,25 @@ std::stack<Vector2D> Navmesh::CalculatePath(const Vector2D& curLoc, const Vector
 
 void Navmesh::ClearMesh()
 {
-	for (auto it = visited.begin(); it != visited.end(); ++it)
+	for (auto& n : mesh)
 	{
-		it->second = false;
+		n.globalDist = INT_MAX;
 	}
-	for (auto it = parents.begin(); it != parents.end(); ++it)
+	for (auto& it : visited)
 	{
-		it->second = nullptr;
+		it.second = false;
 	}
-	for (auto it = goals.begin(); it != goals.end(); ++it)
+	for (auto &it : parents)
 	{
-		it->second = INT_MAX;
+		it.second = nullptr;
 	}
-	for (int n = 0; n < mesh.size(); ++n)
+	for (auto& it : goals)
 	{
-		mesh[n]->globalDist = INT_MAX;
+		it.second = INT_MAX;
 	}
 }
 
-Node * Navmesh::operator()(const int& x, const int& y)
+Node & Navmesh::operator()(const int& x, const int& y)
 {
 	if (boundsCheck(y * cols + x))
 	{
@@ -187,7 +188,7 @@ Node * Navmesh::operator()(const int& x, const int& y)
 	}
 	else
 	{
-		return nullptr;
+		return nullNode;
 	}
 }
 
@@ -196,7 +197,7 @@ Node * Navmesh::getNodeAt(const int& x, const int& y)
 	int index = y * cols + x;
 	if (index >= 0 && index < mesh.size())
 	{
-		return mesh[index];
+		return &mesh[index];
 	}
 	else
 	{
@@ -204,39 +205,39 @@ Node * Navmesh::getNodeAt(const int& x, const int& y)
 	}
 }
 
-const std::vector<Node*>& Navmesh::getNeighbours(const int& x, const int& y)
+const std::array<Node*, 8>& Navmesh::getNeighbours(const int& x, const int& y)
 {
 	int index = y * cols + x + 1;
 	if (index >= 0 && index < mesh.size()) {
-		neighbours[0] = (mesh[index]);
+		neighbours[0] = (&mesh[index]);
 	}
 	index = (y + 1) * cols + x + 1;
 	if (index >= 0 && index < mesh.size()) {
-		neighbours[1] = (mesh[index]);
+		neighbours[1] = (&mesh[index]);
 	}
 	index = (y + 1) * cols + x;
 	if (index >= 0 && index < mesh.size()) {
-		neighbours[2] = (mesh[index]);
+		neighbours[2] = (&mesh[index]);
 	}
 	index = (y + 1) * cols + x - 1;
 	if (index >= 0 && index < mesh.size()) {
-		neighbours[3] = (mesh[index]);
+		neighbours[3] = (&mesh[index]);
 	}
 	index = (y)* cols + x - 1;
 	if (index >= 0 && index < mesh.size()) {
-		neighbours[4] = (mesh[index]);
+		neighbours[4] = (&mesh[index]);
 	}
 	index = (y - 1) * cols + x - 1;
 	if (index >= 0 && index < mesh.size()) {
-		neighbours[5] = (mesh[index]);
+		neighbours[5] = (&mesh[index]);
 	}
 	index = (y - 1) * cols + x;
 	if (index >= 0 && index < mesh.size()) {
-		neighbours[6] = (mesh[index]);
+		neighbours[6] = (&mesh[index]);
 	}
 	index = (y - 1) * cols + x + 1;
 	if (index >= 0 && index < mesh.size()) {
-		neighbours[7] = (mesh[index]);
+		neighbours[7] = (&mesh[index]);
 	}
 
 	return neighbours;

@@ -98,11 +98,12 @@ void Collisionmesh::CalculateCollision()
 	Vector2D force;
 	int x, y;
 
-	for (int i = 0; i < manager.index_dynamic_coll; i++)
+	int index = manager.index_dynamic_coll;
+	for (auto& dynCol : manager.compDynamicColl)
 	{
-		auto& dynCol = manager.compDynamicColl[i];
-		if (dynCol.entity->GetComponent<PathfindingComponent>().moving)
-		{
+		if (index-- <= 0) { break; }
+		//if (dynCol.entity->GetComponent<PathfindingComponent>().moving)
+		//{
 			// determine node position
 			x = dynCol.transform->position.x / tileSizeX;
 			y = dynCol.transform->position.y / tileSizeY;
@@ -126,9 +127,10 @@ void Collisionmesh::CalculateCollision()
 			// check collision with other agents
 			if (!staticCol)
 			{
-				for (int j = 0; j < manager.index_dynamic_coll; j++)
+				int other_index = manager.index_dynamic_coll;
+				for (auto& dynCol2 : manager.compDynamicColl)
 				{
-					auto& dynCol2 = manager.compDynamicColl[j];
+					if (other_index-- <= 0) { break; }
 					if (dynCol.entity != dynCol2.entity)
 					{
 						if (Collision::AABB(dynCol, dynCol2))
@@ -141,6 +143,6 @@ void Collisionmesh::CalculateCollision()
 
 			dynCol.entity->GetComponent<TransformComponent>().velocity += force;
 			dynCol.entity->GetComponent<TransformComponent>().velocity.Normalize();
-		}
+		//}
 	}
 }

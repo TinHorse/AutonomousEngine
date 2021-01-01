@@ -65,7 +65,6 @@ class Entity
 {
 public:
 	Entity(EntityManager& mManager) : manager(mManager) {}
-	void Draw();
 	bool IsActive() const;
 	void Destroy();
 
@@ -88,8 +87,6 @@ public:
 	{
 		T *comp(new T(std::forward<TArgs>(mArgs)...)); // make new object of the specified component
 		comp->entity = this; // sets component's entity (owner) to the current entity
-		Component * uPtr{ comp }; // make pointer to the new component
-		components.push_back(uPtr); // emplace_back is like push_back, but for variadic templates
 
 		componentArray[GetComponentTypeID<T>()] = comp; // add component to the entity's component array
 		componentBitSet[GetComponentTypeID<T>()] = true; // set the hasComponent flag to true for this component
@@ -102,11 +99,9 @@ public:
 	T & AddColliderComponent(T* comp)
 	{
 		comp->entity = this; // sets component's entity (owner) to the current entity
-		Component * uPtr{ comp };
-		components.push_back(uPtr); // emplace_back is like push_back, but for variadic templates
 		componentArray[GetComponentTypeID<T>()] = comp; // add component to the entity's component array
 		componentBitSet[GetComponentTypeID<T>()] = true; // set the hasComponent flag to true for this component
-
+		comp->Init();
 		return *comp;
 	}
 	
@@ -129,7 +124,6 @@ public:
 private:
 	EntityManager& manager;
 	bool active = true;
-	std::vector<Component*> components;
 
 	ComponentArray componentArray;
 	ComponentBitSet componentBitSet; // each Entity has a bitset that keeps track of all active components

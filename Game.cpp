@@ -145,29 +145,24 @@ void Game::Render() // note that all draw function have to be called inside the 
 	SDL_RenderClear(renderer);
 	for (auto& t : tiles)
 	{
-		std::cout << t->GetComponent<TileComponent>().entity << std::endl;
-		t->Draw();
-	}
-	for (auto& t : manager.compTile)
-	{
-		t.Draw();
+		t->GetComponent<TileComponent>().Draw();
 	}
 	for (auto& p : players)
 	{
-		p->Draw();
+		p->GetComponent<SpriteComponent>().Draw();
 	}
 	for (auto& c : colliders)
 	{
 		//if (Math::distance(c->GetComponent<TransformComponent>().position, player->GetComponent<TransformComponent>().position) < 300)
 		//{
-			c->Draw();
+			c->GetComponent<ColliderComponent>().Draw();
 		//}
 	}
 	for (auto& a : agents)
 	{
 		//if (Math::distance(a->GetComponent<TransformComponent>().position, player->GetComponent<TransformComponent>().position) < 300)
 		//{
-			a->Draw();
+			a->GetComponent<SpriteComponent>().Draw();
 		//}
 	}
 	SDL_RenderPresent(renderer);

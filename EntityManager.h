@@ -17,7 +17,6 @@ public:
 	{
 		compTran[index_tran] = TransformComponent(std::forward<TArgs>(args)...);
 		entity.AddColliderComponent<TransformComponent>(&compTran[index_tran]);
-		compTran[index_tran].Init();
 		index_tran++;
 	}
 
@@ -26,7 +25,6 @@ public:
 	{
 		compSprite[index_sprites] = SpriteComponent(std::forward<TArgs>(args)...);
 		entity.AddColliderComponent<SpriteComponent>(&compSprite[index_sprites]);
-		compSprite[index_sprites].Init();
 		index_sprites++;
 	}
 
@@ -35,7 +33,6 @@ public:
 	{
 		compKeyboard[index_keyboard] = KeyboardController(std::forward<TArgs>(args)...);
 		entity.AddColliderComponent<KeyboardController>(&compKeyboard[index_keyboard]);
-		compKeyboard[index_keyboard].Init();
 		index_keyboard++;
 	}
 
@@ -44,7 +41,6 @@ public:
 	{
 		compStaticColl[index_static_coll] = ColliderComponent(std::forward<TArgs>(args)...);
 		entity.AddColliderComponent<ColliderComponent>(&compStaticColl[index_static_coll]);
-		compStaticColl[index_static_coll].Init();
 		index_static_coll++;
 	}
 
@@ -53,7 +49,6 @@ public:
 	{
 		compDynamicColl[index_dynamic_coll] = ColliderComponent(std::forward<TArgs>(args)...);
 		entity.AddColliderComponent<ColliderComponent>(&compDynamicColl[index_dynamic_coll]);
-		compDynamicColl[index_dynamic_coll].Init();
 		index_dynamic_coll++;
 	}
 
@@ -62,7 +57,6 @@ public:
 	{
 		compTile[index_tiles] = TileComponent(std::forward<TArgs>(args)...);
 		entity.AddColliderComponent<TileComponent>(&compTile[index_tiles]);
-		compTile[index_tiles].Init();
 		index_tiles++;
 	}
 
@@ -71,7 +65,6 @@ public:
 	{
 		compPath[index_path] = PathfindingComponent(std::forward<TArgs>(args)...);
 		entity.AddColliderComponent<PathfindingComponent>(&compPath[index_path]);
-		compPath[index_path].Init();
 		index_path++;
 	}
 
@@ -80,7 +73,6 @@ public:
 	{
 		compAI[index_ai] = AIControllerComponent(std::forward<TArgs>(args)...);
 		entity.AddColliderComponent<AIControllerComponent>(&compAI[index_ai]);
-		compAI[index_ai].Init();
 		index_ai++;
 	}
 	

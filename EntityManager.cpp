@@ -2,37 +2,53 @@
 
 void EntityManager::Update()
 {
-	for (int i = 0; i < index_tran; i++)
+	int index = index_tran;
+	for (auto& comp : compTran)
 	{
-		compTran[i].Update();
+		if (index-- <= 0) { break; };
+		comp.Update();
 	}
-	for (int i = 0; i < index_sprites; i++)
+	index = index_sprites;
+	for (auto& comp : compSprite)
 	{
-		compSprite[i].Update();
+		if (index-- <= 0) { break; };
+		comp.Update();
 	}
-	for (int i = 0; i < index_keyboard; i++)
+	index = index_keyboard;
+	for (auto& comp : compKeyboard)
 	{
-		compKeyboard[i].Update();
+		if (index-- <= 0) { break; };
+		comp.Update();
 	}
-	for (int i = 0; i < index_static_coll; i++)
+	index = index_static_coll;
+	for (auto& comp : compStaticColl)
 	{
-		compStaticColl[i].Update();
+		if (index-- <= 0) { break; };
+		comp.Update();
 	}
-	for (int i = 0; i < index_dynamic_coll; i++)
+	index = index_dynamic_coll;
+	for (auto& comp : compDynamicColl)
 	{
-		compDynamicColl[i].Update();
+		if (index-- <= 0) { break; };
+		comp.Update();
 	}
-	for (int i = 0; i < index_tiles; i++)
+	index = index_tiles;
+	for (auto& comp : compTile)
 	{
-		compTile[i].Update();
+		if (index-- <= 0) { break; };
+		comp.Update();
 	}
-	for (int i = 0; i < index_path; i++)
+	index = index_path;
+	for (auto& comp : compPath)
 	{
-		compPath[i].Update();
+		if (index-- <= 0) { break; };
+		comp.Update();
 	}
-	for (int i = 0; i < index_ai; i++)
+	index = index_ai;
+	for (auto& comp : compAI)
 	{
-		compAI[i].Update();
+		if (index-- <= 0) { break; };
+		comp.Update();
 	}
 }
 

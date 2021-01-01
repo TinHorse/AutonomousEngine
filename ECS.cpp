@@ -1,13 +1,5 @@
 #include "ECS.h"
 
-void Entity::Draw()
-{
-	for (auto& comp : components)
-	{
-		comp->Draw();
-	}
-}
-
 bool Entity::IsActive() const
 {
 	return active;

@@ -18,7 +18,7 @@ int Collisionmesh::operator()(const int& x, const int& y)
 	}
 }
 
-const std::vector<ColliderComponent*>& Collisionmesh::getRegion(const int& x, const int& y)
+const std::array<ColliderComponent*,9>& Collisionmesh::getRegion(const int& x, const int& y)
 {
 	mesh_neighbours[0] = getNodeAtPosition(y* cols + x);
 	mesh_neighbours[1] = getNodeAtPosition(y* cols + x + 1);
@@ -61,7 +61,6 @@ void Collisionmesh::LoadMesh(const char * path, int sX, int sY, int sTileX, int 
 {
 	cols = sX;
 	rows = sY;
-	mesh_neighbours = std::vector<ColliderComponent*>(9);
 	tileSizeX = sTileX * scale;
 	tileSizeY = sTileY * scale;
 
@@ -141,8 +140,50 @@ void Collisionmesh::CalculateCollision()
 				}
 			}
 
-			dynCol.entity->GetComponent<TransformComponent>().velocity += force;
-			dynCol.entity->GetComponent<TransformComponent>().velocity.Normalize();
+			dynCol.transform->addForce(force);
 		//}
+	}
+
+	for (auto& entity : manager.GetGroup(Game::groupPlayers))
+	{
+		auto& dynCol = entity->GetComponent<ColliderComponent>();
+		// determine node position
+		x = dynCol.transform->position.x / tileSizeX;
+		y = dynCol.transform->position.y / tileSizeY;
+
+		// check collision with static colliders
+		force.Zero();
+		bool staticCol = false;
+
+		for (auto *n : getRegion(x, y))
+		{
+			if (n != nullptr)
+			{
+				if (Collision::AABB(dynCol, *n))
+				{
+					force += Collision::CalculateOpposingForce(dynCol, *n);
+					staticCol = true;
+				}
+			}
+		}
+
+		// check collision with other agents
+		if (!staticCol)
+		{
+			int other_index = manager.index_dynamic_coll;
+			for (auto& dynCol2 : manager.compDynamicColl)
+			{
+				if (other_index-- <= 0) { break; }
+				if (dynCol.entity != dynCol2.entity)
+				{
+					if (Collision::AABB(dynCol, dynCol2))
+					{
+						force += Collision::CalculateOpposingForce(dynCol, dynCol2);
+					}
+				}
+			}
+		}
+
+		dynCol.transform->addForce(force);
 	}
 }

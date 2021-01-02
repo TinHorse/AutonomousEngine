@@ -51,4 +51,10 @@ public:
 		position.y += velocity.y * speed;
 	}
 
+	void addForce(const Vector2D& force)
+	{
+		velocity += force;
+		velocity.Normalize();
+	}
+
 };

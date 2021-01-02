@@ -16,7 +16,7 @@ Entity& AssetManager::CreatePlayer(Vector2D position, int sizeX, int sizeY, floa
 	auto& player = manager->AddEntity();
 	manager->addTransformComponent(player, position.x, position.y, sizeX, sizeY, scale);
 	manager->addSpriteComponent(player, "player", true);
-	manager->addDynamicColliderComponent(player, "player");
+	manager->addStaticColliderComponent(player, "player");
 	manager->addKeyboardController(player);
 	manager->AddToGroup(&player, Game::groupPlayers);
 	return player;

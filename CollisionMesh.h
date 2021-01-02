@@ -1,5 +1,6 @@
 #pragma once
 #include "Components.h"
+#include <unordered_map>
 
 struct Collisionmesh
 {
@@ -9,7 +10,7 @@ public:
 	void LoadMesh(const char * path, int sX, int sY, int sTileX, int sTileY, int scale);
 	int operator()(const int& x, const int& y);
 
-	const std::vector<ColliderComponent*>& getRegion(const int& x, const int& y);
+	const std::array<ColliderComponent*,9>& getRegion(const int& x, const int& y);
 	void CalculateCollision();
 	bool boundsCheck(const int& index);
 	bool doesNodeExist(const int& index);
@@ -23,6 +24,6 @@ public:
 	int index;
 
 	std::vector<int> collision_mesh;
-	std::map<int, ColliderComponent*> mesh_nodes;
-	std::vector<ColliderComponent*> mesh_neighbours;
+	std::unordered_map<int, ColliderComponent*> mesh_nodes;
+	std::array<ColliderComponent*,9> mesh_neighbours;
 };

@@ -25,6 +25,10 @@ int main(int argc,  char *argv[])
 		{
 			game->Update();
 			lag -= frameDelay;
+			if (lag >= frameDelay)
+			{
+				//std::cout << lag << std::endl;
+			}
 		}
 		game->Render();
 	}

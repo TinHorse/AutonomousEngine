@@ -1,8 +1,7 @@
 #pragma once
 #include "ECS.h"
-//#include "Components.h"
 #include <random>
-//extern EntityManager manager;
+#include <stack>
 
 enum BehaviourState : std::size_t
 {
@@ -18,22 +17,55 @@ class AIControllerComponent : public Component
 {
 public:
 	Vector2D origin;
-	BehaviourState behaviour;
+	std::stack<BehaviourState> behaviour;
+	bool state_change{ true };
+	BehaviourState current_state;
 
 	// randomizer
 	std::random_device rd;
+
+	// individual state variables
+	int tick{ 0 };
+	int health{ 100 };
+	int serotonin{ 0 };
+
+	int hunger{ 0 };
+	int aggro{ 0 };
+	int fear{ 0 };
+
+	int tick_hunger_increase{ 500 };
+	int tick_health_decrease_from_hunger{ 200 };
+	int tick_fear_increase{ 100 };
+
+	int tick_look_for_food{ 100 };
 
 	AIControllerComponent() = default;
 	void Init() override
 	{
 		pathfinder = &entity->GetComponent<PathfindingComponent>();
-		origin = {350,350};
-		behaviour = exploring;
+		behaviour.push(exploring);
+		current_state = behaviour.top();
 	}
 
 	void Update() override
 	{
-		switch (behaviour)
+		tick++;
+		// Update state variables
+		if (tick % tick_hunger_increase == 0)
+		{
+			hunger++;
+		}
+		if (hunger >= 100 && tick % tick_health_decrease_from_hunger == 0)
+		{
+			health--;
+		}
+		if (tick % tick_fear_increase == 0)
+		{
+			fear++;
+		}
+
+		// check current state and execute behaviour based on it
+		switch (current_state)
 		{
 		case exploring:
 			Explore();
@@ -41,22 +73,22 @@ public:
 		default:
 			break;
 		}
-	}
 
-	/*
-	std::vector<Entity*> FindEntitiesInArea(Game::groupLabels l, float dist)
-	{
-		entities.clear();
-		for (auto& e : manager.GetGroup(l))
+		if (state_change)
 		{
-			if (Math::distance(e->GetComponent<TransformComponent>().position, entity->GetComponent<TransformComponent>().position) < dist)
+			current_state = behaviour.top();
+			switch (behaviour.top())
 			{
-				entities.emplace_back(e);
+			case exploring:
+				Explore();
+				break;
+			default:
+				break;
 			}
+			behaviour.pop();
+			state_change = false;
 		}
-		return entities;
 	}
-	*/
 
 	Vector2D FindRandomPointInRadius(const Vector2D& position, float radius)
 	{
@@ -79,22 +111,20 @@ public:
 
 	void Explore()
 	{
-		if (!pathfinder->moving)
-		{
-			pathfinder->FindPath(FindRandomPointInRadius(entity->GetComponent<TransformComponent>().position, 500.f));
-		}
-	}
-
-	
-	
-	void SwitchState()
-	{
-		if (behaviour == exploring)
+		if (!pathfinder->moving) // calculate new path if not moving
 		{
 			Vector2D pos = entity->GetComponent<TransformComponent>().position;
 			origin = pos * 0.9f;
+			pathfinder->FindPath(FindRandomPointInRadius(entity->GetComponent<TransformComponent>().position, 500.f));
 		}
+
+		if (tick % tick_look_for_food == 0)
+		{
+
+		}
+
 	}
+
 
 	AIControllerComponent& operator=(const AIControllerComponent& comp)
 	{

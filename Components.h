@@ -7,3 +7,15 @@
 #include "TileComponent.h"
 #include "PathfindingComponent.h"
 #include "AIControllerComponent.h"
+
+enum ComponentType
+{
+	Transform,
+	Sprite,
+	Keyboard,
+	Collider,
+	Tile,
+	Pathfinding,
+	AIController
+
+};

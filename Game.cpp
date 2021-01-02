@@ -27,6 +27,7 @@ Collisionmesh collision;
 
 
 bool Game::isRunning = false;
+int Game::GameTime = 0;
 
 Entity *player = nullptr;
 
@@ -120,8 +121,9 @@ void Game::HandleEvents()
 
 void Game::Update()
 {
+	GameTime++; // increment game time
+
 	auto start = std::chrono::high_resolution_clock().now();
-	cnt++;
 	manager.Refresh();
 	
 	manager.Update();
@@ -137,7 +139,7 @@ void Game::Update()
 	{
 		average_time += totaltime.count();
 	}
-	std::cout << average_time / cnt << std::endl;
+	std::cout << average_time / GameTime << std::endl;
 }
 
 void Game::Render() // note that all draw function have to be called inside the SDL Renderer

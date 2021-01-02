@@ -12,6 +12,21 @@ public:
 	Entity& AddEntity();
 	std::vector<Entity*>& GetGroup(Group mGroup); // returns the specified group of entities
 
+	
+	std::vector<Entity*>& FindEntitiesInArea(const Vector2D& position, Group mGroup, const float& dist)
+	{
+		std::vector<Entity*> entities;
+		for (auto& e : GetGroup(mGroup))
+		{
+			if (Math::distance(e->GetComponent<TransformComponent>().position, position) < dist)
+			{
+				entities.push_back(e);
+			}
+		}
+		return entities;
+	}
+	
+
 	template<typename ...TArgs>
 	void addTransformComponent(Entity& entity, TArgs ...args)
 	{

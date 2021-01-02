@@ -23,7 +23,7 @@ public:
 
 	void Update() override
 	{
-		transform->velocity = { 0,0 };
+		//transform->velocity.Zero();
 		if (moving)
 		{
 			next = path.top();
@@ -43,6 +43,7 @@ public:
 
 	void FindPath(const Vector2D& target)
 	{
+		moving = false;
 		path = std::move(navigation.CalculatePath(transform->position, target, true));
 		if (!path.empty())
 		{

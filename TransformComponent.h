@@ -56,5 +56,10 @@ public:
 		velocity += force;
 		velocity.Normalize();
 	}
+	void setForce(const Vector2D& force)
+	{
+		velocity = force;
+		velocity.Normalize();
+	}
 
 };

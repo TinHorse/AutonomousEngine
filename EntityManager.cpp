@@ -44,6 +44,7 @@ void EntityManager::Update()
 		if (index-- <= 0) { break; };
 		comp.Update();
 	}
+
 	index = index_ai;
 	for (auto& comp : compAI)
 	{

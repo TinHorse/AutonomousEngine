@@ -39,7 +39,7 @@ public:
 		groupAgents
 	};
 
+	static int GameTime;
 private:
-	int cnt = 0;
 	SDL_Window *window;
 };

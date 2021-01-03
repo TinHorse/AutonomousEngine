@@ -28,7 +28,7 @@ public:
 	
 
 	template<typename ...TArgs>
-	void addTransformComponent(Entity& entity, TArgs ...args)
+	void addTransformComponent(Entity& entity, TArgs && ...args)
 	{
 		compTran[index_tran] = TransformComponent(std::forward<TArgs>(args)...);
 		entity.AddColliderComponent<TransformComponent>(&compTran[index_tran]);
@@ -36,7 +36,7 @@ public:
 	}
 
 	template<typename ...TArgs>
-	void addSpriteComponent(Entity& entity, TArgs ...args)
+	void addSpriteComponent(Entity& entity, TArgs && ...args)
 	{
 		compSprite[index_sprites] = SpriteComponent(std::forward<TArgs>(args)...);
 		entity.AddColliderComponent<SpriteComponent>(&compSprite[index_sprites]);
@@ -44,7 +44,7 @@ public:
 	}
 
 	template<typename ...TArgs>
-	void addKeyboardController(Entity& entity, TArgs ...args)
+	void addKeyboardController(Entity& entity, TArgs && ...args)
 	{
 		compKeyboard[index_keyboard] = KeyboardController(std::forward<TArgs>(args)...);
 		entity.AddColliderComponent<KeyboardController>(&compKeyboard[index_keyboard]);
@@ -52,7 +52,7 @@ public:
 	}
 
 	template<typename ...TArgs>
-	void addStaticColliderComponent(Entity& entity, TArgs ...args)
+	void addStaticColliderComponent(Entity& entity, TArgs && ...args)
 	{
 		compStaticColl[index_static_coll] = ColliderComponent(std::forward<TArgs>(args)...);
 		entity.AddColliderComponent<ColliderComponent>(&compStaticColl[index_static_coll]);
@@ -60,7 +60,7 @@ public:
 	}
 
 	template<typename ...TArgs>
-	void addDynamicColliderComponent(Entity& entity, TArgs ...args)
+	void addDynamicColliderComponent(Entity& entity, TArgs && ...args)
 	{
 		compDynamicColl[index_dynamic_coll] = ColliderComponent(std::forward<TArgs>(args)...);
 		entity.AddColliderComponent<ColliderComponent>(&compDynamicColl[index_dynamic_coll]);
@@ -68,7 +68,7 @@ public:
 	}
 
 	template<typename ...TArgs>
-	void addTileComponent(Entity& entity, TArgs ...args)
+	void addTileComponent(Entity& entity, TArgs && ...args)
 	{
 		compTile[index_tiles] = TileComponent(std::forward<TArgs>(args)...);
 		entity.AddColliderComponent<TileComponent>(&compTile[index_tiles]);
@@ -76,18 +76,19 @@ public:
 	}
 
 	template<typename ...TArgs>
-	void addPathfindingComponent(Entity& entity, TArgs ...args)
+	void addPathfindingComponent(Entity& entity, TArgs && ...args)
 	{
 		compPath[index_path] = PathfindingComponent(std::forward<TArgs>(args)...);
 		entity.AddColliderComponent<PathfindingComponent>(&compPath[index_path]);
 		index_path++;
 	}
 
+
 	template<typename ...TArgs>
-	void addAIControllerComponent(Entity& entity, TArgs ...args)
+	void addAIComponent(Entity& entity, TArgs && ...args)
 	{
-		compAI[index_ai] = AIControllerComponent(std::forward<TArgs>(args)...);
-		entity.AddColliderComponent<AIControllerComponent>(&compAI[index_ai]);
+		compAI[index_ai] = AIComponent(std::forward<TArgs>(args)...);
+		entity.AddColliderComponent<AIComponent>(&compAI[index_ai]);
 		index_ai++;
 	}
 	
@@ -99,7 +100,7 @@ public:
 	std::array<ColliderComponent, 2000> compDynamicColl;
 	std::array<TileComponent, 2000> compTile;
 	std::array<PathfindingComponent, 2000> compPath;
-	std::array<AIControllerComponent, 2000> compAI;
+	std::array<AIComponent, 2000> compAI;
 
 	int index_tran = 0;
 	int index_sprites = 0;

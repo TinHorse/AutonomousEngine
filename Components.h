@@ -6,9 +6,9 @@
 #include "ColliderComponent.h"
 #include "TileComponent.h"
 #include "PathfindingComponent.h"
-#include "AIControllerComponent.h"
+#include "AIComponent.h"
 
-enum ComponentType
+enum ComponentType : std::size_t
 {
 	Transform,
 	Sprite,
@@ -16,6 +16,5 @@ enum ComponentType
 	Collider,
 	Tile,
 	Pathfinding,
-	AIController
-
+	AI
 };

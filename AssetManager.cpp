@@ -29,7 +29,9 @@ Entity& AssetManager::CreateAgent(Vector2D position, int sizeX, int sizeY, float
 	manager->addSpriteComponent(agent, "player", false);
 	manager->addDynamicColliderComponent(agent,"agent");
 	manager->addPathfindingComponent(agent);
-	manager->addAIControllerComponent(agent);
+
+	manager->addAIComponent(agent, 100, idle);
+	agent.GetComponent<AIComponent>().addHuntedAI(50,0,0,20);
 
 	manager->AddToGroup(&agent, Game::groupAgents);
 	return agent;

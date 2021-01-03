@@ -23,7 +23,6 @@ public:
 
 	void Update() override
 	{
-		//transform->velocity.Zero();
 		if (moving)
 		{
 			next = path.top();
@@ -39,11 +38,16 @@ public:
 				}
 			}
 		}
+		else
+		{
+			Explore();
+		}
 	}
 
 	void FindPath(const Vector2D& target)
 	{
 		moving = false;
+		//origin = entity->GetComponent<TransformComponent>().position;
 		path = std::move(navigation.CalculatePath(transform->position, target, true));
 		if (!path.empty())
 		{
@@ -54,6 +58,34 @@ public:
 			}
 		}
 	}
+	
+
+	void Explore()
+	{
+		if (!moving) // calculate new path if not moving
+		{
+			FindPath(FindRandomPointInRadius(entity->GetComponent<TransformComponent>().position, 600.f));
+		}
+	}
+	
+	Vector2D FindRandomPointInRadius(const Vector2D& position, const float& radius)
+	{
+		float r1 = rand_float(-radius, radius);
+		if (abs(r1) < radius / 2.f)
+		{
+			r1 *= (radius / r1);
+		}
+		float r2 = rand_float(-radius, radius);
+		if (abs(r2) < radius / 4.f)
+		{
+			r2 *= (radius / r2);
+		}
+
+		Vector2D v(r1, r2);
+		v += position;
+		return Vector2D(v);
+	}
+	
 
 	bool PathIsEmpty()
 	{
@@ -64,5 +96,6 @@ private:
 	TransformComponent *transform;
 	std::stack<Vector2D> path;
 	Vector2D next;
-
+	//Vector2D origin;
+	
 };

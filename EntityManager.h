@@ -1,29 +1,32 @@
 #pragma once
 #include "ECS.h"
 #include "Components.h"
+#include "AISystem.h"
 
 class EntityManager
 {
 public:
 	void Update();
 	void Refresh();
+	EntityManager();
 
 	void AddToGroup(Entity *entity, Group mGroup); // adds an entity to one of the groups
 	Entity& AddEntity();
+	Entity& AddEntity(EntityType entT);
 	std::vector<Entity*>& GetGroup(Group mGroup); // returns the specified group of entities
 
 	
 	std::vector<Entity*>& FindEntitiesInArea(const Vector2D& position, Group mGroup, const float& dist)
 	{
-		std::vector<Entity*> entities;
+		entities_in_area.clear();
 		for (auto& e : GetGroup(mGroup))
 		{
 			if (Math::distance(e->GetComponent<TransformComponent>().position, position) < dist)
 			{
-				entities.push_back(e);
+				entities_in_area.push_back(e);
 			}
 		}
-		return entities;
+		return entities_in_area;
 	}
 	
 
@@ -81,17 +84,7 @@ public:
 		compPath[index_path] = PathfindingComponent(std::forward<TArgs>(args)...);
 		entity.AddColliderComponent<PathfindingComponent>(&compPath[index_path]);
 		index_path++;
-	}
-
-
-	template<typename ...TArgs>
-	void addAIComponent(Entity& entity, TArgs && ...args)
-	{
-		compAI[index_ai] = AIComponent(std::forward<TArgs>(args)...);
-		entity.AddColliderComponent<AIComponent>(&compAI[index_ai]);
-		index_ai++;
-	}
-	
+	}	
 
 	std::array<TransformComponent, 2000> compTran;
 	std::array<SpriteComponent, 2000> compSprite;
@@ -100,7 +93,6 @@ public:
 	std::array<ColliderComponent, 2000> compDynamicColl;
 	std::array<TileComponent, 2000> compTile;
 	std::array<PathfindingComponent, 2000> compPath;
-	std::array<AIComponent, 2000> compAI;
 
 	int index_tran = 0;
 	int index_sprites = 0;
@@ -109,10 +101,13 @@ public:
 	int index_dynamic_coll = 0;
 	int index_tiles = 0;
 	int index_path = 0;
-	int index_ai = 0;
 
 private:
+	std::unique_ptr<AISystem> aiSystem = nullptr; // system for managing ai objects
+
 	std::vector<std::unique_ptr<Entity>> entities;
 	std::array<std::vector<Entity*>, maxGroups> groupedEntities; // same as entities, but grouped for rendering
+
+	std::vector<Entity*> entities_in_area;
 };
 

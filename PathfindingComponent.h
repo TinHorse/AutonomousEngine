@@ -1,5 +1,5 @@
 #pragma once
-#include "Components.h"
+//#include "Components.h"
 #include "Vector2D.h"
 #include <vector>
 #include "NavMesh.h"
@@ -38,10 +38,6 @@ public:
 				}
 			}
 		}
-		else
-		{
-			Explore();
-		}
 	}
 
 	void FindPath(const Vector2D& target)
@@ -59,6 +55,21 @@ public:
 		}
 	}
 	
+	void FindPathToTarget(const Vector2D& target, Entity& entity)
+	{
+		target_entity = &entity;
+		moving = false;
+		//origin = entity->GetComponent<TransformComponent>().position;
+		path = std::move(navigation.CalculatePath(transform->position, target, true));
+		if (!path.empty())
+		{
+			path.pop();
+			if (!path.empty())
+			{
+				moving = true;
+			}
+		}
+	}
 
 	void Explore()
 	{
@@ -92,10 +103,15 @@ public:
 		return path.empty();
 	}
 
+	const Entity* getTargetEntity()
+	{
+		return target_entity;
+	}
+
 private:
 	TransformComponent *transform;
 	std::stack<Vector2D> path;
 	Vector2D next;
 	//Vector2D origin;
-	
+	Entity *target_entity = nullptr;
 };

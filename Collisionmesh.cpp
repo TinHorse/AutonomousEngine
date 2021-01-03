@@ -101,8 +101,9 @@ void Collisionmesh::CalculateCollision()
 	for (auto& dynCol : manager.compDynamicColl)
 	{
 		if (index-- <= 0) { break; }
-		//if (dynCol.entity->GetComponent<PathfindingComponent>().moving)
-		//{
+		if (dynCol.entity->HasComponent<PathfindingComponent>()
+			&& dynCol.entity->GetComponent<PathfindingComponent>().moving)
+		{
 			// determine node position
 			x = dynCol.transform->position.x / tileSizeX;
 			y = dynCol.transform->position.y / tileSizeY;
@@ -141,7 +142,7 @@ void Collisionmesh::CalculateCollision()
 			}
 
 			dynCol.transform->addForce(force);
-		//}
+		}
 	}
 
 	for (auto& entity : manager.GetGroup(Game::groupPlayers))

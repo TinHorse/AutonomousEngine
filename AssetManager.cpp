@@ -22,19 +22,27 @@ Entity& AssetManager::CreatePlayer(Vector2D position, int sizeX, int sizeY, floa
 	return player;
 }
 
-Entity& AssetManager::CreateAgent(Vector2D position, int sizeX, int sizeY, float scale)
+Entity& AssetManager::CreateHunted(Vector2D position, int sizeX, int sizeY, float scale)
 {
-	auto& agent = manager->AddEntity();
-	manager->addTransformComponent(agent, position.x, position.y, sizeX, sizeY, scale);
-	manager->addSpriteComponent(agent, "player", false);
-	manager->addDynamicColliderComponent(agent,"agent");
-	manager->addPathfindingComponent(agent);
+	auto& hunted = manager->AddEntity(eHunted);
+	manager->addTransformComponent(hunted, position.x, position.y, sizeX, sizeY, scale);
+	manager->addSpriteComponent(hunted, "player", false);
+	manager->addDynamicColliderComponent(hunted,"agent");
+	manager->addPathfindingComponent(hunted);
+	manager->AddToGroup(&hunted, Game::groupHunted);
 
-	manager->addAIComponent(agent, 100, idle);
-	agent.GetComponent<AIComponent>().addHuntedAI(50,0,0,20);
+	return hunted;
+}
 
-	manager->AddToGroup(&agent, Game::groupAgents);
-	return agent;
+Entity & AssetManager::CreateFood(Vector2D position, int sizeX, int sizeY, float scale)
+{
+	auto& foodItem = manager->AddEntity(eFood);
+	manager->addTransformComponent(foodItem, position.x, position.y, sizeX, sizeY, scale);
+	manager->addSpriteComponent(foodItem, "food", false);
+	manager->addDynamicColliderComponent(foodItem, "agent");
+	manager->AddToGroup(&foodItem, Game::groupFood);
+
+	return foodItem;
 }
 
 void AssetManager::AddTexture(std::string texID, const char *path)

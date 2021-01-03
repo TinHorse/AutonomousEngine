@@ -13,7 +13,8 @@ public:
 
 	// Object Management
 	Entity& CreatePlayer(Vector2D position, int sizeX = 32, int sizeY = 32, float scale = 1.f);
-	Entity& CreateAgent(Vector2D position, int sizeX = 32, int sizeY = 32, float scale = 1.f);
+	Entity& CreateHunted(Vector2D position, int sizeX = 32, int sizeY = 32, float scale = 1.f);
+	Entity& CreateFood(Vector2D position, int sizeX = 32, int sizeY = 32, float scale = 1.f);
 
 	// Texture Management
 	void AddTexture(std::string texID, const char *path);

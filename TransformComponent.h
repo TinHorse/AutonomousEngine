@@ -49,6 +49,7 @@ public:
 	{
 		position.x += velocity.x * speed;
 		position.y += velocity.y * speed;
+		velocity.Zero();
 	}
 
 	void addForce(const Vector2D& force)

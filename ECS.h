@@ -17,6 +17,15 @@ class Component;
 class Entity;
 class EntityManager;
 
+enum EntityType : std::size_t
+{
+	eNone,
+	eHunted,
+	eFood,
+	ePredator
+};
+
+
 // initialize variable ComponentID to size_t, whose maximum value is equal to the biggest value that can be held by the OS
 using ComponentID = std::size_t;
 
@@ -64,9 +73,10 @@ public:
 class Entity
 {
 public:
-	Entity(EntityManager& mManager) : manager(mManager) {}
+	Entity(EntityManager& mManager) : manager(mManager), type(eNone) {}
 	bool IsActive() const;
 	void Destroy();
+	virtual void Update() {}
 
 	bool HasGroup(Group mGroup); // checks if entity is part of a specific group
 	void AddToGroup(Group mGroup); // adds entity to specified group
@@ -121,9 +131,10 @@ public:
 		// NOTE on static cast: new_type value = static_cast <new_type> (expression);
 	}
 	
-private:
+protected:
 	EntityManager& manager;
 	bool active = true;
+	EntityType type;
 
 	ComponentArray componentArray;
 	ComponentBitSet componentBitSet; // each Entity has a bitset that keeps track of all active components

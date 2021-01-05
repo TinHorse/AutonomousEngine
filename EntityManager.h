@@ -1,7 +1,6 @@
 #pragma once
 #include "ECS.h"
 #include "Components.h"
-#include "AISystem.h"
 
 class EntityManager
 {
@@ -103,8 +102,6 @@ public:
 	int index_path = 0;
 
 private:
-	std::unique_ptr<AISystem> aiSystem = nullptr; // system for managing ai objects
-
 	std::vector<std::unique_ptr<Entity>> entities;
 	std::array<std::vector<Entity*>, maxGroups> groupedEntities; // same as entities, but grouped for rendering
 

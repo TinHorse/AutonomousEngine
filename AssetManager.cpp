@@ -1,6 +1,7 @@
 #include "AssetManager.h"
 #include "Components.h"
 #include "EntityManager.h"
+#include "AISystem.h"
 
 AssetManager::AssetManager(EntityManager *man) : manager(man)
 {
@@ -24,7 +25,7 @@ Entity& AssetManager::CreatePlayer(Vector2D position, int sizeX, int sizeY, floa
 
 Entity& AssetManager::CreateHunted(Vector2D position, int sizeX, int sizeY, float scale)
 {
-	auto& hunted = manager->AddEntity(eHunted);
+	auto& hunted = manager->AddEntity();
 	manager->addTransformComponent(hunted, position.x, position.y, sizeX, sizeY, scale);
 	manager->addSpriteComponent(hunted, "player", false);
 	manager->addDynamicColliderComponent(hunted,"agent");
@@ -36,7 +37,7 @@ Entity& AssetManager::CreateHunted(Vector2D position, int sizeX, int sizeY, floa
 
 Entity & AssetManager::CreateFood(Vector2D position, int sizeX, int sizeY, float scale)
 {
-	auto& foodItem = manager->AddEntity(eFood);
+	auto& foodItem = manager->AddEntity();
 	manager->addTransformComponent(foodItem, position.x, position.y, sizeX, sizeY, scale);
 	manager->addSpriteComponent(foodItem, "food", false);
 	manager->addDynamicColliderComponent(foodItem, "agent");

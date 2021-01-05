@@ -8,6 +8,7 @@
 #include "AssetManager.h"
 #include "NavMesh.h"
 #include "Collisionmesh.h"
+#include "AISystem.h"
 #include <chrono>
 using namespace std::chrono;
 
@@ -18,6 +19,7 @@ Map *map;
 SDL_Renderer *Game::renderer = nullptr;
 SDL_Event Game::event;
 EntityManager manager;
+AISystem aisystem;
 
 Camera Game::camera = Camera();
 
@@ -137,6 +139,8 @@ void Game::Update()
 	manager.Refresh();
 	
 	manager.Update();
+
+	aisystem.Update();
 
 	Vector2D offset(-400, -300);
 	camera.Update(offset + player->GetComponent<TransformComponent>().position);

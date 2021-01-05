@@ -6,6 +6,7 @@ class TileComponent : public Component
 {
 public:
 	SDL_Texture *texture;
+	std::string texID;
 	SDL_Rect srcRect;
 	SDL_Rect destRect;
 	Vector2D position;
@@ -15,6 +16,7 @@ public:
 	TileComponent(int srcX, int srcY, int xpos, int ypos, int tscale, int tsize, std::string tID)
 	{
 		texture = Game::assets->GetTexture(tID);
+		texID = tID;
 
 		position.x = xpos;
 		position.y = ypos;
@@ -30,7 +32,7 @@ public:
 
 	~TileComponent()
 	{
-		SDL_DestroyTexture(texture);
+		
 	}
 
 	void Update() override
@@ -43,6 +45,7 @@ public:
 	{
 		TextureManager::Draw(texture, srcRect, destRect, SDL_FLIP_NONE);
 	}
+	
 
 };
 

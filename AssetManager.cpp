@@ -9,7 +9,10 @@ AssetManager::AssetManager(EntityManager *man) : manager(man)
 }
 AssetManager::~AssetManager()
 {
-	
+	for (auto& t : textures)
+	{
+		SDL_DestroyTexture(t.second);
+	}
 }
 
 Entity& AssetManager::CreatePlayer(Vector2D position, int sizeX, int sizeY, float scale)
@@ -27,7 +30,7 @@ Entity& AssetManager::CreateHunted(Vector2D position, int sizeX, int sizeY, floa
 {
 	auto& hunted = manager->AddEntity();
 	manager->addTransformComponent(hunted, position.x, position.y, sizeX, sizeY, scale);
-	manager->addSpriteComponent(hunted, "player", false);
+	manager->addSpriteComponent(hunted, "enemy", false);
 	manager->addDynamicColliderComponent(hunted,"agent");
 	manager->addPathfindingComponent(hunted);
 
@@ -62,7 +65,8 @@ Entity & AssetManager::CreateFood(Vector2D position, int sizeX, int sizeY, float
 
 void AssetManager::AddTexture(std::string texID, const char *path)
 {
-	textures.emplace(texID, TextureManager::LoadTexture(path));
+	assert(textures.find(texID) == textures.end());
+	textures[texID] = TextureManager::LoadTexture(path);
 }
 
 SDL_Texture *AssetManager::GetTexture(std::string texID)

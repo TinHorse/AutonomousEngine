@@ -92,6 +92,11 @@ public:
 		return compState[index_state++];
 	}
 
+	std::array<TileComponent, 2000>& getTiles()
+	{
+		return compTile;
+	}
+
 	std::array<TransformComponent, 2000> compTran;
 	std::array<SpriteComponent, 2000> compSprite;
 	std::array<KeyboardController, 2000> compKeyboard;

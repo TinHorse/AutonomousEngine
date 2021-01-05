@@ -9,6 +9,7 @@
 #include "NavMesh.h"
 #include "Collisionmesh.h"
 #include "AISystem.h"
+#include <fstream>
 #include <chrono>
 using namespace std::chrono;
 
@@ -60,7 +61,7 @@ void Game::Init(const char * title, int xpos, int ypos, int width, int height, b
 		renderer = SDL_CreateRenderer(window, -1, 0);
 		if (renderer)
 		{
-			SDL_SetRenderDrawColor(renderer, 0,0,0,255);
+			SDL_SetRenderDrawColor(renderer, 255,255,255,255);
 			std::cout << "renderer created \n";
 		}
 		isRunning = true;
@@ -71,11 +72,11 @@ void Game::Init(const char * title, int xpos, int ypos, int width, int height, b
 	}
 
 	// Load assets
-	assets->AddTexture("terrain", "assets/tileset.png");
-	assets->AddTexture("food", "assets/foodItem.png");
-	assets->AddTexture("player", "assets/player_animated.png");
 	assets->AddTexture("collider", "assets/colliderTex.png");
-
+	assets->AddTexture("food", "assets/foodItem.png");
+	assets->AddTexture("terrain", "assets/tileset.png");
+	assets->AddTexture("player", "assets/player_animated.png");
+	assets->AddTexture("enemy", "assets/enemy.png");
 
 	// Load map
 	map = new Map("terrain", 32, 1);
@@ -160,9 +161,14 @@ void Game::Update()
 
 }
 
-void Game::Render() // note that all draw function have to be called inside the SDL Renderer
+
+void Game::Render() // note that all draw functions have to be called inside the SDL Renderer
 {
 	SDL_RenderClear(renderer);
+
+	SDL_Rect src{ 0,0,160,320 };
+	SDL_Rect dest{ 0,0,320,320 };
+	TextureManager::Draw(assets->GetTexture("terrain"), src, dest, SDL_FLIP_NONE);
 	for (auto& t : tiles)
 	{
 		t->GetComponent<TileComponent>().Draw();

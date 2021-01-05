@@ -20,8 +20,8 @@ Map::~Map()
 void Map::AddTile(int srcX, int srcY, int xpos, int ypos)
 {
 	auto& tile(manager.AddEntity());
-	//manager.addTileComponent(tile, srcX, srcY, xpos, ypos, mapScale, tileSize, texID);
-	tile.AddComponent<TileComponent>(srcX, srcY, xpos, ypos, mapScale, tileSize, texID);
+	manager.addTileComponent(tile, srcX, srcY, xpos, ypos, mapScale, tileSize, texID);
+	//tile.AddComponent<TileComponent>(srcX, srcY, xpos, ypos, mapScale, tileSize, texID);
 	manager.AddToGroup(&tile, Game::groupTiles);
 }
 

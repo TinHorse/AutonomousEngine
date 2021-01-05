@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <bitset>
 #include <array>
+#include "Math.h"
 
 // The Entity Component System is composed of three classes: component, entity and manager
 // A Component can be anything: transform, visual representation, movement, collision etc
@@ -16,14 +17,6 @@
 class Component;
 class Entity;
 class EntityManager;
-
-enum EntityType : std::size_t
-{
-	eNone,
-	eHunted,
-	eFood,
-	ePredator
-};
 
 
 // initialize variable ComponentID to size_t, whose maximum value is equal to the biggest value that can be held by the OS
@@ -62,21 +55,30 @@ class Component
 {
 public:
 	Entity *entity; // reference to its entity (owner)
+	bool IsActive() const;
+	void Destroy();
+	virtual void LinkComponentPointers() {}; // used for re-linking components after a component pointer has changed
 
 	virtual void Init() {};
 	virtual void Update() {};
 	virtual void Draw() {};
 	virtual ~Component() {};
+
+protected:
+	bool active = true;
 };
 
 
 class Entity
 {
 public:
-	Entity(EntityManager& mManager) : manager(mManager), type(eNone) {}
+	Entity(EntityManager& mManager) : manager(mManager) 
+	{
+		Ticks = TickMaster++;
+	}
 	bool IsActive() const;
 	void Destroy();
-	virtual void Update() {}
+	~Entity();
 
 	bool HasGroup(Group mGroup); // checks if entity is part of a specific group
 	void AddToGroup(Group mGroup); // adds entity to specified group
@@ -114,6 +116,23 @@ public:
 		comp->Init();
 		return *comp;
 	}
+
+	template<typename T>
+	void SetComponent(T* comp)
+	{
+		//comp->entity = this; // sets component's entity (owner) to the current entity
+		componentArray[GetComponentTypeID<T>()] = comp; // add component to the entity's component array
+		//componentBitSet[GetComponentTypeID<T>()] = true; // set the hasComponent flag to true for this component
+		//comp->Init();
+		//return *comp;
+		for (auto comp : componentArray)
+		{
+			if (comp)
+			{
+				comp->LinkComponentPointers();
+			}
+		}
+	}
 	
 	template<typename T>
 	inline T & GetComponent() const
@@ -130,13 +149,19 @@ public:
 		return static_cast<T*>(ptr); // static cast the pointer, which converts the pointer to a pointer to the type of the component, rather than being a pointer to its base class Component
 		// NOTE on static cast: new_type value = static_cast <new_type> (expression);
 	}
+
+	const long int& incrementTicks()
+	{
+		return Ticks++;
+	}
 	
 protected:
 	EntityManager& manager;
 	bool active = true;
-	EntityType type;
 
-	ComponentArray componentArray;
+	ComponentArray componentArray{};
 	ComponentBitSet componentBitSet; // each Entity has a bitset that keeps track of all active components
 	GroupBitSet groupBitSet; // each Entity has a Group bitset that keeps track of which groups it is part of
+	long int Ticks;
+	static long int TickMaster;
 };

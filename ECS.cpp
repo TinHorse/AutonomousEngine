@@ -1,5 +1,17 @@
 #include "ECS.h"
 
+long int Entity::TickMaster = 0;
+
+bool Component::IsActive() const
+{
+	return active;
+}
+
+void Component::Destroy()
+{
+	active = false;
+}
+
 bool Entity::IsActive() const
 {
 	return active;
@@ -8,6 +20,21 @@ bool Entity::IsActive() const
 void Entity::Destroy()
 {
 	active = false;
+	for (auto comp : componentArray)
+	{
+		if (comp)
+		{
+			comp->Destroy();
+		}
+	}
+}
+
+Entity::~Entity()
+{
+	for (auto& comp : componentArray)
+	{
+		comp = nullptr;
+	}
 }
 
 bool Entity::HasGroup(Group mGroup)
@@ -24,4 +51,3 @@ void Entity::RemoveFromGroup(Group mGroup)
 {
 	groupBitSet[mGroup] = false;
 }
-

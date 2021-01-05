@@ -18,7 +18,7 @@ public:
 
 	void Init() override
 	{
-		transform = &entity->GetComponent<TransformComponent>();
+		LinkComponentPointers();
 	}
 
 	void Update() override
@@ -35,6 +35,7 @@ public:
 				{
 					moving = false;
 					transform->velocity = {0,0};
+					targetReached = true;
 				}
 			}
 		}
@@ -43,6 +44,7 @@ public:
 	void FindPath(const Vector2D& target)
 	{
 		moving = false;
+		targetReached = false;
 		//origin = entity->GetComponent<TransformComponent>().position;
 		path = std::move(navigation.CalculatePath(transform->position, target, true));
 		if (!path.empty())
@@ -55,12 +57,13 @@ public:
 		}
 	}
 	
-	void FindPathToTarget(const Vector2D& target, Entity& entity)
+	void FindPathToTarget(Entity& entity)
 	{
 		target_entity = &entity;
 		moving = false;
+		targetReached = false;
 		//origin = entity->GetComponent<TransformComponent>().position;
-		path = std::move(navigation.CalculatePath(transform->position, target, true));
+		path = std::move(navigation.CalculatePath(transform->position, entity.GetComponent<TransformComponent>().position, true));
 		if (!path.empty())
 		{
 			path.pop();
@@ -103,9 +106,24 @@ public:
 		return path.empty();
 	}
 
-	const Entity* getTargetEntity()
+	Entity* getTargetEntity()
 	{
 		return target_entity;
+	}
+
+	void clearTargetEntity()
+	{
+		target_entity = nullptr;
+	}
+
+	const bool isTargetReached()
+	{
+		return targetReached;
+	}
+
+	void LinkComponentPointers() override
+	{
+		transform = &entity->GetComponent<TransformComponent>();
 	}
 
 private:
@@ -114,4 +132,5 @@ private:
 	Vector2D next;
 	//Vector2D origin;
 	Entity *target_entity = nullptr;
+	bool targetReached{ false };
 };

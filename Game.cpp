@@ -103,9 +103,9 @@ void Game::Init(const char * title, int xpos, int ypos, int width, int height, b
 	}
 
 	// Create Food
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < 2; i++)
 	{
-		for (int j = 0; j < 4; j++)
+		for (int j = 0; j < 2; j++)
 		{
 			assets->CreateFood(Vector2D(200 + i * 140, 100 + j * 150), 90, 90, 0.25f);
 		}
@@ -136,15 +136,17 @@ void Game::Update()
 	GameTime++; // increment game time
 
 	auto start = std::chrono::high_resolution_clock().now();
+	
 	manager.Refresh();
 	
 	manager.Update();
 
-	aisystem.Update();
+	aisystem.updateHunted();
+	aisystem.updateFoodSources();
 
 	Vector2D offset(-400, -300);
 	camera.Update(offset + player->GetComponent<TransformComponent>().position);
-	
+
 	// Collision
 	collision.CalculateCollision();
 	auto end = std::chrono::high_resolution_clock().now();
@@ -155,6 +157,7 @@ void Game::Update()
 	}
 	std::cout << average_time / GameTime << std::endl;
 	//std::cout << totaltime.count() << std::endl;
+
 }
 
 void Game::Render() // note that all draw function have to be called inside the SDL Renderer

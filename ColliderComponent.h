@@ -35,7 +35,7 @@ public:
 		//{
 			//entity->AddComponent<TransformComponent>(collider.x, collider.y, collider.w, collider.h);
 		//}
-		transform = &entity->GetComponent<TransformComponent>();
+		LinkComponentPointers();
 
 		texture = TextureManager::LoadTexture("assets/colliderTex.png");
 		srcRect = { 0,0,320,320 };
@@ -59,6 +59,11 @@ public:
 	void Draw() override
 	{
 		TextureManager::Draw(texture, srcRect, destRect, SDL_FLIP_NONE);
+	}
+
+	void LinkComponentPointers() override
+	{
+		transform = &entity->GetComponent<TransformComponent>();
 	}
 
 };

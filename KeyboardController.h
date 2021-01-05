@@ -11,8 +11,7 @@ public:
 
 	void Init() override
 	{
-		transform = &entity->GetComponent <TransformComponent>();
-		sprite = &entity->GetComponent<SpriteComponent>();
+		LinkComponentPointers();
 	}
 	void Update() override
 	{
@@ -69,5 +68,11 @@ public:
 				break;
 			}
 		}
+	}
+	
+	void LinkComponentPointers() override
+	{
+		transform = &entity->GetComponent <TransformComponent>();
+		sprite = &entity->GetComponent<SpriteComponent>();
 	}
 };

@@ -42,7 +42,7 @@ public:
 
 	void Init() override
 	{
-		transform = &entity->GetComponent<TransformComponent>(); // the sprite component gets a pointer to the transform component of the entity, thereby fixing its transform to the entity
+		LinkComponentPointers(); // the sprite component gets a pointer to the transform component of the entity, thereby fixing its transform to the entity
 
 		srcRect.x = srcRect.y = 0;
 		srcRect.w = transform->width;
@@ -73,6 +73,11 @@ public:
 		numFrames = animations[animName].numFrames;
 		animationIndex = animations[animName].index;
 		animationSpeed = animations[animName].animationSpeed;
+	}
+
+	void LinkComponentPointers() override
+	{
+		transform = &entity->GetComponent<TransformComponent>();
 	}
 
 

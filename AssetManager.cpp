@@ -30,7 +30,18 @@ Entity& AssetManager::CreateHunted(Vector2D position, int sizeX, int sizeY, floa
 	manager->addSpriteComponent(hunted, "player", false);
 	manager->addDynamicColliderComponent(hunted,"agent");
 	manager->addPathfindingComponent(hunted);
+
 	manager->AddToGroup(&hunted, Game::groupHunted);
+
+	auto& state = manager->addStateComponent(hunted);
+	state.initS("health", 100);
+	state.initS("hunger", 0);
+	state.initS("fear", 0);
+
+	state.initB("idle", 0);
+	state.initB("exploring", 0);
+	state.initB("eating", 0);
+	state.initB("movingToTarget", 0);
 
 	return hunted;
 }
@@ -42,6 +53,9 @@ Entity & AssetManager::CreateFood(Vector2D position, int sizeX, int sizeY, float
 	manager->addSpriteComponent(foodItem, "food", false);
 	manager->addDynamicColliderComponent(foodItem, "agent");
 	manager->AddToGroup(&foodItem, Game::groupFood);
+
+	auto& state = manager->addStateComponent(foodItem);
+	state.initS("food", 100);
 
 	return foodItem;
 }

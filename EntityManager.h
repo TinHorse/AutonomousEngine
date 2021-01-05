@@ -1,6 +1,7 @@
 #pragma once
 #include "ECS.h"
 #include "Components.h"
+#include <set>
 
 class EntityManager
 {
@@ -120,5 +121,7 @@ private:
 	std::array<std::vector<Entity*>, maxGroups> groupedEntities; // same as entities, but grouped for rendering
 
 	std::vector<Entity*> entities_in_area;
+
+	std::set<Entity*> deleted_entities;
 };
 

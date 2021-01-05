@@ -5,6 +5,7 @@
 #include "NavMesh.h"
 #include <stack>
 #include "Math.h"
+#include <set>
 
 extern Navmesh navigation;
 
@@ -111,9 +112,12 @@ public:
 		return target_entity;
 	}
 
-	void clearTargetEntity()
+	void UpdateTargetEntity(std::set<Entity*> deleted_entities)
 	{
-		target_entity = nullptr;
+		if (deleted_entities.find(target_entity) != deleted_entities.end())
+		{
+			target_entity = nullptr;
+		}
 	}
 
 	const bool isTargetReached()

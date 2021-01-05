@@ -2,10 +2,10 @@
 
 void EntityManager::Update()
 {
-	int index = index_tran;
+	int index = 0;
 	for (auto& comp : compTran)
 	{
-		if (index-- <= 0) { break; };
+		if (index++ >= index_tran) { break; };
 		comp.Update();
 	}
 	index = index_sprites;
@@ -43,6 +43,7 @@ void EntityManager::Update()
 	{
 		if (index-- <= 0) { break; };
 		comp.Update();
+		comp.UpdateTargetEntity(deleted_entities);
 	}
 	index = index_state;
 	for (auto& comp : compState)
@@ -54,11 +55,20 @@ void EntityManager::Update()
 
 void EntityManager::Refresh()
 {
+	deleted_entities.clear();
+	for (auto& e : entities)
+	{
+		if (!e.get()->IsActive())
+		{
+			deleted_entities.insert(e.get());
+		}
+	}
+
 	// remove inactive components
 	int index = 0;
 	for (auto& comp : compTran)
 	{
-		if (index++ <= index_tran) { break; };
+		if (index++ >= index_tran) { break; };
 		if (!comp.IsActive())
 		{
 			while (index_tran > 0 && !compTran[index_tran - 1].IsActive())
@@ -76,10 +86,10 @@ void EntityManager::Refresh()
 		}
 	}
 
-	index = index_sprites;
+	index = 0;
 	for (auto& comp : compSprite)
 	{
-		if (index++ <= index_sprites) { break; };
+		if (index++ >= index_sprites) { break; };
 		if (!comp.IsActive())
 		{
 			while (index_sprites > 0 && !compSprite[index_sprites - 1].IsActive())
@@ -96,10 +106,10 @@ void EntityManager::Refresh()
 		}
 	}
 
-	index = index_dynamic_coll;
+	index = 0;
 	for (auto& comp : compDynamicColl)
 	{
-		if (index++ <= index_dynamic_coll) { break; };
+		if (index++ >= index_dynamic_coll) { break; };
 		if (!comp.IsActive())
 		{
 			while (index_dynamic_coll > 0 && !compDynamicColl[index_dynamic_coll - 1].IsActive())
@@ -116,10 +126,10 @@ void EntityManager::Refresh()
 		}
 	}
 
-	index = index_state;
+	index = 0;
 	for (auto& comp : compState)
 	{
-		if (index++ <= index_state) { break; };
+		if (index++ >= index_state) { break; };
 		if (!comp.IsActive())
 		{
 			while (index_state > 0 && !compState[index_state - 1].IsActive())

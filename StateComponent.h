@@ -67,7 +67,13 @@ public:
 		bevaviour[bv] += value;
 	}
 
+	Entity* getTargetEntity()
+	{
+		return target_entity;
+	}
+
 private:
 	std::map<std::string, double> state;
 	std::map<std::string, double> bevaviour;
+	Entity* target_entity;
 };

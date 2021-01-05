@@ -166,9 +166,6 @@ void Game::Render() // note that all draw functions have to be called inside the
 {
 	SDL_RenderClear(renderer);
 
-	SDL_Rect src{ 0,0,160,320 };
-	SDL_Rect dest{ 0,0,320,320 };
-	TextureManager::Draw(assets->GetTexture("terrain"), src, dest, SDL_FLIP_NONE);
 	for (auto& t : tiles)
 	{
 		t->GetComponent<TileComponent>().Draw();

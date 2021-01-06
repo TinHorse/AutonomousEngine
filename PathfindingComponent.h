@@ -27,11 +27,13 @@ public:
 		if (moving)
 		{
 			next = path.top();
-			transform->velocity = (next - transform->position).Normalize() * transform->speed;
+			transform->addForce((next - transform->position).Normalize());
 			if (Math::distance(transform->position, path.top()) < 10)
 			{
 				// else, pull up next target
 				path.pop();
+				previous_position = transform->position;
+				movement_tries = 0;
 				if (path.empty())
 				{
 					moving = false;
@@ -39,11 +41,28 @@ public:
 					targetReached = true;
 				}
 			}
+			if (Math::distance(transform->position, previous_position) < 20)
+			{
+				if (movement_tries++ > 60)
+				{
+					movement_tries = 0;
+					moving = false;
+					transform->velocity = { 0,0 };
+					for (int i = 0; i < path.size(); i++)
+					{
+						path.pop();
+					}
+					std::cout << "clear path" << std::endl;
+				}
+			}
 		}
 	}
 
 	void FindPath(const Vector2D& target)
 	{
+		movement_tries = 0;
+		previous_position = transform->position;
+
 		moving = false;
 		targetReached = false;
 		//origin = entity->GetComponent<TransformComponent>().position;
@@ -60,6 +79,9 @@ public:
 	
 	void FindPathToTarget(Entity& entity)
 	{
+		movement_tries = 0;
+		previous_position = transform->position;
+
 		target_entity = &entity;
 		moving = false;
 		targetReached = false;
@@ -137,4 +159,6 @@ private:
 	//Vector2D origin;
 	Entity *target_entity = nullptr;
 	bool targetReached{ false };
+	int movement_tries;
+	Vector2D previous_position;
 };

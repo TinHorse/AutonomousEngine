@@ -68,14 +68,14 @@ void EntityManager::Refresh()
 	int index = 0;
 	for (auto& comp : compTran)
 	{
-		if (index++ >= index_tran) { break; };
+		if (index >= index_tran) { break; };
 		if (!comp.IsActive())
 		{
 			while (index_tran > 0 && !compTran[index_tran - 1].IsActive())
 			{
 				index_tran--;
 			}
-			if (index_tran > 0)
+			if (index_tran > 0 && index_tran != index)
 			{
 				Entity* entity = compTran[index_tran - 1].entity;
 				std::cout << compTran[index].position << " swapped with " << compTran[index_tran - 1].position;
@@ -84,19 +84,20 @@ void EntityManager::Refresh()
 				index_tran--;
 			}
 		}
+		index++;
 	}
 
 	index = 0;
 	for (auto& comp : compSprite)
 	{
-		if (index++ >= index_sprites) { break; };
+		if (index >= index_sprites) { break; };
 		if (!comp.IsActive())
 		{
 			while (index_sprites > 0 && !compSprite[index_sprites - 1].IsActive())
 			{
 				index_sprites--;
 			}
-			if (index_sprites > 0)
+			if (index_sprites > 0 && index_sprites != index)
 			{
 				Entity* entity = compSprite[index_sprites - 1].entity;
 				std::swap(compSprite[index], compSprite[index_sprites - 1]);
@@ -104,19 +105,20 @@ void EntityManager::Refresh()
 				index_sprites--;
 			}
 		}
+		index++;
 	}
 
 	index = 0;
 	for (auto& comp : compDynamicColl)
 	{
-		if (index++ >= index_dynamic_coll) { break; };
+		if (index >= index_dynamic_coll) { break; };
 		if (!comp.IsActive())
 		{
 			while (index_dynamic_coll > 0 && !compDynamicColl[index_dynamic_coll - 1].IsActive())
 			{
 				index_dynamic_coll--;
 			}
-			if (index_dynamic_coll > 0)
+			if (index_dynamic_coll > 0 && index_dynamic_coll != index)
 			{
 				Entity* entity = compDynamicColl[index_dynamic_coll - 1].entity;
 				std::swap(compDynamicColl[index], compDynamicColl[index_dynamic_coll - 1]);
@@ -124,19 +126,20 @@ void EntityManager::Refresh()
 				index_dynamic_coll--;
 			}
 		}
+		index++;
 	}
 
 	index = 0;
 	for (auto& comp : compState)
 	{
-		if (index++ >= index_state) { break; };
+		if (index >= index_state) { break; };
 		if (!comp.IsActive())
 		{
 			while (index_state > 0 && !compState[index_state - 1].IsActive())
 			{
 				index_state--;
 			}
-			if (index_state > 0)
+			if (index_state > 0 && index_state != index)
 			{
 				Entity* entity = compState[index_state - 1].entity;
 				std::swap(compState[index], compState[index_state - 1]);
@@ -144,6 +147,7 @@ void EntityManager::Refresh()
 				index_state--;
 			}
 		}
+		index++;
 	}
 
 

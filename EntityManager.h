@@ -98,7 +98,7 @@ public:
 		return compTile;
 	}
 
-	std::array<TransformComponent, 2000> compTran;
+	std::array<TransformComponent, 106> compTran;
 	std::array<SpriteComponent, 2000> compSprite;
 	std::array<KeyboardController, 2000> compKeyboard;
 	std::array<ColliderComponent, 2000> compStaticColl;

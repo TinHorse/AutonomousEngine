@@ -54,7 +54,7 @@ Entity & AssetManager::CreateFood(Vector2D position, int sizeX, int sizeY, float
 	auto& foodItem = manager->AddEntity();
 	manager->addTransformComponent(foodItem, position.x, position.y, sizeX, sizeY, scale);
 	manager->addSpriteComponent(foodItem, "food", false);
-	manager->addDynamicColliderComponent(foodItem, "agent");
+	manager->addDynamicColliderComponent(foodItem, "food");
 	manager->AddToGroup(&foodItem, Game::groupFood);
 
 	auto& state = manager->addStateComponent(foodItem);

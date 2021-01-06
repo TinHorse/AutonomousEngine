@@ -38,13 +38,18 @@ Entity& AssetManager::CreateHunted(Vector2D position, int sizeX, int sizeY, floa
 
 	auto& state = manager->addStateComponent(hunted);
 	state.initS("health", 100);
-	state.initS("hunger", 0);
-	state.initS("fear", 0);
+	state.initS("hunger", rand_int(10, 50));
+	state.initS("fear", rand_int(10,50));
+	state.initS("food", 0);
 
 	state.initB("idle", 0);
 	state.initB("exploring", 0);
 	state.initB("eating", 0);
+	state.initB("fleeing", 0);
 	state.initB("movingToTarget", 0);
+
+	state.initTarget("food", nullptr);
+	state.initTarget("player", manager->GetGroup(Game::groupPlayers)[0]);
 
 	return hunted;
 }

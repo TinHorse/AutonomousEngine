@@ -30,9 +30,14 @@ public:
 	// v1 = v2
 	Vector2D& operator=(const Vector2D& vec);
 
-	// v1 * int
+	// v1 * value
 	Vector2D& operator*(const float& f);
 	Vector2D& operator*(const int& i);
+
+	// comparison
+	const bool& operator==(const Vector2D& vec);
+	const bool& operator!=(const Vector2D& vec);
+
 
 	Vector2D& operator+(const float& f);
 

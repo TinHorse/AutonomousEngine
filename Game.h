@@ -19,6 +19,7 @@ public:
 
 	void HandleEvents();
 	void Update();
+	void ExecuteQueues(double maxTime);
 	void Render();
 	void Clean();
 

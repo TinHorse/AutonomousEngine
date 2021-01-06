@@ -4,6 +4,7 @@
 #include <iostream>
 #include <stack>
 #include <map>
+#include "ECS.h"
 
 class Vector2D;
 
@@ -37,7 +38,7 @@ public:
 
 	void Init(int mCols, int mRows);
 	void LoadMesh(const char *path, int sX, int sY, int sTileX, int sTileY, int scale);
-	std::stack<Vector2D> CalculatePath(const Vector2D& curLoc, const Vector2D& targetLoc, bool earlyExit);
+	void CalculatePath(Entity* entity, std::stack<Vector2D>& path, const Vector2D targetLoc, bool earlyExit);
 	void ClearMesh();
 
 	Node &operator()(const int& x, const int& y);
@@ -60,6 +61,7 @@ private:
 
 	std::vector<Node> mesh;
 	std::array<Node*, 8> neighbours;
+
 	Node nullNode;
 };
 

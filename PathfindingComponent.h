@@ -1,5 +1,4 @@
 #pragma once
-//#include "Components.h"
 #include "Vector2D.h"
 #include <vector>
 #include "NavMesh.h"
@@ -52,13 +51,12 @@ public:
 					{
 						path.pop();
 					}
-					std::cout << "clear path" << std::endl;
 				}
 			}
 		}
 	}
 
-	void FindPath(const Vector2D& target)
+	void FindPath(Entity* requesting_entity, const Vector2D& target)
 	{
 		movement_tries = 0;
 		previous_position = transform->position;
@@ -66,7 +64,13 @@ public:
 		moving = false;
 		targetReached = false;
 		//origin = entity->GetComponent<TransformComponent>().position;
-		path = std::move(navigation.CalculatePath(transform->position, target, true));
+
+		for (int i = 0; i < path.size(); i++)
+		{
+			path.pop();
+		}
+
+		navigation.CalculatePath(requesting_entity, path, target, true);
 		if (!path.empty())
 		{
 			path.pop();
@@ -77,16 +81,21 @@ public:
 		}
 	}
 	
-	void FindPathToTarget(Entity& entity)
+	void FindPathToTarget(Entity* requesting_entity, Entity* target_entity)
 	{
 		movement_tries = 0;
 		previous_position = transform->position;
 
-		target_entity = &entity;
 		moving = false;
 		targetReached = false;
 		//origin = entity->GetComponent<TransformComponent>().position;
-		path = std::move(navigation.CalculatePath(transform->position, entity.GetComponent<TransformComponent>().position, true));
+		
+		for (int i = 0; i < path.size(); i++)
+		{
+			path.pop();
+		}
+
+		navigation.CalculatePath(requesting_entity, path, target_entity->GetComponent<TransformComponent>().position, true);
 		if (!path.empty())
 		{
 			path.pop();
@@ -97,11 +106,11 @@ public:
 		}
 	}
 
-	void Explore()
+	void Explore(Entity* requesting_entity)
 	{
 		if (!moving) // calculate new path if not moving
 		{
-			FindPath(FindRandomPointInRadius(entity->GetComponent<TransformComponent>().position, 600.f));
+			FindPath(requesting_entity, FindRandomPointInRadius(entity->GetComponent<TransformComponent>().position, 500.f));
 		}
 	}
 	
@@ -129,19 +138,6 @@ public:
 		return path.empty();
 	}
 
-	Entity* getTargetEntity()
-	{
-		return target_entity;
-	}
-
-	void UpdateTargetEntity(std::set<Entity*> deleted_entities)
-	{
-		if (deleted_entities.find(target_entity) != deleted_entities.end())
-		{
-			target_entity = nullptr;
-		}
-	}
-
 	const bool isTargetReached()
 	{
 		return targetReached;
@@ -157,7 +153,6 @@ private:
 	std::stack<Vector2D> path;
 	Vector2D next;
 	//Vector2D origin;
-	Entity *target_entity = nullptr;
 	bool targetReached{ false };
 	int movement_tries;
 	Vector2D previous_position;

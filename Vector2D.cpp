@@ -107,6 +107,16 @@ Vector2D & Vector2D::operator*(const int & i)
 	return *this;
 }
 
+const bool& Vector2D::operator==(const Vector2D & vec)
+{
+	return (this->x == vec.x && this->y == vec.y);
+}
+
+const bool& Vector2D::operator!=(const Vector2D & vec)
+{
+	return (this->x != vec.x && this->y != vec.y);
+}
+
 Vector2D & Vector2D::operator+(const float & f)
 {
 	this->x += f;

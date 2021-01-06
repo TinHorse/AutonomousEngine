@@ -15,19 +15,9 @@ public:
 	std::vector<Entity*>& GetGroup(Group mGroup); // returns the specified group of entities
 
 	
-	std::vector<Entity*>& FindEntitiesInArea(const Vector2D& position, Group mGroup, const float& dist)
-	{
-		entities_in_area.clear();
-		for (auto& e : GetGroup(mGroup))
-		{
-			if (Math::distance(e->GetComponent<TransformComponent>().position, position) < dist)
-			{
-				entities_in_area.push_back(e);
-			}
-		}
-		return entities_in_area;
-	}
+	std::vector<Entity*>& FindEntitiesInArea(const Vector2D& position, Group mGroup, const float& dist);
 	
+	std::set<Entity*>& getDeletedEntities();
 
 	template<typename ...TArgs>
 	TransformComponent& addTransformComponent(Entity& entity, TArgs && ...args)
@@ -98,7 +88,7 @@ public:
 		return compTile;
 	}
 
-	std::array<TransformComponent, 106> compTran;
+	std::array<TransformComponent, 2000> compTran;
 	std::array<SpriteComponent, 2000> compSprite;
 	std::array<KeyboardController, 2000> compKeyboard;
 	std::array<ColliderComponent, 2000> compStaticColl;

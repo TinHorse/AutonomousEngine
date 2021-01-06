@@ -1,10 +1,13 @@
 #include "Game.h";
+#include <chrono>
+using namespace std::chrono;
+
 
 Game *game = nullptr;
 int main(int argc,  char *argv[])
 {
-	const int FPS = 60;
-	const int frameDelay = 1000 / FPS; // sets frameDelay = (milliseconds in a second / FPS)
+	const double FPS = 60;
+	const double frameDelay = 1000 / FPS; // sets frameDelay = (milliseconds in a second / FPS)
 	// this means that there should be a new frame approx. every 13 milliseconds
 
 	double prevTime = SDL_GetTicks();
@@ -15,22 +18,34 @@ int main(int argc,  char *argv[])
 
 	while (game->Running())
 	{
+		
+
 		double currTime = SDL_GetTicks();
 		double elapsed = currTime - prevTime;
 		prevTime = currTime;
 		lag += elapsed;
 
+		auto start = std::chrono::high_resolution_clock().now();
 		game->HandleEvents();
 		while (lag >= frameDelay)
 		{
 			game->Update();
 			lag -= frameDelay;
-			if (lag >= frameDelay)
-			{
-				//std::cout << lag << std::endl;
-			}
+			game->ExecuteQueues(frameDelay - lag);
 		}
+		
+		auto end = std::chrono::high_resolution_clock().now();
+		auto totaltime = std::chrono::duration_cast<milliseconds>(end - start);
+		if (totaltime.count() > 10)
+		{
+			std::cout << totaltime.count() << std::endl;
+		}
+
+
 		game->Render();
+		
+
+		
 	}
 	game->Clean(); // delete game memory
 

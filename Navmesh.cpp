@@ -2,6 +2,7 @@
 #include <fstream>
 #include <queue>
 #include "Math.h"
+#include "Components.h"
 
 int Node::NodeID = 0;
 
@@ -12,6 +13,7 @@ Navmesh::Navmesh()
 
 Navmesh::~Navmesh()
 {
+
 }
 
 void Navmesh::Init(int mCols, int mRows)
@@ -59,10 +61,11 @@ void Navmesh::LoadMesh(const char * path, int sX, int sY, int sTileX, int sTileY
 	stream.close();
 }
 
-std::stack<Vector2D> Navmesh::CalculatePath(const Vector2D& curLoc, const Vector2D& targetLoc, bool earlyExit)
+void Navmesh::CalculatePath(Entity* entity, std::stack<Vector2D>& path, const Vector2D targetLoc, bool earlyExit)
 {
 	int totalNodes = 0;
 
+	const Vector2D& curLoc = entity->GetComponent<TransformComponent>().position;
 	int closestX = (curLoc.x / tileSizeX);
 	int closestY = (curLoc.y / tileSizeY);
 
@@ -75,10 +78,9 @@ std::stack<Vector2D> Navmesh::CalculatePath(const Vector2D& curLoc, const Vector
 	Node* target = getNodeAt(closestXTarget, closestYTarget);
 	
 	// check if start or target are out of bounds, check if target is obstacle
-	std::stack<Vector2D> path;
 	if (!current || !target || target->isObstacle)
 	{
-		return path;
+		return;
 	}
 
 	// list yet to be tested
@@ -91,9 +93,14 @@ std::stack<Vector2D> Navmesh::CalculatePath(const Vector2D& curLoc, const Vector
 	// Initialize currrent
 	goals[current] = Math::distanceNoSqrt(current->x, current->y, target->x, target->y);
 
+	int num_nodes_tested = 0;
+	int max_nodes_to_test = Math::distanceNoSqrt(current->x, current->y, target->x, target->y) / 4;
+	//std::cout << "max nodse to test " << max_nodes_to_test << " at distance " << sqrt(goals[current]) << std::endl;
 	// while there are nodes not yet tested
 	while (!not_tested.empty() && current != target)
 	{
+		if (num_nodes_tested++ > max_nodes_to_test) { break; }
+
 		// if the node has been visited, remove it
 		while (!not_tested.empty() && visited[not_tested.top()->ID])
 		{
@@ -156,8 +163,6 @@ std::stack<Vector2D> Navmesh::CalculatePath(const Vector2D& curLoc, const Vector
 
 	path.pop();
 	path.push(curLoc);
-
-	return path;
 }
 
 void Navmesh::ClearMesh()

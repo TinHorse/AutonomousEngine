@@ -9,6 +9,8 @@
 #include "NavMesh.h"
 #include "Collisionmesh.h"
 #include "AISystem.h"
+#include "Queues.h"
+
 #include <fstream>
 #include <chrono>
 using namespace std::chrono;
@@ -27,6 +29,8 @@ Camera Game::camera = Camera();
 AssetManager *Game::assets = new AssetManager(&manager);
 Navmesh navigation;
 Collisionmesh collision;
+
+PathfindingQueue pathfindingQueue;
 
 
 bool Game::isRunning = false;
@@ -104,9 +108,9 @@ void Game::Init(const char * title, int xpos, int ypos, int width, int height, b
 	}
 
 	// Create Food
-	for (int i = 0; i < 2; i++)
+	for (int i = 0; i < 7; i++)
 	{
-		for (int j = 0; j < 2; j++)
+		for (int j = 0; j < 7; j++)
 		{
 			assets->CreateFood(Vector2D(200 + i * 140, 100 + j * 150), 90, 90, 0.25f);
 		}
@@ -156,9 +160,18 @@ void Game::Update()
 	{
 		average_time += totaltime.count();
 	}
-	std::cout << average_time / GameTime << std::endl;
+	//std::cout << average_time / GameTime << std::endl;
 	//std::cout << totaltime.count() << std::endl;
 
+}
+
+void Game::ExecuteQueues(double maxTime)
+{
+	pathfindingQueue.UpdateDeletedEntities(manager.getDeletedEntities());
+	if (maxTime > 0)
+	{
+		pathfindingQueue.executePathfindingRequests(maxTime / 2);
+	}
 }
 
 

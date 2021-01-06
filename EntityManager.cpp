@@ -1,4 +1,5 @@
 #include "EntityManager.h"
+#include "Collision.h"
 
 void EntityManager::Update()
 {
@@ -43,13 +44,13 @@ void EntityManager::Update()
 	{
 		if (index-- <= 0) { break; };
 		comp.Update();
-		comp.UpdateTargetEntity(deleted_entities);
 	}
 	index = index_state;
 	for (auto& comp : compState)
 	{
 		if (index-- <= 0) { break; };
 		comp.Update();
+		comp.UpdateTargetEntities(deleted_entities);
 	}
 }
 
@@ -65,6 +66,7 @@ void EntityManager::Refresh()
 	}
 
 	// remove inactive components
+	
 	int index = 0;
 	for (auto& comp : compTran)
 	{
@@ -78,7 +80,6 @@ void EntityManager::Refresh()
 			if (index_tran > 0 && index_tran != index)
 			{
 				Entity* entity = compTran[index_tran - 1].entity;
-				std::cout << compTran[index].position << " swapped with " << compTran[index_tran - 1].position;
 				std::swap(compTran[index], compTran[index_tran - 1]);
 				entity->SetComponent<TransformComponent>(&compTran[index]);
 				index_tran--;
@@ -179,8 +180,6 @@ void EntityManager::Refresh()
 
 	// this is very efficient, since "remove_if" actually moves all elements that do not fit the remove criterium to the front of the vector. Afterwards, a single call of erase removes all remaining elements at the end of the vector.
 
-
-	
 }
 
 
@@ -207,4 +206,22 @@ Entity & EntityManager::AddEntity()
 std::vector<Entity*>& EntityManager::GetGroup(Group mGroup)
 {
 	return groupedEntities[mGroup];
+}
+
+std::vector<Entity*>& EntityManager::FindEntitiesInArea(const Vector2D& position, Group mGroup, const float& dist)
+{
+	entities_in_area.clear();
+	for (auto& e : GetGroup(mGroup))
+	{
+		if (Collision::CircularCollision(e->GetComponent<TransformComponent>().position, position, dist))
+		{
+			entities_in_area.push_back(e);
+		}
+	}
+	return entities_in_area;
+}
+
+std::set<Entity*>& EntityManager::getDeletedEntities()
+{
+	return deleted_entities;
 }

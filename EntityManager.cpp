@@ -131,6 +131,27 @@ void EntityManager::Refresh()
 	}
 
 	index = 0;
+	for (auto& comp : compPath)
+	{
+		if (index >= index_path) { break; };
+		if (!comp.IsActive())
+		{
+			while (index_path > 0 && !compPath[index_path - 1].IsActive())
+			{
+				index_path--;
+			}
+			if (index_path > 0 && index_path != index)
+			{
+				Entity* entity = compPath[index_path - 1].entity;
+				std::swap(compPath[index], compPath[index_path - 1]);
+				entity->SetComponent<PathfindingComponent>(&compPath[index]);
+				index_path--;
+			}
+		}
+		index++;
+	}
+
+	index = 0;
 	for (auto& comp : compState)
 	{
 		if (index >= index_state) { break; };
@@ -150,6 +171,26 @@ void EntityManager::Refresh()
 		}
 		index++;
 	}
+
+	/*
+	std::array<TransformComponent, 2000> compTran;
+	std::array<SpriteComponent, 2000> compSprite;
+	std::array<KeyboardController, 2000> compKeyboard;
+	std::array<ColliderComponent, 2000> compStaticColl;
+	std::array<ColliderComponent, 2000> compDynamicColl;
+	std::array<TileComponent, 2000> compTile;
+	std::array<PathfindingComponent, 2000> compPath;
+	std::array<StateComponent, 2000> compState;
+
+	int index_tran = 0;
+	int index_sprites = 0;
+	int index_keyboard = 0;
+	int index_static_coll = 0;
+	int index_dynamic_coll = 0;
+	int index_tiles = 0;
+	int index_path = 0;
+	int index_state = 0;
+	*/
 
 
 	// removes entity groups if they are inactive. This is called the erase-remove idiom

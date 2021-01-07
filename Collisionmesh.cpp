@@ -101,29 +101,29 @@ void Collisionmesh::CalculateCollision()
 	for (auto& dynCol : manager.compDynamicColl)
 	{
 		if (index-- <= 0) { break; }
+		// determine node position
+		x = dynCol.transform->position.x / tileSizeX;
+		y = dynCol.transform->position.y / tileSizeY;
+
+		// check collision with static colliders
+		force.Zero();
+		bool staticCol = false;
+
+		for (auto *n : getRegion(x, y))
+		{
+			if (n != nullptr)
+			{
+				if (Collision::AABB(dynCol, *n))
+				{
+					force += Collision::CalculateOpposingForce(dynCol, *n);
+					staticCol = true;
+				}
+			}
+		}
+
 		if (dynCol.entity->HasComponent<PathfindingComponent>()
 			&& dynCol.entity->GetComponent<PathfindingComponent>().moving)
 		{
-			// determine node position
-			x = dynCol.transform->position.x / tileSizeX;
-			y = dynCol.transform->position.y / tileSizeY;
-
-			// check collision with static colliders
-			force.Zero();
-			bool staticCol = false;
-
-			for (auto *n : getRegion(x, y))
-			{
-				if (n != nullptr)
-				{
-					if (Collision::AABB(dynCol, *n))
-					{
-						force += Collision::CalculateOpposingForce(dynCol, *n);
-						staticCol = true;
-					}
-				}
-			}
-
 			// check collision with other agents
 			if (!staticCol)
 			{
@@ -140,9 +140,9 @@ void Collisionmesh::CalculateCollision()
 					}
 				}
 			}
-
-			dynCol.transform->addForce(force);
 		}
+
+		dynCol.transform->addForce(force);
 	}
 
 	for (auto& entity : manager.GetGroup(Game::groupPlayers))
@@ -179,7 +179,14 @@ void Collisionmesh::CalculateCollision()
 				{
 					if (Collision::AABB(dynCol, dynCol2))
 					{
-						force += Collision::CalculateOpposingForce(dynCol, dynCol2);
+						if (dynCol2.entity->HasComponent<PathfindingComponent>())
+						{
+							dynCol2.entity->GetComponent<TransformComponent>().addForce(Collision::CalculateOpposingForce(dynCol2, dynCol));
+						}
+						else
+						{
+							force += Collision::CalculateOpposingForce(dynCol, dynCol2);
+						}
 					}
 				}
 			}

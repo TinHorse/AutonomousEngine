@@ -24,9 +24,19 @@ public:
 			{
 				auto& state = entity->GetComponent<StateComponent>();
 
+				if (state.getS("hunger") > 100)
+				{
+					state.addS("health", -1);
+				}
+
+				if (state.getS("health") <= 0)
+				{
+					entity->Destroy();
+				}
+
 				if (state.getS("hunger") > 50)
 				{
-					state.addB("exploring", 50);
+					state.addB("exploring", 5);
 				}
 				if (state.getS("food") > 0)
 				{
@@ -34,9 +44,19 @@ public:
 					state.addS("food", -1);
 				}
 				state.addS("fear", 1);
-				state.addS("hunger", 1);
+				state.addS("hunger", 10);
+
+				if (state.getB("exploring") > 50)
+				{
+					//state.pushBehaviour(new Exploring(entity, &entity->GetComponent<PathfindingComponent>(), &state));
+					state.setB("exploring", 0);
+				}
+
+
 
 				performBehaviourHunted(*entity, ticks);
+
+				//state.executeCurrentBehaviour();
 			}
 		}
 	}
@@ -71,10 +91,17 @@ public:
 		else if (state.getB("eating"))
 		{
 			Entity* foodSource = state.getTarget("food");
-			if (foodSource)
+			if (state.getS("food") < 10)
 			{
-				foodSource->GetComponent<StateComponent>().addS("food", -10);
-				state.addS("food", 10);
+				if (foodSource)
+				{
+					foodSource->GetComponent<StateComponent>().addS("food", -10);
+					state.addS("food", 10);
+				}
+				else
+				{
+					state.setB("eating", 0);
+				}
 			}
 			else
 			{

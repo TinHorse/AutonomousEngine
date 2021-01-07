@@ -47,7 +47,7 @@ public:
 
 		if (state.getB("fleeing") > 0)
 		{
-			if (Collision::CircularCollision(state.getTarget("player")->GetComponent<TransformComponent>().position, entity.GetComponent<TransformComponent>().position, 150))
+			if (Collision::CircularCollision(state.getTarget("player")->GetComponent<TransformComponent>().position, entity.GetComponent<TransformComponent>().position, 200))
 			{
 				state.setB("fleeing", 0);
 				state.addS("fear", -10);

@@ -89,7 +89,7 @@ void Game::Init(const char * title, int xpos, int ypos, int width, int height, b
 	// Load navigation
 	navigation.LoadMesh("assets/collisionmap.txt", 40, 40, 32, 32, 1);
 
-	player = &assets->CreatePlayer(Vector2D(225,200), 90, 90, 0.25f);
+	player = &assets->CreatePlayer(Vector2D(225,200), 90, 90, 0.4f);
 
 	// Load collision
 	collision.LoadMesh("assets/collisionmap.txt", 40, 40, 32, 32, 1);
@@ -106,7 +106,7 @@ void Game::Init(const char * title, int xpos, int ypos, int width, int height, b
 			assets->CreateHunted(Vector2D(300+i * 60, 300+j * 60), 90, 90, 0.25f);
 		}
 	}
-
+	
 	// Create Food
 	for (int i = 0; i < 7; i++)
 	{

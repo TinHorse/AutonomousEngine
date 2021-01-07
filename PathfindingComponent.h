@@ -26,33 +26,32 @@ public:
 		if (moving)
 		{
 			next = path.top();
+			increment_adjusted_distance *= 1.05;
+			adjusted_distance += increment_adjusted_distance;
 			transform->addForce((next - transform->position).Normalize());
-			if (Math::distance(transform->position, path.top()) < 10)
+			if (Math::distance(transform->position, path.top()) < adjusted_distance)
 			{
 				// else, pull up next target
 				path.pop();
 				previous_position = transform->position;
 				movement_tries = 0;
+				if (adjusted_distance > 20)
+				{
+					std::cout << "adj : " << adjusted_distance << std::endl;
+				}
 				if (path.empty())
 				{
 					moving = false;
 					transform->velocity = {0,0};
 					targetReached = true;
 				}
-			}
-			if (Math::distance(transform->position, previous_position) < 20)
-			{
-				if (movement_tries++ > 60)
+				else
 				{
-					movement_tries = 0;
-					moving = false;
-					transform->velocity = { 0,0 };
-					for (int i = 0; i < path.size(); i++)
-					{
-						path.pop();
-					}
+					increment_adjusted_distance = 1.f / Math::distanceNoSqrt(transform->position, path.top());
+					adjusted_distance = 10;
 				}
 			}
+			
 		}
 	}
 
@@ -77,6 +76,8 @@ public:
 			if (!path.empty())
 			{
 				moving = true;
+				increment_adjusted_distance = 1.f / Math::distanceNoSqrt(transform->position, path.top());
+				adjusted_distance = 10;
 			}
 		}
 	}
@@ -102,6 +103,8 @@ public:
 			if (!path.empty())
 			{
 				moving = true;
+				increment_adjusted_distance = 1.f / Math::distanceNoSqrt(transform->position, path.top());
+				adjusted_distance = 10;
 			}
 		}
 	}
@@ -156,4 +159,7 @@ private:
 	bool targetReached{ false };
 	int movement_tries;
 	Vector2D previous_position;
+
+	float adjusted_distance;
+	float increment_adjusted_distance;
 };

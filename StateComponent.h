@@ -3,6 +3,18 @@
 #include <map>
 #include <cassert>
 
+enum Behaviour : std::size_t
+{
+	idle,
+	exploring,
+	eating, 
+	followTarget,
+
+	returnToOrigin,
+	goToOrigin,
+	waitForCalm
+};
+
 class StateComponent : public Component
 {
 public:
@@ -16,7 +28,6 @@ public:
 	{
 		
 	}
-
 
 	// STATE
 
@@ -71,45 +82,31 @@ public:
 		bevaviour[bv] += value;
 	}
 
-
-	// TARGETS
-
-	void initTarget(const std::string& t, Entity* entity)
+	const Behaviour& currentBehaviour()
 	{
-		assert(targetEntities.find(t) == targetEntities.end() && "attempting to INIT target that already exists");
-		targetEntities[t] = entity;
+		if (!state_machine.empty())
+			return state_machine.top();
+		else
+			return idle;
 	}
 
-	Entity* getTarget(const std::string& t)
+	void pushBehaviour(const Behaviour& s)
 	{
-		assert(targetEntities.find(t) != targetEntities.end() && "attempting to GET target that doesnt exist");
-		return targetEntities[t];
+		if (!state_machine.empty() && state_machine.top() == s)
+			state_machine.top() = s;
+		else
+			state_machine.push(s);
 	}
 
-	void setTarget(const std::string& t, Entity* entity)
+	void popBehaviour()
 	{
-		assert(targetEntities.find(t) != targetEntities.end() && "attempting to SET target that doesnt exist");
-		targetEntities[t] = entity;
-	}
-
-
-	void UpdateTargetEntities(std::set<Entity*>& deleted_entities)
-	{
-		for (auto& entity : deleted_entities)
-		{
-			for (auto& targets : targetEntities)
-			{
-				if (targets.second == entity)
-				{
-					targets.second = nullptr;
-				}
-			}
-		}
+		if (!state_machine.empty())
+			state_machine.pop();
 	}
 
 private:
 	std::map<std::string, double> state;
 	std::map<std::string, double> bevaviour;
 
-	std::map<std::string, Entity*> targetEntities;
+	std::stack<Behaviour> state_machine;
 };

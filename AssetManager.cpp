@@ -23,6 +23,10 @@ Entity& AssetManager::CreatePlayer(Vector2D position, int sizeX, int sizeY, floa
 	manager->addStaticColliderComponent(player, "player");
 	manager->addKeyboardController(player);
 	manager->AddToGroup(&player, Game::groupPlayers);
+
+	auto& state = manager->addStateComponent(player);
+	state.initS("calm", 0);
+
 	return player;
 }
 
@@ -32,24 +36,22 @@ Entity& AssetManager::CreateHunted(Vector2D position, int sizeX, int sizeY, floa
 	manager->addTransformComponent(hunted, position.x, position.y, sizeX, sizeY, scale);
 	manager->addSpriteComponent(hunted, "enemy", false);
 	manager->addDynamicColliderComponent(hunted,"agent");
-	manager->addPathfindingComponent(hunted);
+	auto& pathfinder = manager->addPathfindingComponent(hunted);
 
 	manager->AddToGroup(&hunted, Game::groupHunted);
 
 	auto& state = manager->addStateComponent(hunted);
 	state.initS("health", 100);
-	state.initS("hunger", rand_int(10, 50));
-	state.initS("fear", rand_int(10,50));
+	state.initS("hunger", 50);
+	state.initS("calm", 0);
 	state.initS("food", 0);
 
-	state.initB("idle", 0);
-	state.initB("exploring", 0);
-	state.initB("eating", 0);
+	state.initB("exploring", 100);
+	state.initB("returningToShepherd", 100);
 	state.initB("fleeing", 0);
-	state.initB("movingToTarget", 0);
 
-	state.initTarget("food", nullptr);
-	state.initTarget("player", manager->GetGroup(Game::groupPlayers)[0]);
+	pathfinder.initTarget("current", nullptr);
+	pathfinder.initTarget("origin", manager->GetGroup(Game::groupPlayers)[0]);
 
 	return hunted;
 }
@@ -63,7 +65,7 @@ Entity & AssetManager::CreateFood(Vector2D position, int sizeX, int sizeY, float
 	manager->AddToGroup(&foodItem, Game::groupFood);
 
 	auto& state = manager->addStateComponent(foodItem);
-	state.initS("food", 100);
+	state.initS("food", 10);
 
 	return foodItem;
 }

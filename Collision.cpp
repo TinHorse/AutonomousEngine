@@ -38,6 +38,29 @@ bool Collision::AABB(const ColliderComponent & colA, const ColliderComponent & c
 	return false;
 }
 
+bool Collision::AABBExtended(const SDL_Rect& rectA, const SDL_Rect& rectB, float extra_radius)
+{
+	if (
+		rectA.x + rectA.w + extra_radius > rectB.x &&
+		rectA.y + rectA.h + extra_radius > rectB.y &&
+		rectB.x + rectB.w + extra_radius > rectA.x &&
+		rectB.y + rectB.h + extra_radius > rectA.y
+		)
+	{
+		return true;
+	}
+	return false;
+}
+
+bool Collision::AABBExtended(const ColliderComponent & colA, const ColliderComponent & colB, float extra_radius)
+{
+	if (AABBExtended(colA.collider, colB.collider, extra_radius))
+	{
+		return true;
+	}
+	return false;
+}
+
 bool Collision::CircularCollision(const Vector2D & vecA, const Vector2D & vecB, float radius)
 {
 	if (Math::distance(vecA, vecB) < radius)

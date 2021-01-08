@@ -44,13 +44,13 @@ void EntityManager::Update()
 	{
 		if (index-- <= 0) { break; };
 		comp.Update();
+		comp.UpdateTargetEntities(deleted_entities);
 	}
 	index = index_state;
 	for (auto& comp : compState)
 	{
 		if (index-- <= 0) { break; };
 		comp.Update();
-		comp.UpdateTargetEntities(deleted_entities);
 	}
 }
 

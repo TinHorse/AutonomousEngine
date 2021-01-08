@@ -5,6 +5,7 @@
 #include <stack>
 #include "Math.h"
 #include <set>
+#include <cassert>
 
 extern Navmesh navigation;
 
@@ -23,7 +24,7 @@ public:
 
 	void Update() override
 	{
-		if (moving)
+		if (moving && !stop)
 		{
 			next = path.top();
 			increment_adjusted_distance *= 1.05;
@@ -33,17 +34,12 @@ public:
 			{
 				// else, pull up next target
 				path.pop();
-				previous_position = transform->position;
-				movement_tries = 0;
-				if (adjusted_distance > 20)
-				{
-					std::cout << "adj : " << adjusted_distance << std::endl;
-				}
+
 				if (path.empty())
 				{
+					stop = true;
 					moving = false;
 					transform->velocity = {0,0};
-					targetReached = true;
 				}
 				else
 				{
@@ -51,18 +47,13 @@ public:
 					adjusted_distance = 10;
 				}
 			}
-			
 		}
 	}
 
 	void FindPath(Entity* requesting_entity, const Vector2D& target)
 	{
-		movement_tries = 0;
-		previous_position = transform->position;
-
 		moving = false;
-		targetReached = false;
-		//origin = entity->GetComponent<TransformComponent>().position;
+		stop = false;
 
 		for (int i = 0; i < path.size(); i++)
 		{
@@ -84,12 +75,8 @@ public:
 	
 	void FindPathToTarget(Entity* requesting_entity, Entity* target_entity)
 	{
-		movement_tries = 0;
-		previous_position = transform->position;
-
 		moving = false;
-		targetReached = false;
-		//origin = entity->GetComponent<TransformComponent>().position;
+		stop = false;
 		
 		for (int i = 0; i < path.size(); i++)
 		{
@@ -141,25 +128,65 @@ public:
 		return path.empty();
 	}
 
-	const bool isTargetReached()
-	{
-		return targetReached;
-	}
-
 	void LinkComponentPointers() override
 	{
 		transform = &entity->GetComponent<TransformComponent>();
+	}
+
+
+	// TARGETS
+
+	void initTarget(const std::string& t, Entity* entity)
+	{
+		assert(targetEntities.find(t) == targetEntities.end() && "attempting to INIT target that already exists");
+		targetEntities[t] = entity;
+	}
+
+	Entity* getTarget(const std::string& t)
+	{
+		assert(targetEntities.find(t) != targetEntities.end() && "attempting to GET target that doesnt exist");
+		return targetEntities[t];
+	}
+
+	void setTarget(const std::string& t, Entity* entity)
+	{
+		assert(targetEntities.find(t) != targetEntities.end() && "attempting to SET target that doesnt exist");
+		targetEntities[t] = entity;
+	}
+
+	void Stop()
+	{
+		stop = true;
+	}
+
+	const bool& isStopped()
+	{
+		return stop;
+	}
+
+
+	void UpdateTargetEntities(std::set<Entity*>& deleted_entities)
+	{
+		for (auto& entity : deleted_entities)
+		{
+			for (auto& targets : targetEntities)
+			{
+				if (targets.second == entity)
+				{
+					targets.second = nullptr;
+				}
+			}
+		}
 	}
 
 private:
 	TransformComponent *transform;
 	std::stack<Vector2D> path;
 	Vector2D next;
-	//Vector2D origin;
-	bool targetReached{ false };
-	int movement_tries;
-	Vector2D previous_position;
+	bool stop = false;
 
 	float adjusted_distance;
 	float increment_adjusted_distance;
+
+	std::map<std::string, Entity*> targetEntities;
 };

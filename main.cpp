@@ -18,8 +18,6 @@ int main(int argc,  char *argv[])
 
 	while (game->Running())
 	{
-		
-
 		double currTime = SDL_GetTicks();
 		double elapsed = currTime - prevTime;
 		prevTime = currTime;
@@ -38,7 +36,7 @@ int main(int argc,  char *argv[])
 		auto totaltime = std::chrono::duration_cast<milliseconds>(end - start);
 		if (totaltime.count() > 10)
 		{
-			std::cout << totaltime.count() << std::endl;
+			//std::cout << totaltime.count() << std::endl;
 		}
 
 
@@ -51,3 +49,4 @@ int main(int argc,  char *argv[])
 
 	return 0;
 }
+

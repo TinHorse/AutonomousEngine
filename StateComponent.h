@@ -85,17 +85,25 @@ public:
 	const Behaviour& currentBehaviour()
 	{
 		if (!state_machine.empty())
-			return state_machine.top();
+			return state_machine.top().first;
 		else
 			return idle;
 	}
 
-	void pushBehaviour(const Behaviour& s)
+	const bool& currentPriority()
 	{
-		if (!state_machine.empty() && state_machine.top() == s)
-			state_machine.top() = s;
+		if (!state_machine.empty())
+			return state_machine.top().second;
 		else
-			state_machine.push(s);
+			return 0;
+	}
+
+	void pushBehaviour(const Behaviour& s, int priority)
+	{
+		if (!state_machine.empty() && state_machine.top().first == s)
+			state_machine.top() = std::make_pair(s, priority);
+		else
+			state_machine.push(std::make_pair(s, priority));
 	}
 
 	void popBehaviour()
@@ -108,5 +116,5 @@ private:
 	std::map<std::string, double> state;
 	std::map<std::string, double> bevaviour;
 
-	std::stack<Behaviour> state_machine;
+	std::stack<std::pair<Behaviour, int>> state_machine;
 };

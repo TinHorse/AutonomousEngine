@@ -25,7 +25,7 @@ Entity& AssetManager::CreatePlayer(Vector2D position, int sizeX, int sizeY, floa
 	manager->AddToGroup(&player, Game::groupPlayers);
 
 	auto& state = manager->addStateComponent(player);
-	state.initS("calm", 0);
+	state.initS("calm", 100);
 
 	return player;
 }
@@ -49,6 +49,8 @@ Entity& AssetManager::CreateHunted(Vector2D position, int sizeX, int sizeY, floa
 	state.initB("exploring", 100);
 	state.initB("returningToShepherd", 100);
 	state.initB("fleeing", 0);
+
+	//state.pushBehaviour(exploring, 0);
 
 	pathfinder.initTarget("current", nullptr);
 	pathfinder.initTarget("origin", manager->GetGroup(Game::groupPlayers)[0]);

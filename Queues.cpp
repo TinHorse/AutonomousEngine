@@ -26,7 +26,7 @@ void PathfindingQueue::executePathfindingRequests(double maxTime)
 	while (!pathfinding_requests.empty())
 	{
 		currTime = SDL_GetTicks();
-		if ((currTime - beginTime) >= maxTime) { break; }
+		//if ((currTime - beginTime) >= maxTime) { break; }
 
 		auto mapIndex = pathfinding_requests.begin();
 		auto entity = mapIndex->first;
@@ -39,6 +39,7 @@ void PathfindingQueue::executePathfindingRequests(double maxTime)
 			{
 				if (deletedEntities.find(request.targetEntity) == deletedEntities.end())
 				{
+					std::cout << "QUEUE finding path" << std::endl;
 					request.entity->GetComponent<PathfindingComponent>().FindPathToTarget(request.entity, request.targetEntity);
 				}
 			}

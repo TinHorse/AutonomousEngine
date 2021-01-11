@@ -24,41 +24,56 @@ public:
 
 	void Update() override
 	{
-		if (moving && !stop)
+		if (moving)
 		{
 			next = path.top();
-			increment_adjusted_distance *= 1.05;
-			adjusted_distance += increment_adjusted_distance;
 			transform->addForce((next - transform->position).Normalize());
-			if (Math::distance(transform->position, path.top()) < adjusted_distance)
+			if (Math::distanceNoSqrt(transform->position, path.top()) < 100)
 			{
 				// else, pull up next target
 				path.pop();
+				move_tries = 0;
 
 				if (path.empty())
 				{
-					stop = true;
 					moving = false;
 					transform->velocity = {0,0};
+					return;
 				}
-				else
+			}
+
+			// check movement tries
+			float dist = Math::distanceNoSqrt(transform->position, path.top());
+			if (abs(dist - previous_dist) < 100)
+			{
+				move_tries++;
+				if (move_tries > 50)
 				{
-					increment_adjusted_distance = 1.f / Math::distanceNoSqrt(transform->position, path.top());
-					adjusted_distance = 10;
+					if (!path.empty())
+					{
+						move_tries = 0;
+						path.pop();
+						if (path.empty())
+						{
+							moving = false;
+						}
+					}
+					if (move_tries > 100)
+					{
+						ClearPath();
+					}
 				}
+			}
+			if (!path.empty())
+			{
+				previous_dist = Math::distanceNoSqrt(transform->position, path.top());
 			}
 		}
 	}
 
 	void FindPath(Entity* requesting_entity, const Vector2D& target)
 	{
-		moving = false;
-		stop = false;
-
-		for (int i = 0; i < path.size(); i++)
-		{
-			path.pop();
-		}
+		ClearPath();
 
 		navigation.CalculatePath(requesting_entity, path, target, true);
 		if (!path.empty())
@@ -67,21 +82,13 @@ public:
 			if (!path.empty())
 			{
 				moving = true;
-				increment_adjusted_distance = 1.f / Math::distanceNoSqrt(transform->position, path.top());
-				adjusted_distance = 10;
 			}
 		}
 	}
 	
 	void FindPathToTarget(Entity* requesting_entity, Entity* target_entity)
 	{
-		moving = false;
-		stop = false;
-		
-		for (int i = 0; i < path.size(); i++)
-		{
-			path.pop();
-		}
+		ClearPath();
 
 		navigation.CalculatePath(requesting_entity, path, target_entity->GetComponent<TransformComponent>().position, true);
 		if (!path.empty())
@@ -90,9 +97,17 @@ public:
 			if (!path.empty())
 			{
 				moving = true;
-				increment_adjusted_distance = 1.f / Math::distanceNoSqrt(transform->position, path.top());
-				adjusted_distance = 10;
 			}
+		}
+	}
+
+	void ClearPath()
+	{
+		moving = false;
+		move_tries = 0;
+		for (int i = 0; i < path.size(); i++)
+		{
+			path.pop();
 		}
 	}
 
@@ -156,12 +171,12 @@ public:
 
 	void Stop()
 	{
-		stop = true;
+		moving = false;
 	}
 
 	const bool& isStopped()
 	{
-		return stop;
+		return !moving;
 	}
 
 
@@ -183,10 +198,10 @@ private:
 	TransformComponent *transform;
 	std::stack<Vector2D> path;
 	Vector2D next;
-	bool stop = false;
 
-	float adjusted_distance;
-	float increment_adjusted_distance;
+	// movement tries
+	int move_tries;
+	float previous_dist;
 
 	std::map<std::string, Entity*> targetEntities;
 };

@@ -122,8 +122,7 @@ void Collisionmesh::CalculateCollision()
 		}
 
 		if (dynCol.entity->HasComponent<PathfindingComponent>()
-			&& dynCol.entity->GetComponent<PathfindingComponent>().moving
-			&& !dynCol.entity->GetComponent<PathfindingComponent>().isStopped())
+			&& dynCol.entity->GetComponent<PathfindingComponent>().moving)
 		{
 			// check collision with other agents
 			if (!staticCol)

@@ -26,7 +26,7 @@ struct Node
 	int x, y;
 	int ID;
 	bool isObstacle;
-	int globalDist = INT_MAX;
+	long int globalDist = LONG_MAX;
 	static int NodeID;
 };
 
@@ -57,7 +57,7 @@ private:
 	std::map<Node*, Node*> parents;
 
 	// fLocal and fGlobal map
-	std::map<Node*, int> goals;
+	std::map<Node*, long int> goals;
 
 	std::vector<Node> mesh;
 	std::array<Node*, 8> neighbours;

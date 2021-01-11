@@ -29,14 +29,16 @@ int main(int argc,  char *argv[])
 		{
 			game->Update();
 			lag -= frameDelay;
-			game->ExecuteQueues(frameDelay - lag);
+			//game->ExecuteQueues(frameDelay - lag);
+			start = std::chrono::high_resolution_clock().now();
+			game->ExecuteQueues(6);
 		}
 		
 		auto end = std::chrono::high_resolution_clock().now();
 		auto totaltime = std::chrono::duration_cast<milliseconds>(end - start);
 		if (totaltime.count() > 10)
 		{
-			//std::cout << totaltime.count() << std::endl;
+			std::cout << totaltime.count() << std::endl;
 		}
 
 

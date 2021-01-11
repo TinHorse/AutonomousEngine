@@ -99,20 +99,20 @@ void Game::Init(const char * title, int xpos, int ypos, int width, int height, b
 	camera.Init(t.position.x, t.position.y, 800, 600);
 
 	// Create Hunted
-	for (int i = 0; i < 5; i++)
+	for (int i = 0; i < 10; i++)
 	{
-		for (int j = 0; j < 5; j++)
+		for (int j = 0; j < 10; j++)
 		{
 			assets->CreateHunted(Vector2D(300+i * 60, 300+j * 60), 90, 90, 0.25f);
 		}
 	}
 	
 	// Create Food
-	for (int i = 0; i < 7; i++)
+	for (int i = 0; i < 5; i++)
 	{
-		for (int j = 0; j < 7; j++)
+		for (int j = 0; j < 5; j++)
 		{
-			assets->CreateFood(Vector2D(200 + i * 140, 100 + j * 150), 90, 90, 0.25f);
+			assets->CreateFood(Vector2D(100 + i * 140, 100 + j * 150), 90, 90, 0.25f);
 		}
 	}
 }

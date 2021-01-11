@@ -7,27 +7,32 @@
 extern EntityManager manager;
 extern PathfindingQueue pathfindingQueue;
 
-static bool s_exploring(Entity * entity)
+static int s_exploring(Entity * entity)
 {
-	if (!entity->GetComponent<PathfindingComponent>().getTarget("current"))
+	auto& pathfinder = entity->GetComponent<PathfindingComponent>();
+	if (!pathfinder.getTarget("current"))
 	{
 		auto& foodSources = manager.FindEntitiesInArea(entity->GetComponent<TransformComponent>().position, Game::groupFood, 100);
 		for (auto& f : foodSources)
 		{
 			pathfindingQueue.makePathfindingRequest(entity, f);
-			entity->GetComponent<PathfindingComponent>().setTarget("current", f);
+			pathfinder.setTarget("current", f);
 			return true;
 		}
 	}
-	pathfindingQueue.makePathfindingRequest(entity);
+	if (!pathfinder.moving)
+	{
+		pathfindingQueue.makePathfindingRequest(entity);
+	}
 	return false;
 };
 
-static bool s_followTarget(Entity * entity, Entity * target, float radius)
+static int s_followTarget(Entity * entity, Entity * target, float radius)
 {
 	if (target)
 	{
-		if (Math::distance(target->GetComponent<TransformComponent>().position, entity->GetComponent<TransformComponent>().position) < radius)
+		//std::cout << Math::distance(target->GetComponent<TransformComponent>().position, entity->GetComponent<TransformComponent>().position) << std::endl;
+		if (Collision::AABBExtended(target->GetComponent<ColliderComponent>(), entity->GetComponent<ColliderComponent>(), radius))
 		{
 			return true;
 		}
@@ -35,21 +40,24 @@ static bool s_followTarget(Entity * entity, Entity * target, float radius)
 		{
 			pathfindingQueue.makePathfindingRequest(entity, target);
 		}
+		return 2;
 	}
 	return false;
 };
 
-static bool s_transferState(Entity * entity, Entity *target, std::string transfer_state, int rate_increase, int rate_decrease, int max_until_stop, int transfer_range)
+static int s_transferState(Entity * entity, Entity *target, std::string transfer_state, int rate_increase, int rate_decrease, int max_until_stop, int transfer_range)
 {
 	if (target && Collision::AABBExtended(target->GetComponent<ColliderComponent>(), entity->GetComponent<ColliderComponent>(), transfer_range))
 	{
 		auto& state = entity->GetComponent<StateComponent>();
-		if (state.getS(transfer_state) < max_until_stop)
+		if (state.getS(transfer_state) < max_until_stop && target->GetComponent<StateComponent>().getS(transfer_state) > 0)
 		{
 			target->GetComponent<StateComponent>().addS(transfer_state, rate_decrease);
 			state.addS(transfer_state, rate_increase);
-			return true;
+			return 2;
 		}
+		entity->GetComponent<PathfindingComponent>().setTarget("current", nullptr);
+		return true;
 	}
 	return false;
 };
@@ -98,30 +106,33 @@ public:
 				}
 				if (state.getS("hunger") >= 50)
 				{
-					state.addB("exploring", 10);
+					state.addB("exploring", 50);
 				}
 
 
-				// initialize behaviour
+				// initialize behaviour based on state
 				if (state.getB("returningToShepherd") > 100)
 				{
-					state.pushBehaviour(waitForCalm);
-					state.pushBehaviour(followTarget);
+					state.pushBehaviour(waitForCalm, 1);
+					state.pushBehaviour(followTarget, 1);
 					auto& pathfinder = entity->GetComponent<PathfindingComponent>();
 					pathfindingQueue.makePathfindingRequest(entity, pathfinder.getTarget("origin"));
 					pathfinder.setTarget("current", pathfinder.getTarget("origin"));
 					state.setB("returningToShepherd", 0);
 				}
-				else if (state.getB("exploring") > 100)
+				
+				if (state.getB("exploring") > 100)
 				{
-					//state.pushBehaviour(exploring);
+					if (!state.currentPriority())
+					{
+						state.pushBehaviour(exploring, 0);
+					}
 					state.setB("exploring", 0);
 				}
 
-				
 			}
 
-			if (ticks % 10 == 0)
+			if (ticks % 30 == 0)
 			{
 				// call behaviour
 				performBehaviourHunted(entity, ticks);
@@ -129,48 +140,74 @@ public:
 		}
 	}
 
+	int result;
 	void performBehaviourHunted(Entity* entity, const long& ticks)
 	{
 		auto& state = entity->GetComponent<StateComponent>();
 		auto& pathfinder = entity->GetComponent<PathfindingComponent>();
 
+		//std::cout << state.currentBehaviour() << std::endl;
 		//execute state
 		switch (state.currentBehaviour())
 		{
 		case idle:
 			break;
+
 		case exploring:
 			if (s_exploring(entity))
 			{
-				state.pushBehaviour(eating);
-				state.pushBehaviour(followTarget);
+				state.popBehaviour();
+				state.pushBehaviour(eating, 0);
+				state.pushBehaviour(followTarget, 0);
 			}
 			break;
+
 		case followTarget:
-			if (s_followTarget(entity, pathfinder.getTarget("current"), 50))
+			result = s_followTarget(entity, pathfinder.getTarget("current"), 10);
+			switch (result)
 			{
+			case true:
 				state.popBehaviour();
-				entity->GetComponent<PathfindingComponent>().Stop();
+				//entity->GetComponent<PathfindingComponent>().Stop();
+				break;
+			case false:
+				state.popBehaviour();
+				break;
+			case 2:
+				break;
 			}
 			break;
+
 		case eating:
-			if (s_transferState(entity, pathfinder.getTarget("current"), "food", 1, -1, 10, 10))
+			result = s_transferState(entity, pathfinder.getTarget("current"), "food", 1, -1, 10, 10);
+			switch (result)
 			{
+			case false:
+				state.pushBehaviour(followTarget, 0);
+				break;
+			case true:
 				state.popBehaviour();
+				break;
+			case 2:
+				break;
 			}
 			break;
+
 		case waitForCalm:
-			if (s_transferState(entity, pathfinder.getTarget("origin"), "calm", 200, 0, 10, 10))
+			result = s_transferState(entity, pathfinder.getTarget("origin"), "calm", 200, 0, 10, 10);
+			switch (result)
 			{
+			case false:
+				state.pushBehaviour(followTarget, 1);
+				break;
+			case true:
 				state.popBehaviour();
-			}
-			else
-			{
-				pathfindingQueue.makePathfindingRequest(entity, pathfinder.getTarget("origin"));
-				pathfinder.setTarget("current", pathfinder.getTarget("origin"));
-				state.pushBehaviour(followTarget);
+				break;
+			case 2:
+				break;
 			}
 			break;
+
 		default:
 			assert(true && "FSM trying to access Behaviour function that doesnt exist");
 		}

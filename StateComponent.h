@@ -9,9 +9,12 @@ enum Behaviour : std::size_t
 	exploring,
 	eating,
 	followTarget,
-
-	transferStateB
+	waitingForCalm,
+	attacking,
+	fleeing
 };
+
+
 
 class StateComponent : public Component
 {
@@ -54,7 +57,7 @@ public:
 	}
 
 
-	// BEHAVIOUR
+	// BEHAVIOUR VARIABLES
 
 	void initB(const std::string& bv, const double& value)
 	{
@@ -80,6 +83,8 @@ public:
 		bevaviour[bv] += value;
 	}
 
+	// BEHAVIOURS
+
 	const Behaviour& currentBehaviour()
 	{
 		if (!state_machine.empty())
@@ -96,10 +101,16 @@ public:
 			return 0;
 	}
 
-	void pushBehaviour(const Behaviour& s, int priority)
+	void pushBehaviour(const Behaviour& s, int priority, bool forcePush = false)
 	{
-		if (!state_machine.empty() && state_machine.top().first == s)
-			state_machine.top() = std::make_pair(s, priority);
+		if (!state_machine.empty())
+		{
+			if (forcePush || currentPriority() <= priority)
+				if (state_machine.top().first != s)
+					state_machine.push(std::make_pair(s, priority));
+				else
+					state_machine.top() = std::make_pair(s, priority);
+		}
 		else
 			state_machine.push(std::make_pair(s, priority));
 	}
@@ -110,9 +121,46 @@ public:
 			state_machine.pop();
 	}
 
+
+	// TARGETS
+
+	void initTarget(const std::string& t, Entity* entity)
+	{
+		assert(targetEntities.find(t) == targetEntities.end() && "attempting to INIT target that already exists");
+		targetEntities[t] = entity;
+	}
+
+	Entity* getTarget(const std::string& t)
+	{
+		assert(targetEntities.find(t) != targetEntities.end() && "attempting to GET target that doesnt exist");
+		return targetEntities[t];
+	}
+
+	void setTarget(const std::string& t, Entity* entity)
+	{
+		assert(targetEntities.find(t) != targetEntities.end() && "attempting to SET target that doesnt exist");
+		targetEntities[t] = entity;
+	}
+
+	void UpdateTargetEntities(std::set<Entity*>& deleted_entities)
+	{
+		for (auto& entity : deleted_entities)
+		{
+			for (auto& targets : targetEntities)
+			{
+				if (targets.second == entity)
+				{
+					targets.second = nullptr;
+				}
+			}
+		}
+	}
+
 private:
 	std::map<std::string, double> state;
 	std::map<std::string, double> bevaviour;
 
 	std::stack<std::pair<Behaviour, int>> state_machine;
+
+	std::map<std::string, Entity*> targetEntities;
 };

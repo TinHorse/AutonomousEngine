@@ -65,7 +65,7 @@ void Game::Init(const char * title, int xpos, int ypos, int width, int height, b
 		renderer = SDL_CreateRenderer(window, -1, 0);
 		if (renderer)
 		{
-			SDL_SetRenderDrawColor(renderer, 255,255,255,255);
+			SDL_SetRenderDrawColor(renderer, 0,0,0,255);
 			std::cout << "renderer created \n";
 		}
 		isRunning = true;
@@ -99,9 +99,9 @@ void Game::Init(const char * title, int xpos, int ypos, int width, int height, b
 	camera.Init(t.position.x, t.position.y, 800, 600);
 
 	// Create Hunted
-	for (int i = 0; i < 1; i++)
+	for (int i = 0; i < 5; i++)
 	{
-		for (int j = 0; j < 1; j++)
+		for (int j = 0; j < 5; j++)
 		{
 			assets->CreateHunted(Vector2D(300+i * 60, 300+j * 60), 90, 90, 0.25f);
 		}
@@ -115,6 +115,15 @@ void Game::Init(const char * title, int xpos, int ypos, int width, int height, b
 			assets->CreateFood(Vector2D(100 + i * 140, 100 + j * 150), 90, 90, 0.25f);
 		}
 	}
+
+	// Create Predators
+	for (int i = 0; i < 2; i++)
+	{
+		for (int j = 0; j < 2; j++)
+		{
+			assets->CreatePredator(Vector2D(300 + i * 60, 400 + j * 60), 90, 90, 0.3f);
+		}
+	}
 }
 
 auto& players(manager.GetGroup(Game::groupPlayers));
@@ -122,6 +131,7 @@ auto& colliders(manager.GetGroup(Game::groupColliders));
 auto& tiles(manager.GetGroup(Game::groupTiles));
 auto& hunted(manager.GetGroup(Game::groupHunted));
 auto& foods(manager.GetGroup(Game::groupFood));
+auto& predators(manager.GetGroup(Game::groupPredators));
 
 void Game::HandleEvents()
 {
@@ -180,7 +190,10 @@ void Game::Render() // note that all draw functions have to be called inside the
 
 	for (auto& t : tiles)
 	{
-		t->GetComponent<TileComponent>().Draw();
+		if (Math::distance(t->GetComponent<TileComponent>().position, player->GetComponent<TransformComponent>().position) < 300)
+		{
+			t->GetComponent<TileComponent>().Draw();
+		}
 	}
 	for (auto& p : players)
 	{
@@ -188,24 +201,31 @@ void Game::Render() // note that all draw functions have to be called inside the
 	}
 	for (auto& c : colliders)
 	{
-		//if (Math::distance(c->GetComponent<TransformComponent>().position, player->GetComponent<TransformComponent>().position) < 300)
-		//{
+		if (Math::distance(c->GetComponent<TransformComponent>().position, player->GetComponent<TransformComponent>().position) < 300)
+		{
 			c->GetComponent<ColliderComponent>().Draw();
-		//}
+		}
 	}
 	for (auto& h : hunted)
 	{
-		//if (Math::distance(a->GetComponent<TransformComponent>().position, player->GetComponent<TransformComponent>().position) < 300)
-		//{
+		if (Math::distance(h->GetComponent<TransformComponent>().position, player->GetComponent<TransformComponent>().position) < 300)
+		{
 			h->GetComponent<SpriteComponent>().Draw();
-		//}
+		}
 	}
 	for (auto& f : foods)
 	{
-		//if (Math::distance(a->GetComponent<TransformComponent>().position, player->GetComponent<TransformComponent>().position) < 300)
-		//{
+		if (Math::distance(f->GetComponent<TransformComponent>().position, player->GetComponent<TransformComponent>().position) < 300)
+		{
 		f->GetComponent<SpriteComponent>().Draw();
-		//}
+		}
+	}
+	for (auto& p : predators)
+	{
+		if (Math::distance(p->GetComponent<TransformComponent>().position, player->GetComponent<TransformComponent>().position) < 300)
+		{
+		p->GetComponent<SpriteComponent>().Draw();
+		}
 	}
 	SDL_RenderPresent(renderer);
 }

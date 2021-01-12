@@ -75,6 +75,7 @@ void Collisionmesh::LoadMesh(const char * path, int sX, int sY, int sTileX, int 
 			if (c == '1')
 			{
 				auto& tileCol(manager.AddEntity());
+				manager.addTransformComponent(tileCol, x * tileSizeX, y * tileSizeY, tileSizeX, tileSizeY, scale);
 				manager.addStaticColliderComponent(tileCol, "terrain", x * tileSizeX, y * tileSizeY, tileSizeX);
 				manager.AddToGroup(&tileCol, Game::groupColliders);
 				addNode(&tileCol.GetComponent<ColliderComponent>());

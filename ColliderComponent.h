@@ -31,10 +31,6 @@ public:
 
 	void Init() override
 	{
-		//if (!entity->HasComponent<TransformComponent>())
-		//{
-			//entity->AddComponent<TransformComponent>(collider.x, collider.y, collider.w, collider.h);
-		//}
 		LinkComponentPointers();
 
 		texture = TextureManager::LoadTexture("assets/colliderTex.png");

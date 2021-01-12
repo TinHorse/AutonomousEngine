@@ -38,7 +38,8 @@ public:
 		groupPlayers,
 		groupColliders,
 		groupHunted,
-		groupFood
+		groupFood,
+		groupPredators
 	};
 
 	static int GameTime;

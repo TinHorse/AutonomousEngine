@@ -72,22 +72,22 @@ public:
 		}
 	}
 
-	void FindPath(Entity* requesting_entity, const Vector2D& target)
+	void FindPath(const Vector2D& target)
 	{
 		ClearPath();
 
-		navigation.CalculatePath(requesting_entity, path, target, true);
+		navigation.CalculatePath(entity, path, target, true);
 		if (!path.empty())
 		{
 			moving = true;
 		}
 	}
 
-	void FindPathToTarget(Entity* requesting_entity, Entity* target_entity)
+	void FindPathToTarget(Entity* target_entity)
 	{
 		ClearPath();
 
-		navigation.CalculatePath(requesting_entity, path, target_entity->GetComponent<TransformComponent>().position, true);
+		navigation.CalculatePath(entity, path, target_entity->GetComponent<TransformComponent>().position, true);
 
 		if (!path.empty())
 		{
@@ -106,11 +106,11 @@ public:
 		}
 	}
 
-	void Explore(Entity* requesting_entity)
+	void Explore()
 	{
 		if (!moving) // calculate new path if not moving
 		{
-			FindPath(requesting_entity, FindRandomPointInRadius(entity->GetComponent<TransformComponent>().position, 500.f));
+			FindPath(FindRandomPointInRadius(entity->GetComponent<TransformComponent>().position, 500.f));
 		}
 	}
 	
@@ -143,27 +143,6 @@ public:
 		transform = &entity->GetComponent<TransformComponent>();
 	}
 
-
-	// TARGETS
-
-	void initTarget(const std::string& t, Entity* entity)
-	{
-		assert(targetEntities.find(t) == targetEntities.end() && "attempting to INIT target that already exists");
-		targetEntities[t] = entity;
-	}
-
-	Entity* getTarget(const std::string& t)
-	{
-		assert(targetEntities.find(t) != targetEntities.end() && "attempting to GET target that doesnt exist");
-		return targetEntities[t];
-	}
-
-	void setTarget(const std::string& t, Entity* entity)
-	{
-		assert(targetEntities.find(t) != targetEntities.end() && "attempting to SET target that doesnt exist");
-		targetEntities[t] = entity;
-	}
-
 	void Stop()
 	{
 		moving = false;
@@ -174,21 +153,6 @@ public:
 		return !moving;
 	}
 
-
-	void UpdateTargetEntities(std::set<Entity*>& deleted_entities)
-	{
-		for (auto& entity : deleted_entities)
-		{
-			for (auto& targets : targetEntities)
-			{
-				if (targets.second == entity)
-				{
-					targets.second = nullptr;
-				}
-			}
-		}
-	}
-
 private:
 	TransformComponent *transform;
 	std::stack<Vector2D> path;
@@ -197,6 +161,4 @@ private:
 	// movement tries
 	int move_tries;
 	float previous_dist;
-
-	std::map<std::string, Entity*> targetEntities;
 };

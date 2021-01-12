@@ -40,16 +40,16 @@ void PathfindingQueue::executePathfindingRequests(double maxTime)
 				if (deletedEntities.find(request.targetEntity) == deletedEntities.end())
 				{
 					std::cout << "QUEUE finding path" << std::endl;
-					request.entity->GetComponent<PathfindingComponent>().FindPathToTarget(request.entity, request.targetEntity);
+					request.entity->GetComponent<PathfindingComponent>().FindPathToTarget(request.targetEntity);
 				}
 			}
 			else if(request.target != Vector2D(0,0))
 			{
-				request.entity->GetComponent<PathfindingComponent>().FindPath(request.entity, request.target);
+				request.entity->GetComponent<PathfindingComponent>().FindPath(request.target);
 			}
 			else
 			{
-				request.entity->GetComponent<PathfindingComponent>().Explore(request.entity);
+				request.entity->GetComponent<PathfindingComponent>().Explore();
 			}
 		}
 

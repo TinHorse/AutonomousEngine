@@ -50,10 +50,9 @@ Entity& AssetManager::CreateHunted(Vector2D position, int sizeX, int sizeY, floa
 	state.initB("returningToShepherd", 100);
 	state.initB("fleeing", 0);
 
-	//state.pushBehaviour(exploring, 0);
-
-	pathfinder.initTarget("current", nullptr);
-	pathfinder.initTarget("origin", manager->GetGroup(Game::groupPlayers)[0]);
+	state.initTarget("current", nullptr);
+	state.initTarget("origin", manager->GetGroup(Game::groupPlayers)[0]);
+	state.initTarget("enemy", nullptr);
 
 	return hunted;
 }
@@ -70,6 +69,31 @@ Entity & AssetManager::CreateFood(Vector2D position, int sizeX, int sizeY, float
 	state.initS("food", 10);
 
 	return foodItem;
+}
+
+Entity & AssetManager::CreatePredator(Vector2D position, int sizeX, int sizeY, float scale)
+{
+	auto& predator = manager->AddEntity();
+	manager->addTransformComponent(predator, position.x, position.y, sizeX, sizeY, scale);
+	manager->addSpriteComponent(predator, "player", false);
+	manager->addDynamicColliderComponent(predator, "predator");
+	auto& pathfinder = manager->addPathfindingComponent(predator);
+
+	manager->AddToGroup(&predator, Game::groupPredators);
+
+	auto& state = manager->addStateComponent(predator);
+	state.initS("health", 100);
+	state.initS("hunger", 50);
+	state.initS("food", 0);
+
+	state.initB("exploring", 100);
+	state.initB("attacking", 100);
+	state.initB("fleeing", 0);
+
+	state.initTarget("current", nullptr);
+	state.initTarget("origin", nullptr);
+
+	return predator;
 }
 
 void AssetManager::AddTexture(std::string texID, const char *path)

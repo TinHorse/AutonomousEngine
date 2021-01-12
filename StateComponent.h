@@ -7,12 +7,10 @@ enum Behaviour : std::size_t
 {
 	idle,
 	exploring,
-	eating, 
+	eating,
 	followTarget,
 
-	returnToOrigin,
-	goToOrigin,
-	waitForCalm
+	transferStateB
 };
 
 class StateComponent : public Component

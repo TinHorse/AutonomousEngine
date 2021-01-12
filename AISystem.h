@@ -7,7 +7,14 @@
 extern EntityManager manager;
 extern PathfindingQueue pathfindingQueue;
 
-static int s_exploring(Entity * entity)
+enum Result : std::size_t 
+{
+	rCONTINUE,
+	rFAIL,
+	rSUCCESS
+};
+
+static Result s_exploring(Entity * entity)
 {
 	auto& pathfinder = entity->GetComponent<PathfindingComponent>();
 	if (!pathfinder.getTarget("current"))
@@ -17,35 +24,34 @@ static int s_exploring(Entity * entity)
 		{
 			pathfindingQueue.makePathfindingRequest(entity, f);
 			pathfinder.setTarget("current", f);
-			return true;
+			return rSUCCESS;
 		}
 	}
 	if (!pathfinder.moving)
 	{
 		pathfindingQueue.makePathfindingRequest(entity);
 	}
-	return false;
+	return rCONTINUE;
 };
 
-static int s_followTarget(Entity * entity, Entity * target, float radius)
+static Result s_followTarget(Entity * entity, Entity * target, float radius)
 {
 	if (target)
 	{
-		//std::cout << Math::distance(target->GetComponent<TransformComponent>().position, entity->GetComponent<TransformComponent>().position) << std::endl;
 		if (Collision::AABBExtended(target->GetComponent<ColliderComponent>(), entity->GetComponent<ColliderComponent>(), radius))
 		{
-			return true;
+			return rSUCCESS;
 		}
 		else if (!entity->GetComponent<PathfindingComponent>().moving)
 		{
 			pathfindingQueue.makePathfindingRequest(entity, target);
 		}
-		return 2;
+		return rCONTINUE;
 	}
-	return false;
+	return rFAIL;
 };
 
-static int s_transferState(Entity * entity, Entity *target, std::string transfer_state, int rate_increase, int rate_decrease, int max_until_stop, int transfer_range)
+static Result s_transferState(Entity * entity, Entity *target, std::string transfer_state, int rate_increase, int rate_decrease, int max_until_stop, int transfer_range)
 {
 	if (target && Collision::AABBExtended(target->GetComponent<ColliderComponent>(), entity->GetComponent<ColliderComponent>(), transfer_range))
 	{
@@ -54,12 +60,12 @@ static int s_transferState(Entity * entity, Entity *target, std::string transfer
 		{
 			target->GetComponent<StateComponent>().addS(transfer_state, rate_decrease);
 			state.addS(transfer_state, rate_increase);
-			return 2;
+			return rCONTINUE;
 		}
 		entity->GetComponent<PathfindingComponent>().setTarget("current", nullptr);
-		return true;
+		return rSUCCESS;
 	}
-	return false;
+	return rFAIL;
 };
 
 class AISystem
@@ -70,6 +76,14 @@ public:
 		
 	}
 	~AISystem() {}
+
+	void Update()
+	{
+		updateHunted();
+		updateFoodSources();
+		updatePredators();
+	}
+
 	void updateHunted()
 	{
 		for (auto& entity : manager.GetGroup(Game::groupHunted))
@@ -110,10 +124,10 @@ public:
 				}
 
 
-				// initialize behaviour based on state
+				// update behaviour based on state
 				if (state.getB("returningToShepherd") > 100)
 				{
-					state.pushBehaviour(waitForCalm, 1);
+					state.pushBehaviour(transferStateB, 1);
 					state.pushBehaviour(followTarget, 1);
 					auto& pathfinder = entity->GetComponent<PathfindingComponent>();
 					pathfindingQueue.makePathfindingRequest(entity, pathfinder.getTarget("origin"));
@@ -129,7 +143,6 @@ public:
 					}
 					state.setB("exploring", 0);
 				}
-
 			}
 
 			if (ticks % 30 == 0)
@@ -140,7 +153,7 @@ public:
 		}
 	}
 
-	int result;
+	Result result;
 	void performBehaviourHunted(Entity* entity, const long& ticks)
 	{
 		auto& state = entity->GetComponent<StateComponent>();
@@ -166,14 +179,13 @@ public:
 			result = s_followTarget(entity, pathfinder.getTarget("current"), 10);
 			switch (result)
 			{
-			case true:
-				state.popBehaviour();
-				//entity->GetComponent<PathfindingComponent>().Stop();
-				break;
-			case false:
+			case rSUCCESS:
 				state.popBehaviour();
 				break;
-			case 2:
+			case rFAIL:
+				state.popBehaviour();
+				break;
+			default:
 				break;
 			}
 			break;
@@ -182,18 +194,18 @@ public:
 			result = s_transferState(entity, pathfinder.getTarget("current"), "food", 1, -1, 10, 10);
 			switch (result)
 			{
-			case false:
-				state.pushBehaviour(followTarget, 0);
-				break;
-			case true:
+			case rSUCCESS:
 				state.popBehaviour();
 				break;
-			case 2:
+			case rFAIL:
+				state.pushBehaviour(followTarget, 0);
+				break;
+			default:
 				break;
 			}
 			break;
 
-		case waitForCalm:
+		case transferStateB:
 			result = s_transferState(entity, pathfinder.getTarget("origin"), "calm", 200, 0, 10, 10);
 			switch (result)
 			{
@@ -223,14 +235,17 @@ public:
 			{
 				auto& state = entity->GetComponent<StateComponent>();
 
-				//state.addS("food", -30);
-
 				if (state.getS("food") <= 0)
 				{
 					entity->Destroy();
 				}
 			}
 		}
+	}
+
+	void updatePredators()
+	{
+		
 	}
 	
 

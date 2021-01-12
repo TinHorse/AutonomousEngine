@@ -88,9 +88,23 @@ void Navmesh::CalculatePath(Entity* entity, std::stack<Vector2D>& path, const Ve
 	Node* target = getNodeAt(closestXTarget, closestYTarget);
 	
 	// check if start or target are out of bounds, check if target is obstacle
-	if (!current || !target || target->isObstacle)
-	{
+	if (!current || !target)
 		return;
+
+	if (target->isObstacle)
+	{
+		std::cout << "is Bostacle" << std::endl;
+		for (auto& n : getNeighbours(target->x, target->y))
+		{
+			if (!n->isObstacle)
+			{
+				std::cout << "no bostacle" << std::endl;
+				target = n;
+				break;
+			}
+		}
+		if(target->isObstacle)
+			return;
 	}
 
 	// list yet to be tested
@@ -109,9 +123,8 @@ void Navmesh::CalculatePath(Entity* entity, std::stack<Vector2D>& path, const Ve
 	// while there are nodes not yet tested
 	while (!not_tested.empty() && current != target)
 	{
-		if (num_nodes_tested++ > max_nodes_to_test) { 
+		if (num_nodes_tested++ > max_nodes_to_test)
 			std::cout << "LIMIT REACHED : " << num_nodes_tested << std::endl;
-		}
 
 		// if the node has been visited, remove it
 		while (!not_tested.empty() && visited[not_tested.top()->ID])
@@ -173,8 +186,10 @@ void Navmesh::CalculatePath(Entity* entity, std::stack<Vector2D>& path, const Ve
 		}
 	}
 
-	path.pop();
-	path.push(curLoc);
+	if (!path.empty())
+		path.pop();
+		//if (!path.empty())
+			//path.pop();
 }
 
 void Navmesh::ClearMesh()

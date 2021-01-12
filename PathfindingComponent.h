@@ -6,6 +6,7 @@
 #include "Math.h"
 #include <set>
 #include <cassert>
+#include "Components.h"
 
 extern Navmesh navigation;
 
@@ -37,7 +38,7 @@ public:
 				if (path.empty())
 				{
 					moving = false;
-					transform->velocity = {0,0};
+					transform->velocity = { 0,0 };
 					return;
 				}
 			}
@@ -78,27 +79,21 @@ public:
 		navigation.CalculatePath(requesting_entity, path, target, true);
 		if (!path.empty())
 		{
-			path.pop();
-			if (!path.empty())
-			{
-				moving = true;
-			}
+			moving = true;
 		}
 	}
-	
+
 	void FindPathToTarget(Entity* requesting_entity, Entity* target_entity)
 	{
 		ClearPath();
 
 		navigation.CalculatePath(requesting_entity, path, target_entity->GetComponent<TransformComponent>().position, true);
+
 		if (!path.empty())
 		{
-			path.pop();
-			if (!path.empty())
-			{
-				moving = true;
-			}
+			moving = true;
 		}
+
 	}
 
 	void ClearPath()

@@ -39,7 +39,6 @@ void PathfindingQueue::executePathfindingRequests(double maxTime)
 			{
 				if (deletedEntities.find(request.targetEntity) == deletedEntities.end())
 				{
-					std::cout << "QUEUE finding path" << std::endl;
 					request.entity->GetComponent<PathfindingComponent>().FindPathToTarget(request.targetEntity);
 				}
 			}

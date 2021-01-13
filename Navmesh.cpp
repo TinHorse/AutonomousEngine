@@ -93,12 +93,10 @@ void Navmesh::CalculatePath(Entity* entity, std::stack<Vector2D>& path, const Ve
 
 	if (target->isObstacle)
 	{
-		std::cout << "is Bostacle" << std::endl;
 		for (auto& n : getNeighbours(target->x, target->y))
 		{
 			if (!n->isObstacle)
 			{
-				std::cout << "no bostacle" << std::endl;
 				target = n;
 				break;
 			}
@@ -117,14 +115,14 @@ void Navmesh::CalculatePath(Entity* entity, std::stack<Vector2D>& path, const Ve
 	// Initialize currrent
 	goals[current] = Math::distanceNoSqrt(current->x, current->y, target->x, target->y);
 
-	int num_nodes_tested = 0;
-	int max_nodes_to_test = Math::distanceNoSqrt(current->x, current->y, target->x, target->y);
+	//int num_nodes_tested = 0;
+	//int max_nodes_to_test = Math::distanceNoSqrt(current->x, current->y, target->x, target->y);
 	//std::cout << "max nodse to test " << max_nodes_to_test << " at distance " << sqrt(goals[current]) << std::endl;
 	// while there are nodes not yet tested
 	while (!not_tested.empty() && current != target)
 	{
-		if (num_nodes_tested++ > max_nodes_to_test)
-			std::cout << "LIMIT REACHED : " << num_nodes_tested << std::endl;
+		//if (num_nodes_tested++ > max_nodes_to_test)
+			//std::cout << "LIMIT REACHED : " << num_nodes_tested << std::endl;
 
 		// if the node has been visited, remove it
 		while (!not_tested.empty() && visited[not_tested.top()->ID])

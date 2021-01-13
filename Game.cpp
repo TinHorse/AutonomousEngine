@@ -82,6 +82,8 @@ void Game::Init(const char * title, int xpos, int ypos, int width, int height, b
 	assets->AddTexture("player", "assets/player_animated.png");
 	assets->AddTexture("enemy", "assets/enemy.png");
 
+	assets->AddTexture("enemy2", "assets/player2.png");
+
 	// Load map
 	map = new Map("terrain", 32, 1);
 	map->LoadMap("assets/tilemap.txt", 40, 40);
@@ -121,7 +123,7 @@ void Game::Init(const char * title, int xpos, int ypos, int width, int height, b
 	{
 		for (int j = 0; j < 2; j++)
 		{
-			assets->CreatePredator(Vector2D(300 + i * 60, 400 + j * 60), 90, 90, 0.3f);
+			assets->CreatePredator(Vector2D(300 + i * 60, 400 + j * 60), 236, 233, 0.15f);
 		}
 	}
 }

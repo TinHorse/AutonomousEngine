@@ -75,7 +75,7 @@ Entity & AssetManager::CreatePredator(Vector2D position, int sizeX, int sizeY, f
 {
 	auto& predator = manager->AddEntity();
 	manager->addTransformComponent(predator, position.x, position.y, sizeX, sizeY, scale);
-	manager->addSpriteComponent(predator, "player", false);
+	manager->addSpriteComponent(predator, "enemy2", false);
 	manager->addDynamicColliderComponent(predator, "predator");
 	auto& pathfinder = manager->addPathfindingComponent(predator);
 

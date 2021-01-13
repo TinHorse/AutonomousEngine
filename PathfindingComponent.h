@@ -29,7 +29,7 @@ public:
 		{
 			next = path.top();
 			transform->addForce((next - transform->position).Normalize());
-			if (Math::distanceNoSqrt(transform->position, path.top()) < 100)
+			if (Math::distanceNoSqrt(transform->position, path.top()) < 225)
 			{
 				// else, pull up next target
 				path.pop();
@@ -110,7 +110,7 @@ public:
 	{
 		if (!moving) // calculate new path if not moving
 		{
-			FindPath(FindRandomPointInRadius(entity->GetComponent<TransformComponent>().position, 500.f));
+			FindPath(FindRandomPointInRadius(entity->GetComponent<TransformComponent>().position, 300.f));
 		}
 	}
 	

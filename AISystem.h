@@ -331,11 +331,11 @@ public:
 		switch (state.currentBehaviour())
 		{
 		case idle:
-			std::cout << "idle" << std::endl;
+			//std::cout << "idle" << std::endl;
 			break;
 
 		case exploring:
-			std::cout << "exploring" << std::endl;
+			//std::cout << "exploring" << std::endl;
 			if (s_exploring(entity, Game::groupHunted, 200))
 			{
 				state.popBehaviour();
@@ -346,7 +346,7 @@ public:
 			break;
 
 		case followTarget:
-			std::cout << "followTarget " << state.getTarget("current") << std::endl;
+			//std::cout << "followTarget " << state.getTarget("current") << std::endl;
 			result = s_followTarget(entity, state.getTarget("current"), 10);
 			switch (result)
 			{
@@ -362,7 +362,7 @@ public:
 			break;
 
 		case attacking:
-			std::cout << "attacking" << std::endl;
+			//std::cout << "attacking" << std::endl;
 			result = s_transferState(entity, state.getTarget("current"), "health", 0, -10, 101, 10);
 			switch (result)
 			{

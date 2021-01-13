@@ -53,7 +53,7 @@ public:
 		{
 			velocity += collision_response_static;
 		}
-		if (collision_response_dynamic.x || collision_response_dynamic.y)
+		else if (collision_response_dynamic.x || collision_response_dynamic.y)
 		{
 			velocity += collision_response_dynamic;
 		}

@@ -29,7 +29,7 @@ public:
 		{
 			next = path.top();
 			transform->addVelocity((next - transform->position).Normalize());
-			if (Math::distanceNoSqrt(transform->position, path.top()) < 150)
+			if (Math::distanceNoSqrt(transform->position, path.top()) < 900)
 			{
 				// else, pull up next target
 				path.pop();

@@ -85,16 +85,16 @@ void Game::Init(const char * title, int xpos, int ypos, int width, int height, b
 	assets->AddTexture("enemy2", "assets/player2.png");
 
 	// Load map
-	map = new Map("terrain", 32, 1);
+	map = new Map("terrain", 32, 2);
 	map->LoadMap("assets/tilemap.txt", 40, 40);
 
 	// Load navigation
-	navigation.LoadMesh("assets/collisionmap.txt", 40, 40, 32, 32, 1);
+	navigation.LoadMesh("assets/collisionmap.txt", 40, 40, 32, 32, 2);
 
-	player = &assets->CreatePlayer(Vector2D(225,200), 90, 90, 0.35f);
+	player = &assets->CreatePlayer(Vector2D(225,200), 90, 90, 0.7f);
 
 	// Load collision
-	collision.LoadMesh("assets/collisionmap.txt", 40, 40, 32, 32, 1);
+	collision.LoadMesh("assets/collisionmap.txt", 40, 40, 32, 32, 2);
 
 	// Initialize camera
 	auto& t = player->GetComponent<TransformComponent>();
@@ -105,7 +105,7 @@ void Game::Init(const char * title, int xpos, int ypos, int width, int height, b
 	{
 		for (int j = 0; j < 3; j++)
 		{
-			assets->CreateHunted(Vector2D(300+i * 60, 300+j * 60), 90, 90, 0.25f);
+			assets->CreateHunted(Vector2D(300+i * 60, 300+j * 60), 90, 90, 0.5f);
 		}
 	}
 	
@@ -114,7 +114,7 @@ void Game::Init(const char * title, int xpos, int ypos, int width, int height, b
 	{
 		for (int j = 0; j < 5; j++)
 		{
-			assets->CreateFood(Vector2D(100 + i * 140, 100 + j * 150), 90, 90, 0.25f);
+			assets->CreateFood(Vector2D(100 + i * 140, 100 + j * 150), 90, 90, 0.5f);
 		}
 	}
 
@@ -123,7 +123,7 @@ void Game::Init(const char * title, int xpos, int ypos, int width, int height, b
 	{
 		for (int j = 0; j < 2; j++)
 		{
-			assets->CreatePredator(Vector2D(300 + i * 60, 400 + j * 60), 236, 233, 0.1f);
+			assets->CreatePredator(Vector2D(300 + i * 60, 400 + j * 60), 236, 233, 0.2f);
 		}
 	}
 }

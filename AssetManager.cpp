@@ -42,9 +42,11 @@ Entity& AssetManager::CreateHunted(Vector2D position, int sizeX, int sizeY, floa
 
 	auto& state = manager->addStateComponent(hunted);
 	state.initS("health", 100);
+	state.initS("isDead", 0);
 	state.initS("hunger", 50);
 	state.initS("calm", 0);
 	state.initS("food", 0);
+	state.initS("carrion", 100);
 
 	state.initB("exploring", 100);
 	state.initB("returningToShepherd", 100);
@@ -84,7 +86,7 @@ Entity & AssetManager::CreatePredator(Vector2D position, int sizeX, int sizeY, f
 	auto& state = manager->addStateComponent(predator);
 	state.initS("health", 100);
 	state.initS("hunger", 50);
-	state.initS("food", 0);
+	state.initS("carrion", 0);
 
 	state.initB("exploring", 100);
 	state.initB("attacking", 100);

@@ -28,14 +28,16 @@ public:
 		if (moving)
 		{
 			next = path.top();
-			transform->addForce((next - transform->position).Normalize());
-			if (Math::distanceNoSqrt(transform->position, path.top()) < 225)
+			transform->addVelocity((next - transform->position).Normalize());
+			if (Math::distanceNoSqrt(transform->position, path.top()) < 150)
 			{
 				// else, pull up next target
 				path.pop();
-				move_tries = 0;
-
-				if (path.empty())
+				if (!path.empty())
+				{
+					max_moves = ((Math::distance(path.top(), transform->position)) / transform->speed) * 1.5f;
+				}
+				else
 				{
 					moving = false;
 					transform->velocity = { 0,0 };
@@ -43,12 +45,23 @@ public:
 				}
 			}
 
+			//std::cout << max_moves << std::endl;
+			max_moves--;
+			if (max_moves < 0)
+			{
+				ClearPath();
+				std::cout << "clear path" << std::endl;
+			}
+
+
+
 			// check movement tries
+			/*
 			float dist = Math::distanceNoSqrt(transform->position, path.top());
-			if (abs(dist - previous_dist) < 100)
+			if (abs(dist - previous_dist) < 255)
 			{
 				move_tries++;
-				if (move_tries > 50)
+				if (move_tries > 40)
 				{
 					if (!path.empty())
 					{
@@ -59,16 +72,19 @@ public:
 							moving = false;
 						}
 					}
-					if (move_tries > 100)
+					if (move_tries > 80)
 					{
 						ClearPath();
 					}
 				}
 			}
+			*/
+			/*
 			if (!path.empty())
 			{
 				previous_dist = Math::distanceNoSqrt(transform->position, path.top());
 			}
+			*/
 		}
 	}
 
@@ -80,6 +96,7 @@ public:
 		if (!path.empty())
 		{
 			moving = true;
+			max_moves = ((Math::distance(path.top(), transform->position)) / transform->speed) * 1.5f;
 		}
 	}
 
@@ -92,6 +109,7 @@ public:
 		if (!path.empty())
 		{
 			moving = true;
+			max_moves = ((Math::distance(path.top(), transform->position)) / transform->speed) * 1.5f;
 		}
 
 	}
@@ -138,6 +156,14 @@ public:
 		return path.empty();
 	}
 
+	void pushPoint(Vector2D point)
+	{
+		point += transform->position;
+		path.push(point);
+		max_moves = ((Math::distance(path.top(), transform->position)) / transform->speed) * 1.5f;
+	}
+
+
 	void LinkComponentPointers() override
 	{
 		transform = &entity->GetComponent<TransformComponent>();
@@ -160,5 +186,6 @@ private:
 
 	// movement tries
 	int move_tries;
+	int max_moves;
 	float previous_dist;
 };

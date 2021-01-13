@@ -117,13 +117,14 @@ void Collisionmesh::CalculateCollision()
 				if (Collision::AABB(dynCol, *n))
 				{
 					force += Collision::CalculateOpposingForce(dynCol, *n);
-					staticCol = true;
 				}
 			}
 		}
 
-		if (dynCol.entity->HasComponent<PathfindingComponent>()
-			&& dynCol.entity->GetComponent<PathfindingComponent>().moving)
+		dynCol.transform->addCollisionResponseStatic(force.Normalize());
+		force.Zero();
+
+		if (dynCol.entity->HasComponent<PathfindingComponent>())
 		{
 			// check collision with other agents
 			if (!staticCol)
@@ -136,17 +137,15 @@ void Collisionmesh::CalculateCollision()
 					{
 						if (Collision::AABB(dynCol, dynCol2))
 						{
-							if (dynCol2.entity->HasComponent<PathfindingComponent>())
-							{
-								dynCol2.entity->GetComponent<TransformComponent>().addForce(Collision::CalculateOpposingForce(dynCol2, dynCol));
-							}
+							force += Collision::CalculateOpposingForce(dynCol, dynCol2);
 						}
 					}
 				}
+				dynCol.transform->addCollisionResponseDynamic(force.Normalize());
 			}
 		}
 
-		dynCol.transform->addForce(force);
+		
 	}
 
 	for (auto& entity : manager.GetGroup(Game::groupPlayers))
@@ -167,10 +166,12 @@ void Collisionmesh::CalculateCollision()
 				if (Collision::AABB(dynCol, *n))
 				{
 					force += Collision::CalculateOpposingForce(dynCol, *n);
-					staticCol = true;
 				}
 			}
 		}
+
+		dynCol.transform->addCollisionResponseStatic(force);
+		force.Zero();
 
 		// check collision with other agents
 		if (!staticCol)
@@ -185,7 +186,7 @@ void Collisionmesh::CalculateCollision()
 					{
 						if (dynCol2.entity->HasComponent<PathfindingComponent>())
 						{
-							dynCol2.entity->GetComponent<TransformComponent>().addForce(Collision::CalculateOpposingForce(dynCol2, dynCol));
+							dynCol2.entity->GetComponent<TransformComponent>().addCollisionResponseDynamic(Collision::CalculateOpposingForce(dynCol2, dynCol));
 						}
 						else
 						{
@@ -194,8 +195,7 @@ void Collisionmesh::CalculateCollision()
 					}
 				}
 			}
+			dynCol.transform->addCollisionResponseDynamic(force);
 		}
-
-		dynCol.transform->addForce(force);
 	}
 }

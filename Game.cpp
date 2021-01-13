@@ -91,7 +91,7 @@ void Game::Init(const char * title, int xpos, int ypos, int width, int height, b
 	// Load navigation
 	navigation.LoadMesh("assets/collisionmap.txt", 40, 40, 32, 32, 1);
 
-	player = &assets->CreatePlayer(Vector2D(225,200), 90, 90, 0.4f);
+	player = &assets->CreatePlayer(Vector2D(225,200), 90, 90, 0.35f);
 
 	// Load collision
 	collision.LoadMesh("assets/collisionmap.txt", 40, 40, 32, 32, 1);
@@ -101,9 +101,9 @@ void Game::Init(const char * title, int xpos, int ypos, int width, int height, b
 	camera.Init(t.position.x, t.position.y, 800, 600);
 
 	// Create Hunted
-	for (int i = 0; i < 5; i++)
+	for (int i = 0; i < 3; i++)
 	{
-		for (int j = 0; j < 5; j++)
+		for (int j = 0; j < 3; j++)
 		{
 			assets->CreateHunted(Vector2D(300+i * 60, 300+j * 60), 90, 90, 0.25f);
 		}
@@ -123,7 +123,7 @@ void Game::Init(const char * title, int xpos, int ypos, int width, int height, b
 	{
 		for (int j = 0; j < 2; j++)
 		{
-			assets->CreatePredator(Vector2D(300 + i * 60, 400 + j * 60), 236, 233, 0.15f);
+			assets->CreatePredator(Vector2D(300 + i * 60, 400 + j * 60), 236, 233, 0.1f);
 		}
 	}
 }

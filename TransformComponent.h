@@ -7,6 +7,8 @@ class TransformComponent : public Component
 public:
 	Vector2D position;
 	Vector2D velocity;
+	Vector2D collision_response_static;
+	Vector2D collision_response_dynamic;
 	float speed = 1.5f;
 
 	int height = 128;
@@ -47,20 +49,37 @@ public:
 
 	void Update() override
 	{
-		position.x += velocity.x * speed;
-		position.y += velocity.y * speed;
+		if (collision_response_static.x || collision_response_static.y)
+		{
+			velocity += collision_response_static;
+		}
+		if (collision_response_dynamic.x || collision_response_dynamic.y)
+		{
+			velocity += collision_response_dynamic;
+		}
+		
+		collision_response_static.Zero();
+		collision_response_dynamic.Zero();
+		
+		velocity.Normalize();
+		position += velocity * speed * 2;
 		velocity.Zero();
+		
 	}
 
-	void addForce(const Vector2D& force)
+	void addVelocity(const Vector2D& force)
 	{
 		velocity += force;
-		velocity.Normalize();
 	}
-	void setForce(const Vector2D& force)
+
+	void addCollisionResponseStatic(const Vector2D& force)
 	{
-		velocity = force;
-		velocity.Normalize();
+		collision_response_static += force;
+	}
+
+	void addCollisionResponseDynamic(const Vector2D& force)
+	{
+		collision_response_dynamic += force;
 	}
 
 };

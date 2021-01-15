@@ -172,27 +172,6 @@ void EntityManager::Refresh()
 		index++;
 	}
 
-	/*
-	std::array<TransformComponent, 2000> compTran;
-	std::array<SpriteComponent, 2000> compSprite;
-	std::array<KeyboardController, 2000> compKeyboard;
-	std::array<ColliderComponent, 2000> compStaticColl;
-	std::array<ColliderComponent, 2000> compDynamicColl;
-	std::array<TileComponent, 2000> compTile;
-	std::array<PathfindingComponent, 2000> compPath;
-	std::array<StateComponent, 2000> compState;
-
-	int index_tran = 0;
-	int index_sprites = 0;
-	int index_keyboard = 0;
-	int index_static_coll = 0;
-	int index_dynamic_coll = 0;
-	int index_tiles = 0;
-	int index_path = 0;
-	int index_state = 0;
-	*/
-
-
 	// removes entity groups if they are inactive. This is called the erase-remove idiom
 	for (auto i(0u); i < maxGroups; i++)
 	{

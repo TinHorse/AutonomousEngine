@@ -88,6 +88,27 @@ public:
 		return compTile;
 	}
 
+	std::array<StateComponent, 2000>& getStates()
+	{
+		return compState;
+	}
+
+	int getIndexStaticCol()
+	{
+		return index_static_coll;
+	}
+
+	int getIndexDynamicCol()
+	{
+		return index_dynamic_coll;
+	}
+
+	std::array<ColliderComponent, 2000>& getDynamicCols()
+	{
+		return compDynamicColl;
+	}
+
+private:
 	std::array<TransformComponent, 2000> compTran;
 	std::array<SpriteComponent, 2000> compSprite;
 	std::array<KeyboardController, 2000> compKeyboard;
@@ -106,7 +127,6 @@ public:
 	int index_path = 0;
 	int index_state = 0;
 
-private:
 	std::vector<std::unique_ptr<Entity>> entities;
 	std::array<std::vector<Entity*>, maxGroups> groupedEntities; // same as entities, but grouped for rendering
 

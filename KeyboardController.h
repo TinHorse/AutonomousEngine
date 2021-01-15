@@ -40,6 +40,10 @@ public:
 				sprite->Play("walk");
 				sprite->spriteFlip = SDL_FLIP_NONE;
 			}
+			if (keystate[SDL_SCANCODE_SPACE])
+			{
+				sprite->Play("eat");
+			}
 
 		}
 		if (Game::event.type == SDL_KEYUP)

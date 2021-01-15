@@ -98,8 +98,8 @@ void Collisionmesh::CalculateCollision()
 	Vector2D force;
 	int x, y;
 
-	int index = manager.index_dynamic_coll;
-	for (auto& dynCol : manager.compDynamicColl)
+	int index = manager.getIndexDynamicCol();
+	for (auto& dynCol : manager.getDynamicCols())
 	{
 		if (index-- <= 0) { break; }
 
@@ -129,8 +129,8 @@ void Collisionmesh::CalculateCollision()
 			// check collision with other agents
 			if (!staticCol)
 			{
-				int other_index = manager.index_dynamic_coll;
-				for (auto& dynCol2 : manager.compDynamicColl)
+				int other_index = manager.getIndexDynamicCol();
+				for (auto& dynCol2 : manager.getDynamicCols())
 				{
 					if (other_index-- <= 0) { break; }
 					if (dynCol.entity != dynCol2.entity)
@@ -177,8 +177,8 @@ void Collisionmesh::CalculateCollision()
 		// check collision with other agents
 		if (!staticCol)
 		{
-			int other_index = manager.index_dynamic_coll;
-			for (auto& dynCol2 : manager.compDynamicColl)
+			int other_index = manager.getIndexDynamicCol();
+			for (auto& dynCol2 : manager.getDynamicCols())
 			{
 				if (other_index-- <= 0) { break; }
 				if (dynCol.entity != dynCol2.entity)

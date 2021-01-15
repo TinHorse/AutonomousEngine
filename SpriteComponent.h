@@ -24,8 +24,10 @@ public:
 
 		Animation idle = Animation(0,10,150);
 		Animation walk = Animation(1,9,50);
+		Animation eat = Animation(2,6,50);
 		animations.emplace("idle", idle);
 		animations.emplace("walk", walk);
+		animations.emplace("eat", eat);
 
 		Play("idle");
 		setTexture(tID);
@@ -75,22 +77,25 @@ public:
 		animationSpeed = animations[animName].animationSpeed;
 	}
 
-	void PlayAnims()
+	void PlayAnim(std::string animation = "")
 	{
-		if (transform->getVelocity().x == 0)
+		if (animation.empty())
 		{
-			spriteFlip = SDL_FLIP_NONE;
-			Play("idle");
-		}
-		else if (transform->getVelocity().x > 0)
-		{
-			spriteFlip = SDL_FLIP_NONE;
-			Play("walk");
-		}
-		else
-		{
-			spriteFlip = SDL_FLIP_HORIZONTAL;
-			Play("walk");
+			if (transform->getVelocity().x > 0)
+			{
+				spriteFlip = SDL_FLIP_NONE;
+				Play("walk");
+			}
+			else if (transform->getVelocity().x < 0)
+			{
+				spriteFlip = SDL_FLIP_HORIZONTAL;
+				Play("walk");
+			}
+			if (transform->getVelocity().y == 0)
+			{
+				spriteFlip = SDL_FLIP_NONE;
+				Play("idle");
+			}
 		}
 	}
 

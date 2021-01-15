@@ -4,102 +4,15 @@
 #include "Queues.h"
 #include "Collision.h"
 #include "AIStateUpdate.h"
+#include "AIBehaviour.h"
 
 extern EntityManager manager;
 extern PathfindingQueue pathfindingQueue;
 
-enum Result : std::size_t 
-{
-	rCONTINUE,
-	rFAIL,
-	rSUCCESS,
-	rNO_TARGET
-};
-
-static Result s_exploring(Entity * entity, Group targetGroup, float searchDistance)
-{
-	auto& pathfinder = entity->GetComponent<PathfindingComponent>();
-	auto& state = entity->GetComponent<StateComponent>();
-	if (!state.getTarget("current"))
-	{
-		auto& foodSources = manager.FindEntitiesInArea(entity->GetComponent<TransformComponent>().position, targetGroup, searchDistance);
-		for (auto& f : foodSources)
-		{
-			pathfindingQueue.makePathfindingRequest(entity, f);
-			state.setTarget("current", f);
-			return rSUCCESS;
-		}
-	}
-	if (!pathfinder.moving)
-	{
-		pathfindingQueue.makePathfindingRequest(entity);
-	}
-	return rCONTINUE;
-};
-
-static Result s_followTarget(Entity * entity, Entity * target, float radius)
-{
-	if (target)
-	{
-		if (Collision::AABBExtended(target->GetComponent<ColliderComponent>(), entity->GetComponent<ColliderComponent>(), radius))
-		{
-			return rSUCCESS;
-		}
-		else if (!entity->GetComponent<PathfindingComponent>().moving)
-		{
-			pathfindingQueue.makePathfindingRequest(entity, target);
-		}
-		return rCONTINUE;
-	}
-	return rNO_TARGET;
-};
-
-static Result s_transferState(Entity * entity, Entity *target, std::string transfer_state, int rate_increase, int rate_decrease, int max_until_stop, int transfer_range)
-{
-	if (target)
-	{
-		if (target && Collision::AABBExtended(target->GetComponent<ColliderComponent>(), entity->GetComponent<ColliderComponent>(), transfer_range))
-		{
-			auto& state = entity->GetComponent<StateComponent>();
-			if (state.getS(transfer_state) < max_until_stop && target->GetComponent<StateComponent>().getS(transfer_state) > 0)
-			{
-				target->GetComponent<StateComponent>().addS(transfer_state, rate_decrease);
-				state.addS(transfer_state, rate_increase);
-				return rCONTINUE;
-			}
-			return rSUCCESS;
-		}
-		return rFAIL;
-	}
-	return rNO_TARGET;
-};
-
-static Result s_runAway(Entity * entity, Entity * target, float radius)
-{
-	if (target)
-	{
-		if (!Collision::AABBExtended(target->GetComponent<ColliderComponent>(), entity->GetComponent<ColliderComponent>(), radius))
-		{
-			return rSUCCESS;
-		}
-		else if (!entity->GetComponent<PathfindingComponent>().moving)
-		{
-			Vector2D safe = entity->GetComponent<TransformComponent>().position;
-			safe -= target->GetComponent<TransformComponent>().position;
-			pathfindingQueue.makePathfindingRequest(entity, safe);
-		}
-		return rCONTINUE;
-	}
-	return rNO_TARGET;
-};
-
 class AISystem
 {
 public:
-	AISystem()
-	{
-		
-	}
+	AISystem() {}
 	~AISystem() {}
 
 	void Update()
@@ -111,7 +24,6 @@ public:
 			{
 				updateHunted(*entity);
 			}
-
 			if (ticks % 30 == 0)
 			{
 				performBehaviourHunted(entity, ticks);
@@ -145,18 +57,16 @@ public:
 	{
 		auto& state = entity->GetComponent<StateComponent>();
 
-		entity->GetComponent<SpriteComponent>().PlayAnims();
+		entity->GetComponent<SpriteComponent>().PlayAnim();
 
 		//execute state
 		Result result;
 		switch (state.currentBehaviour())
 		{
 		case idle:
-			//std::cout << "idle" << std::endl;
 			break;
 
 		case exploring:
-			//std::cout << "exploring" << std::endl;
 			if (s_exploring(entity, Game::groupFood, 100))
 			{
 				state.popBehaviour();
@@ -166,8 +76,7 @@ public:
 			break;
 
 		case followTarget:
-			//std::cout << "followTarget " << state.getTarget("current") <<std::endl;
-			result = s_followTarget(entity, state.getTarget("current"), 10);
+			result = s_followTarget(entity, state.getTarget("current"), 20);
 			switch (result)
 			{
 			case rSUCCESS:
@@ -182,7 +91,7 @@ public:
 			break;
 
 		case eating:
-			//std::cout << "eating" << std::endl;
+			std::cout << "eating" << std::endl;
 			result = s_transferState(entity, state.getTarget("current"), "food", 1, -1, 10, 10);
 			switch (result)
 			{
@@ -200,14 +109,14 @@ public:
 			}
 			break;
 		case goToOrigin:
+			state.popBehaviour();
 			state.pushBehaviour(waitingForCalm, 1);
 			state.pushBehaviour(followTarget, 1);
 			pathfindingQueue.makePathfindingRequest(entity, state.getTarget("origin"));
 			break;
 
 		case waitingForCalm:
-			//std::cout << "waitingForCalm" << std::endl;
-			result = s_transferState(entity, state.getTarget("origin"), "calm", 100, 0, 50, 10);
+			result = s_transferState(entity, state.getTarget("origin"), "calm", 100, 0, 50, 30);
 			switch (result)
 			{
 			case rSUCCESS:
@@ -223,7 +132,6 @@ public:
 			break;
 
 		case fleeing:
-			//std::cout << "waitingForCalm" << std::endl;
 			result = s_runAway(entity, state.getTarget("enemy"), 200);
 			switch (result)
 			{
@@ -267,7 +175,6 @@ public:
 			break;
 
 		case followTarget:
-			//std::cout << "followTarget " << state.getTarget("current") << std::endl;
 			result = s_followTarget(entity, state.getTarget("current"), 10);
 			switch (result)
 			{

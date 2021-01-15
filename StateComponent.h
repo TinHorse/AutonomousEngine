@@ -23,6 +23,7 @@ class StateComponent : public Component
 {
 public:
 	StateComponent() {}
+	StateComponent(std::string _tag) {tag = _tag;}
 	void Init() override
 	{
 		
@@ -32,6 +33,8 @@ public:
 	{
 		
 	}
+
+	std::string tag;
 
 	// STATE
 

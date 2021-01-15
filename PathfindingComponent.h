@@ -13,8 +13,6 @@ extern Navmesh navigation;
 class PathfindingComponent : public Component
 {
 public:
-	bool moving;
-
 	PathfindingComponent() : moving(false) {}
 	~PathfindingComponent() {}
 
@@ -50,7 +48,6 @@ public:
 			if (max_moves < 0)
 			{
 				ClearPath();
-				std::cout << "clear path" << std::endl;
 			}
 		}
 	}
@@ -157,6 +154,7 @@ private:
 	TransformComponent *transform;
 	std::stack<Vector2D> path;
 	Vector2D next;
+	bool moving;
 
 	// movement tries
 	int move_tries;

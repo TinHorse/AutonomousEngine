@@ -34,7 +34,7 @@ Entity& AssetManager::CreateHunted(Vector2D position, int sizeX, int sizeY, floa
 {
 	auto& hunted = manager->AddEntity();
 	manager->addTransformComponent(hunted, position.x, position.y, sizeX, sizeY, scale);
-	manager->addSpriteComponent(hunted, "enemy", false);
+	manager->addSpriteComponent(hunted, "player", true);
 	manager->addDynamicColliderComponent(hunted,"agent");
 	auto& pathfinder = manager->addPathfindingComponent(hunted);
 

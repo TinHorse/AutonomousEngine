@@ -9,6 +9,7 @@ public:
 	Vector2D velocity;
 	Vector2D collision_response_static;
 	Vector2D collision_response_dynamic;
+	Vector2D previous_velocity;
 	float speed = 1.5f;
 
 	int height = 128;
@@ -33,7 +34,7 @@ public:
 		position.y = y;
 	}
 
-	TransformComponent(float x, float y, int h, int w, float sc)
+	TransformComponent(float x, float y, int w, int h, float sc)
 	{
 		position.x = x;
 		position.y = y;
@@ -62,7 +63,8 @@ public:
 		collision_response_dynamic.Zero();
 		
 		velocity.Normalize();
-		position += velocity * speed * 2;
+		position += velocity * speed;
+		previous_velocity = velocity;
 		velocity.Zero();
 		
 	}
@@ -80,6 +82,11 @@ public:
 	void addCollisionResponseDynamic(const Vector2D& force)
 	{
 		collision_response_dynamic += force;
+	}
+
+	const Vector2D& getVelocity()
+	{
+		return previous_velocity;
 	}
 
 };

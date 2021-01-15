@@ -22,8 +22,8 @@ public:
 	{
 		animated = isAnimated;
 
-		Animation idle = Animation(0,4,100);
-		Animation walk = Animation(1,5,100);
+		Animation idle = Animation(0,10,150);
+		Animation walk = Animation(1,9,50);
 		animations.emplace("idle", idle);
 		animations.emplace("walk", walk);
 
@@ -73,6 +73,25 @@ public:
 		numFrames = animations[animName].numFrames;
 		animationIndex = animations[animName].index;
 		animationSpeed = animations[animName].animationSpeed;
+	}
+
+	void PlayAnims()
+	{
+		if (transform->getVelocity().x == 0)
+		{
+			spriteFlip = SDL_FLIP_NONE;
+			Play("idle");
+		}
+		else if (transform->getVelocity().x > 0)
+		{
+			spriteFlip = SDL_FLIP_NONE;
+			Play("walk");
+		}
+		else
+		{
+			spriteFlip = SDL_FLIP_HORIZONTAL;
+			Play("walk");
+		}
 	}
 
 	void LinkComponentPointers() override

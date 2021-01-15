@@ -142,6 +142,8 @@ void Collisionmesh::CalculateCollision()
 					}
 				}
 				dynCol.transform->addCollisionResponseDynamic(force.Normalize());
+				//force.x = -force.x;
+				//dynCol.entity->GetComponent<PathfindingComponent>().pushPoint(force.Normalize() * 5);
 			}
 		}
 		

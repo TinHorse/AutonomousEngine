@@ -11,7 +11,8 @@ enum Behaviour : std::size_t
 	followTarget,
 	waitingForCalm,
 	attacking,
-	fleeing
+	fleeing,
+	goToOrigin
 };
 
 

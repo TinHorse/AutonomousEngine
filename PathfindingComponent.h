@@ -156,11 +156,18 @@ public:
 		return path.empty();
 	}
 
-	void pushPoint(Vector2D point)
+	void pushPoint(Vector2D skew)
 	{
-		point += transform->position;
-		path.push(point);
-		max_moves = ((Math::distance(path.top(), transform->position)) / transform->speed) * 1.5f;
+		if (!path.empty())
+		{
+			path.top() += skew;
+			//path.push(skew + transform->position);
+		}
+		else
+		{
+			path.push(skew + transform->position);
+		}
+		
 	}
 
 

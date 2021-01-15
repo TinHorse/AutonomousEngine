@@ -5,5 +5,5 @@
 #include "KeyboardController.h"
 #include "ColliderComponent.h"
 #include "TileComponent.h"
-#include "PathfindingComponent.h"
 #include "StateComponent.h"
+#include "PathfindingComponent.h"

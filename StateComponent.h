@@ -2,6 +2,8 @@
 #include "Components.h"
 #include <map>
 #include <cassert>
+#include <set>
+#include <stack>
 
 enum Behaviour : std::size_t
 {

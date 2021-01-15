@@ -52,39 +52,6 @@ public:
 				ClearPath();
 				std::cout << "clear path" << std::endl;
 			}
-
-
-
-			// check movement tries
-			/*
-			float dist = Math::distanceNoSqrt(transform->position, path.top());
-			if (abs(dist - previous_dist) < 255)
-			{
-				move_tries++;
-				if (move_tries > 40)
-				{
-					if (!path.empty())
-					{
-						move_tries = 0;
-						path.pop();
-						if (path.empty())
-						{
-							moving = false;
-						}
-					}
-					if (move_tries > 80)
-					{
-						ClearPath();
-					}
-				}
-			}
-			*/
-			/*
-			if (!path.empty())
-			{
-				previous_dist = Math::distanceNoSqrt(transform->position, path.top());
-			}
-			*/
 		}
 	}
 

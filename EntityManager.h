@@ -130,6 +130,7 @@ private:
 	std::vector<std::unique_ptr<Entity>> entities;
 	std::array<std::vector<Entity*>, maxGroups> groupedEntities; // same as entities, but grouped for rendering
 
+
 	std::vector<Entity*> entities_in_area;
 
 	std::set<Entity*> deleted_entities;

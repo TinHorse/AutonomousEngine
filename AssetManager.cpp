@@ -3,6 +3,8 @@
 #include "EntityManager.h"
 #include "AISystem.h"
 
+extern AISystem aisystem;
+
 AssetManager::AssetManager(EntityManager *man) : manager(man)
 {
 	
@@ -39,22 +41,7 @@ Entity& AssetManager::CreateHunted(Vector2D position, int sizeX, int sizeY, floa
 	auto& pathfinder = manager->addPathfindingComponent(hunted);
 
 	manager->AddToGroup(&hunted, Game::groupHunted);
-
-	auto& state = manager->addStateComponent(hunted, "hunted");
-	state.initS("health", 100);
-	state.initS("isDead", 0);
-	state.initS("hunger", 50);
-	state.initS("calm", 0);
-	state.initS("food", 0);
-	state.initS("carrion", 100);
-
-	state.initB("exploring", 100);
-	state.initB("returningToShepherd", 100);
-	state.initB("fleeing", 0);
-
-	state.initTarget("current", nullptr);
-	state.initTarget("origin", manager->GetGroup(Game::groupPlayers)[0]);
-	state.initTarget("enemy", nullptr);
+	aisystem.addAIEntity(&hunted, Game::groupHunted, manager->GetGroup(Game::groupPlayers)[0]);
 
 	return hunted;
 }

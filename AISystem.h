@@ -6,6 +6,8 @@
 #include "AIStateUpdate.h"
 #include "AIBehaviour.h"
 
+#include "Hunted.h"
+
 extern EntityManager manager;
 extern PathfindingQueue pathfindingQueue;
 
@@ -15,6 +17,8 @@ public:
 	AISystem() {}
 	~AISystem() {}
 
+
+	/*
 	void Update()
 	{
 		for (auto& entity : manager.GetGroup(Game::groupHunted))
@@ -226,8 +230,51 @@ public:
 			assert(true && "FSM trying to access Behaviour function that doesnt exist");
 		}
 	}
-	
+	*/
+
+	void update()
+	{
+		for (auto& h : hunted)
+		{
+			h.update();
+		}
+	}
+
+	template<typename ...TArgs>
+	void addAIEntity(Entity * entity, Game::groupLabels mGroup, TArgs && ...args)
+	{
+		switch (mGroup)
+		{
+		case Game::groupHunted:
+			hunted[index_hunted] = Hunted(entity, std::forward<TArgs> (args)...);
+			index_hunted++;
+		}
+	}
+
+	void refresh()
+	{
+		int index = 0;
+		for (auto& h : hunted)
+		{
+			if (index >= index_hunted) { break; };
+			if (!h.entity)
+			{
+				while (index_hunted > 0 && !hunted[index_hunted - 1].entity)
+				{
+					index_hunted--;
+				}
+				if (index_hunted > 0 && index_hunted != index)
+				{
+					std::swap(hunted[index], hunted[index_hunted - 1]);
+					index_hunted--;
+				}
+			}
+			index++;
+		}
+	}
 
 private:
-	
+	std::array<Hunted, 1000> hunted;
+
+	int index_hunted = 0;
 };

@@ -158,7 +158,8 @@ void Game::Update()
 	
 	manager.Update();
 
-	aisystem.Update();
+	aisystem.refresh();
+	aisystem.update();
 
 	Vector2D offset(-400, -300);
 	camera.Update(offset + player->GetComponent<TransformComponent>().position);

@@ -155,6 +155,7 @@ private:
 	std::stack<Vector2D> path;
 	Vector2D next;
 	bool moving;
+	Entity *target;
 
 	// movement tries
 	int move_tries;

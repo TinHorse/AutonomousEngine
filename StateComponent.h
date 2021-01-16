@@ -5,20 +5,6 @@
 #include <set>
 #include <stack>
 
-enum Behaviour : std::size_t
-{
-	idle,
-	exploring,
-	eating,
-	followTarget,
-	waitingForCalm,
-	attacking,
-	fleeing,
-	goToOrigin
-};
-
-
-
 class StateComponent : public Component
 {
 public:

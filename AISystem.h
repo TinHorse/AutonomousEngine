@@ -1,15 +1,4 @@
-#pragma once
-#include "Components.h"
-#include "EntityManager.h"
-#include "Queues.h"
-#include "Collision.h"
-#include "AIStateUpdate.h"
-#include "AIBehaviour.h"
 
-#include "Hunted.h"
-
-extern EntityManager manager;
-extern PathfindingQueue pathfindingQueue;
 
 class AISystem
 {
@@ -234,12 +223,17 @@ public:
 
 	void update()
 	{
+		/*
+		int index = index_hunted;
 		for (auto& h : hunted)
 		{
+			if (index-- <= 0) { break; }
 			h.update();
 		}
+		*/
 	}
 
+	/*
 	template<typename ...TArgs>
 	void addAIEntity(Entity * entity, Game::groupLabels mGroup, TArgs && ...args)
 	{
@@ -250,14 +244,16 @@ public:
 			index_hunted++;
 		}
 	}
+	*/
 
 	void refresh()
 	{
+		/*
 		int index = 0;
 		for (auto& h : hunted)
 		{
 			if (index >= index_hunted) { break; };
-			if (!h.entity)
+			if (!h)
 			{
 				while (index_hunted > 0 && !hunted[index_hunted - 1].entity)
 				{
@@ -271,10 +267,11 @@ public:
 			}
 			index++;
 		}
+		*/
 	}
 
 private:
-	std::array<Hunted, 1000> hunted;
+	//std::array<Hunted, 1000> hunted;
 
 	int index_hunted = 0;
 };

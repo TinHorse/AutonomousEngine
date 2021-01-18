@@ -40,7 +40,7 @@ static void updateHunted(Entity& entity)
 			state.addB("exploring", 50);
 		}
 
-
+		/*
 		// update behaviour based on state
 		if (state.getB("returningToShepherd") > 100)
 		{
@@ -60,7 +60,7 @@ static void updateHunted(Entity& entity)
 		{
 			state.pushBehaviour(fleeing, 2);
 		}
-
+		*/
 	}
 	else
 	{
@@ -91,7 +91,7 @@ static void updatePredators(Entity & entity)
 
 	if (state.getB("exploring") > 20)
 	{
-		state.pushBehaviour(exploring, 0);
+		//state.pushBehaviour(exploring, 0);
 		state.setB("exploring", 0);
 	}
 }

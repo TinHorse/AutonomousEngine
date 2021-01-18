@@ -76,7 +76,7 @@ public:
 	}
 
 	// BEHAVIOURS
-
+	/*
 	const Behaviour& currentBehaviour()
 	{
 		if (!state_machine.empty())
@@ -113,7 +113,7 @@ public:
 			state_machine.pop();
 	}
 
-
+	*/
 	// TARGETS
 
 	void initTarget(const std::string& t, Entity* entity)
@@ -152,7 +152,7 @@ private:
 	std::map<std::string, double> state;
 	std::map<std::string, double> bevaviour;
 
-	std::stack<std::pair<Behaviour, int>> state_machine;
+	//std::stack<std::pair<Behaviour, int>> state_machine;
 
 	std::map<std::string, Entity*> targetEntities;
 };

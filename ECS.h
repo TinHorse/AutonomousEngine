@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <bitset>
 #include <array>
+#include <set>
 #include "Math.h"
 
 // The Entity Component System is composed of three classes: component, entity and manager
@@ -77,8 +78,10 @@ public:
 		Ticks = TickMaster++;
 	}
 	bool IsActive() const;
+	virtual void update() {}
+	virtual void refresh(std::set<Entity*> deletedEntities) {}
 	void Destroy();
-	~Entity();
+	virtual ~Entity();
 
 	bool HasGroup(Group mGroup); // checks if entity is part of a specific group
 	void AddToGroup(Group mGroup); // adds entity to specified group

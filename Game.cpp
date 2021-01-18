@@ -158,8 +158,19 @@ void Game::Update()
 	
 	manager.Update();
 
-	aisystem.refresh();
-	aisystem.update();
+
+	for (auto& h : hunted)
+	{
+		h->update();
+	}
+	for (auto& f : foods)
+	{
+		f->update();
+	}
+	for (auto& p : predators)
+	{
+		p->update();
+	}
 
 	Vector2D offset(-400, -300);
 	camera.Update(offset + player->GetComponent<TransformComponent>().position);

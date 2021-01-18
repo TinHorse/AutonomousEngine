@@ -26,7 +26,7 @@ void PathfindingQueue::executePathfindingRequests(double maxTime)
 	while (!pathfinding_requests.empty())
 	{
 		currTime = SDL_GetTicks();
-		//if ((currTime - beginTime) >= maxTime) { break; }
+		if ((currTime - beginTime) >= maxTime) { break; }
 
 		auto mapIndex = pathfinding_requests.begin();
 		auto entity = mapIndex->first;

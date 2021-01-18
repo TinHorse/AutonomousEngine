@@ -1,9 +1,7 @@
 #include "AssetManager.h"
 #include "Components.h"
 #include "EntityManager.h"
-#include "AISystem.h"
-
-extern AISystem aisystem;
+#include "Entities.h"
 
 AssetManager::AssetManager(EntityManager *man) : manager(man)
 {
@@ -19,7 +17,7 @@ AssetManager::~AssetManager()
 
 Entity& AssetManager::CreatePlayer(Vector2D position, int sizeX, int sizeY, float scale)
 {
-	auto& player = manager->AddEntity();
+	Entity& player = manager->AddEntity<Player>();
 	manager->addTransformComponent(player, position.x, position.y, sizeX, sizeY, scale);
 	manager->addSpriteComponent(player, "player", true);
 	manager->addStaticColliderComponent(player, "player");
@@ -34,21 +32,21 @@ Entity& AssetManager::CreatePlayer(Vector2D position, int sizeX, int sizeY, floa
 
 Entity& AssetManager::CreateHunted(Vector2D position, int sizeX, int sizeY, float scale)
 {
-	auto& hunted = manager->AddEntity();
+	auto& hunted = manager->AddEntity<Hunted>(manager->GetGroup(Game::groupPlayers)[0]);
 	manager->addTransformComponent(hunted, position.x, position.y, sizeX, sizeY, scale);
 	manager->addSpriteComponent(hunted, "player", true);
 	manager->addDynamicColliderComponent(hunted,"hunted");
 	auto& pathfinder = manager->addPathfindingComponent(hunted);
 
 	manager->AddToGroup(&hunted, Game::groupHunted);
-	aisystem.addAIEntity(&hunted, Game::groupHunted, manager->GetGroup(Game::groupPlayers)[0]);
+	//aisystem.addAIEntity(&hunted, Game::groupHunted, manager->GetGroup(Game::groupPlayers)[0]);
 
 	return hunted;
 }
 
 Entity & AssetManager::CreateFood(Vector2D position, int sizeX, int sizeY, float scale)
 {
-	auto& foodItem = manager->AddEntity();
+	auto& foodItem = manager->AddEntity<Grass>();
 	manager->addTransformComponent(foodItem, position.x, position.y, sizeX, sizeY, scale);
 	manager->addSpriteComponent(foodItem, "food", false);
 	manager->addDynamicColliderComponent(foodItem, "food");
@@ -62,7 +60,7 @@ Entity & AssetManager::CreateFood(Vector2D position, int sizeX, int sizeY, float
 
 Entity & AssetManager::CreatePredator(Vector2D position, int sizeX, int sizeY, float scale)
 {
-	auto& predator = manager->AddEntity();
+	auto& predator = manager->AddEntity<Predator>();
 	manager->addTransformComponent(predator, position.x, position.y, sizeX, sizeY, scale);
 	manager->addSpriteComponent(predator, "enemy2", false);
 	manager->addDynamicColliderComponent(predator, "predator");

@@ -11,11 +11,21 @@ public:
 	EntityManager();
 
 	void AddToGroup(Entity *entity, Group mGroup); // adds an entity to one of the groups
-	Entity& AddEntity();
+	template<typename T = Entity, typename ...TArgs>
+	T & AddEntity(TArgs &&...args)
+	{
+		T *entity = new T(*this, std::forward<TArgs>(args)...);
+
+		std::unique_ptr<Entity> uPtr{ entity }; // creates a new unique_ptr that points to the entity. Note that assignment from standard pointer to unique pointer cannot be done through uPtr = entity but must instead be done via {} operator
+		entities.emplace_back(std::move(uPtr)); // "emplace_back" gets rid of having to do an unnecessary copy of the element, instead just using the data that is already there at the same memory location. Using "std::move" in conjunction with "emplace_back" is only useful if the element already exists, which is true in this case
+		return *entity;
+	}
+
 	std::vector<Entity*>& GetGroup(Group mGroup); // returns the specified group of entities
 
 	
 	std::vector<Entity*>& FindEntitiesInArea(const Vector2D& position, Group mGroup, const float& dist);
+	Entity* FindOneEntityInArea(const Vector2D& position, Group mGroup, const float& dist);
 	
 	std::set<Entity*>& getDeletedEntities();
 

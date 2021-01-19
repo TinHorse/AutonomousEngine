@@ -13,7 +13,7 @@ public:
 	void update() override
 	{
 		auto ticks = incrementTicks();
-		if (ticks % 30 == 0)
+		if (ticks % i_state_update == 0)
 		{
 			if (food <= 0)
 			{

@@ -8,7 +8,6 @@
 #include "AssetManager.h"
 #include "NavMesh.h"
 #include "Collisionmesh.h"
-#include "AISystem.h"
 #include "Queues.h"
 
 #include <fstream>
@@ -22,7 +21,6 @@ Map *map;
 SDL_Renderer *Game::renderer = nullptr;
 SDL_Event Game::event;
 EntityManager manager;
-AISystem aisystem;
 
 Camera Game::camera = Camera();
 

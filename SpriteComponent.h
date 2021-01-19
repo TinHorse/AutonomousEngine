@@ -10,28 +10,23 @@ class SpriteComponent : public Component
 {
 public:
 	int animationIndex = 0;
-	std::map<const char*, Animation> animations;
+	std::map<std::string, Animation> animations;
 	SDL_RendererFlip spriteFlip = SDL_FLIP_NONE;
 
 	SpriteComponent() = default;
-	SpriteComponent(std::string tID)
-	{
-		setTexture(tID);
-	}
 	SpriteComponent(std::string tID, bool isAnimated)
 	{
 		animated = isAnimated;
-
-		Animation idle = Animation(0,10,150);
-		Animation walk = Animation(1,9,50);
-		Animation eat = Animation(2,6,50);
-		animations.emplace("idle", idle);
-		animations.emplace("walk", walk);
-		animations.emplace("eat", eat);
-
-		Play("idle");
 		setTexture(tID);
 	}
+	
+	void addAnimation(std::string name, int ind, int nFrames, int mSpeed)
+	{
+		Animation anim = Animation(ind, nFrames, mSpeed);
+		animations.emplace(name, anim);
+		Play(name);
+	}
+
 	~SpriteComponent()
 	{
 		
@@ -70,16 +65,20 @@ public:
 		TextureManager::Draw(texture, srcRect, destRect, spriteFlip);
 	}
 
-	void Play(const char *animName)
+	void Play(std::string animName)
 	{
 		numFrames = animations[animName].numFrames;
 		animationIndex = animations[animName].index;
 		animationSpeed = animations[animName].animationSpeed;
 	}
 
-	void PlayAnim(std::string animation = "")
+	void PlayAnim(std::string anim)
 	{
-		if (animation.empty())
+		if (!anim.empty())
+		{
+			Play(anim);
+		}
+		else
 		{
 			if (transform->getVelocity().x > 0)
 			{
@@ -109,6 +108,7 @@ private:
 	TransformComponent *transform;
 	SDL_Texture *texture;
 	SDL_Rect srcRect, destRect;
+
 
 	bool animated = false;
 	int numFrames = 0;

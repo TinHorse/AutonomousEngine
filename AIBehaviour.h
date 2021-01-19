@@ -13,16 +13,16 @@ enum Result : std::size_t
 	rNO_TARGET
 };
 
-static Result s_explore(Entity * entity)
+static Result s_explore(bool state_switch, Entity * entity)
 {
-	if (entity->GetComponent<PathfindingComponent>().isStopped())
+	if (entity->GetComponent<PathfindingComponent>().isStopped() || state_switch)
 	{
 		pathfindingQueue.makePathfindingRequest(entity);
 	}
 	return rSUCCESS;
 }
 
-static Result s_followDynamicTarget(Entity * entity, Entity * target, Vector2D& targetPosition, const float& min_radius)
+static Result s_followDynamicTarget(bool state_switch, Entity * entity, Entity * target, Vector2D& targetPosition, const float& min_radius)
 {
 	if (target)
 	{
@@ -31,7 +31,7 @@ static Result s_followDynamicTarget(Entity * entity, Entity * target, Vector2D& 
 			entity->GetComponent<PathfindingComponent>().Stop();
 			return rSUCCESS;
 		}
-		else if (entity->GetComponent<PathfindingComponent>().isStopped() || Math::distanceNoSqrt(targetPosition, target->GetComponent<TransformComponent>().position) > 40000)
+		else if (entity->GetComponent<PathfindingComponent>().isStopped() || Math::distanceNoSqrt(targetPosition, target->GetComponent<TransformComponent>().position) > 40000 || state_switch)
 		{
 			pathfindingQueue.makePathfindingRequest(entity, target);
 			targetPosition = target->GetComponent<TransformComponent>().position;
@@ -41,7 +41,7 @@ static Result s_followDynamicTarget(Entity * entity, Entity * target, Vector2D& 
 	return rNO_TARGET;
 }
 
-static Result s_followStaticTarget(Entity * entity, Entity * target, Vector2D& targetPosition, const float& min_radius)
+static Result s_followStaticTarget(bool state_switch, Entity * entity, Entity * target, Vector2D& targetPosition, const float& min_radius)
 {
 	if (target)
 	{
@@ -50,7 +50,7 @@ static Result s_followStaticTarget(Entity * entity, Entity * target, Vector2D& t
 			entity->GetComponent<PathfindingComponent>().Stop();
 			return rSUCCESS;
 		}
-		else if (entity->GetComponent<PathfindingComponent>().isStopped())
+		else if (entity->GetComponent<PathfindingComponent>().isStopped() || state_switch)
 		{
 			pathfindingQueue.makePathfindingRequest(entity, target);
 			targetPosition = target->GetComponent<TransformComponent>().position;
@@ -60,17 +60,16 @@ static Result s_followStaticTarget(Entity * entity, Entity * target, Vector2D& t
 	return rNO_TARGET;
 }
 
-
-static Result s_transfer_IncDec(Entity * entityInc, Entity * entityDec, int& varInc, int * varDec, int incrementA, int decrementB, int capA, int capB, float max_transfer_radius)
+static Result s_DecOther(bool state_switch, Entity * entity, Entity * entityDec, int * varDec, int decrementB, int capB, float max_transfer_radius)
 {
 	if (entityDec)
 	{
-		if (Collision::AABBExtended(entityInc->GetComponent<ColliderComponent>(), entityDec->GetComponent<ColliderComponent>(), max_transfer_radius))
+		if (Collision::AABBExtended(entity->GetComponent<ColliderComponent>(), entityDec->GetComponent<ColliderComponent>(), max_transfer_radius) || state_switch)
 		{
-			if (varInc < capA && *varDec > capB)
+			if (*varDec > capB)
 			{
-				varInc += incrementA;
 				*varDec += decrementB;
+				std::cout << *varDec << " var dec " << std::endl;
 				return rCONTINUE;
 			}
 			return rSUCCESS;
@@ -80,11 +79,32 @@ static Result s_transfer_IncDec(Entity * entityInc, Entity * entityDec, int& var
 	return rNO_TARGET;
 }
 
-static Result s_transfer_DecInc(Entity * entityDec, Entity * entityInc, int& varDec, int * varInc, int decrementA, int incrementB, int capA, int capB, float max_transfer_radius)
+
+static Result s_transfer_IncDec(bool state_switch, Entity * entityInc, Entity * entityDec, int& varInc, int * varDec, int incrementA, int decrementB, int capA, int capB, float max_transfer_radius)
 {
 	if (entityDec)
 	{
-		if (Collision::AABBExtended(entityInc->GetComponent<ColliderComponent>(), entityDec->GetComponent<ColliderComponent>(), max_transfer_radius))
+		if (Collision::AABBExtended(entityInc->GetComponent<ColliderComponent>(), entityDec->GetComponent<ColliderComponent>(), max_transfer_radius) || state_switch)
+		{
+			if (varInc < capA && *varDec > capB)
+			{
+				varInc += incrementA;
+				*varDec += decrementB;
+				std::cout << varInc << " carrion" << std::endl;
+				return rCONTINUE;
+			}
+			return rSUCCESS;
+		}
+		return rFAIL;
+	}
+	return rNO_TARGET;
+}
+
+static Result s_transfer_DecInc(bool state_switch, Entity * entityDec, Entity * entityInc, int& varDec, int * varInc, int decrementA, int incrementB, int capA, int capB, float max_transfer_radius)
+{
+	if (entityDec)
+	{
+		if (Collision::AABBExtended(entityInc->GetComponent<ColliderComponent>(), entityDec->GetComponent<ColliderComponent>(), max_transfer_radius) || state_switch)
 		{
 			if (varDec > capA && *varInc < capB)
 			{
@@ -99,82 +119,20 @@ static Result s_transfer_DecInc(Entity * entityDec, Entity * entityInc, int& var
 	return rNO_TARGET;
 }
 
-
-
-
-
-
-static Result s_exploring(Entity * entity, Group targetGroup, float searchDistance)
+static Result s_runAway(bool state_switch, Entity * entity, Entity * enemy, float radius)
 {
-	auto& pathfinder = entity->GetComponent<PathfindingComponent>();
-	auto& state = entity->GetComponent<StateComponent>();
-	if (!state.getTarget("current"))
+	if (enemy)
 	{
-		auto& foodSources = manager.FindEntitiesInArea(entity->GetComponent<TransformComponent>().position, targetGroup, searchDistance);
-		for (auto& f : foodSources)
-		{
-			pathfindingQueue.makePathfindingRequest(entity, f);
-			state.setTarget("current", f);
-			return rSUCCESS;
-		}
-	}
-	if (pathfinder.isStopped())
-	{
-		pathfindingQueue.makePathfindingRequest(entity);
-	}
-	return rCONTINUE;
-};
-
-static Result s_followTarget(Entity * entity, Entity * target, float radius)
-{
-	if (target)
-	{
-		if (Collision::AABBExtended(target->GetComponent<ColliderComponent>(), entity->GetComponent<ColliderComponent>(), radius))
-		{
-			entity->GetComponent<PathfindingComponent>().Stop();
-			return rSUCCESS;
-		}
-		else if (entity->GetComponent<PathfindingComponent>().isStopped())
-		{
-			pathfindingQueue.makePathfindingRequest(entity, target);
-		}
-		return rCONTINUE;
-	}
-	return rNO_TARGET;
-};
-
-static Result s_transferState(Entity * entity, Entity *target, std::string transfer_state, int rate_increase, int rate_decrease, int max_until_stop, int transfer_range)
-{
-	if (target)
-	{
-		if (target && Collision::AABBExtended(target->GetComponent<ColliderComponent>(), entity->GetComponent<ColliderComponent>(), transfer_range))
-		{
-			auto& state = entity->GetComponent<StateComponent>();
-			if (state.getS(transfer_state) < max_until_stop && target->GetComponent<StateComponent>().getS(transfer_state) > 0)
-			{
-				target->GetComponent<StateComponent>().addS(transfer_state, rate_decrease);
-				state.addS(transfer_state, rate_increase);
-				return rCONTINUE;
-			}
-			return rSUCCESS;
-		}
-		return rFAIL;
-	}
-	return rNO_TARGET;
-};
-
-static Result s_runAway(Entity * entity, Entity * target, float radius)
-{
-	if (target)
-	{
-		if (!Collision::AABBExtended(target->GetComponent<ColliderComponent>(), entity->GetComponent<ColliderComponent>(), radius))
+		if (!Collision::AABBExtended(enemy->GetComponent<ColliderComponent>(), entity->GetComponent<ColliderComponent>(), radius))
 		{
 			return rSUCCESS;
 		}
-		else if (entity->GetComponent<PathfindingComponent>().isStopped())
+		else if (entity->GetComponent<PathfindingComponent>().isStopped() || state_switch)
 		{
 			Vector2D safe = entity->GetComponent<TransformComponent>().position;
-			safe -= target->GetComponent<TransformComponent>().position;
+			safe -= enemy->GetComponent<TransformComponent>().position;
+			safe.Normalize() * 200;
+			//std::cout << safe << std::endl;
 			pathfindingQueue.makePathfindingRequest(entity, safe);
 		}
 		return rCONTINUE;

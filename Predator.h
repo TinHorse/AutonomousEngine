@@ -22,7 +22,7 @@ public:
 	void update() override
 	{
 		auto ticks = incrementTicks();
-		if (ticks % 30 == 0)
+		if (ticks % i_state_update == 0)
 		{
 			if (!isDead)
 			{
@@ -56,9 +56,18 @@ public:
 				}
 			}
 		}
-		if (ticks % 30 == 0)
+		if (ticks % i_behaviour_update == 0)
 		{
+			currentState = state.current();
 			updateBehaviour();
+			if (state.current() != currentState)
+			{
+				state_switch = true;
+			}
+			else
+			{
+				state_switch = false;
+			}
 		}
 	}
 
@@ -85,11 +94,11 @@ public:
 			}
 			else
 			{
-				s_explore(this);
+				s_explore(state_switch, this);
 			}
 			break;
 		case followingDynamicTarget:
-			result = s_followDynamicTarget(this, target, targetPosition, 30);
+			result = s_followDynamicTarget(state_switch, this, target, targetPosition, 30);
 			switch (result)
 			{
 			case rSUCCESS:
@@ -102,9 +111,11 @@ public:
 			}
 			break;
 		case attacking:
-			result = s_transfer_IncDec(this, target, health, targetValue, 0, -10, 1, 0, 20);
+			result = s_DecOther(state_switch, this, target, targetValue, -20, 0, 20);
 			switch (result)
 			{
+			case rCONTINUE:
+				break;
 			case rSUCCESS:
 				state.pop();
 				if (target)
@@ -113,10 +124,9 @@ public:
 					if (temp)
 					{
 						targetValue = &temp->getCarrion();
+						std::cout << temp->getHealth() << " health" << std::endl;
 					}
 				}
-				break;
-			case rCONTINUE:
 				break;
 			case rFAIL:
 				state.push(followingDynamicTarget, state.currentPriority());
@@ -127,7 +137,7 @@ public:
 			}
 			break;
 		case eating:
-			result = s_transfer_IncDec(this, target, food, targetValue, 5, -5, 100, 0, 20);
+			result = s_transfer_IncDec(state_switch, this, target, food, targetValue, 50, -50, 100, 0, 20);
 			switch (result)
 			{
 			case rSUCCESS:
@@ -169,5 +179,7 @@ private:
 	int * targetValue;
 
 	StateMachine<Behaviour> state;
+	bool state_switch = false;
+	Behaviour currentState;
 };
 

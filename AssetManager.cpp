@@ -19,7 +19,12 @@ Entity& AssetManager::CreatePlayer(Vector2D position, int sizeX, int sizeY, floa
 {
 	Entity& player = manager->AddEntity<Player>();
 	manager->addTransformComponent(player, position.x, position.y, sizeX, sizeY, scale);
-	manager->addSpriteComponent(player, "player", true);
+
+	auto& sprite = manager->addSpriteComponent(player, "player", true);
+	sprite.addAnimation("idle", 0, 10, 150);
+	sprite.addAnimation("walk", 1, 9, 50);
+	sprite.addAnimation("eat", 2, 6, 50);
+
 	manager->addStaticColliderComponent(player, "player");
 	manager->addKeyboardController(player);
 	manager->AddToGroup(&player, Game::groupPlayers);
@@ -34,9 +39,14 @@ Entity& AssetManager::CreateHunted(Vector2D position, int sizeX, int sizeY, floa
 {
 	auto& hunted = manager->AddEntity<Hunted>(manager->GetGroup(Game::groupPlayers)[0]);
 	manager->addTransformComponent(hunted, position.x, position.y, sizeX, sizeY, scale);
-	manager->addSpriteComponent(hunted, "player", true);
+	auto& sprite = manager->addSpriteComponent(hunted, "player", true);
+	sprite.addAnimation("idle", 0, 10, 150);
+	sprite.addAnimation("walk", 1, 9, 50);
+	sprite.addAnimation("eat", 2, 6, 50);
+
+
 	manager->addDynamicColliderComponent(hunted,"hunted");
-	auto& pathfinder = manager->addPathfindingComponent(hunted);
+	manager->addPathfindingComponent(hunted);
 
 	manager->AddToGroup(&hunted, Game::groupHunted);
 	//aisystem.addAIEntity(&hunted, Game::groupHunted, manager->GetGroup(Game::groupPlayers)[0]);

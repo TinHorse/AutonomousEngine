@@ -71,6 +71,10 @@ void EntityManager::Refresh()
 		{
 			e->refresh(deleted_entities);
 		}
+		for (auto& e : GetGroup(Game::groupPredators))
+		{
+			e->refresh(deleted_entities);
+		}
 
 		// remove inactive components
 

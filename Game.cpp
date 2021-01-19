@@ -90,7 +90,8 @@ void Game::Init(const char * title, int xpos, int ypos, int width, int height, b
 	// Load navigation
 	navigation.LoadMesh("assets/collisionmap.txt", 40, 40, 32, 32, 1.8f);
 
-	player = &assets->CreatePlayer(Vector2D(225,200), 265, 207, 0.25f);
+	// Create player
+	player = &assets->CreatePlayer(Vector2D(225,200), 265, 207, 0.23f);
 
 	// Load collision
 	collision.LoadMesh("assets/collisionmap.txt", 40, 40, 32, 32, 1.8f);
@@ -216,7 +217,7 @@ void Game::Render() // note that all draw functions have to be called inside the
 	{
 		if (Math::distance(c->GetComponent<TransformComponent>().position, player->GetComponent<TransformComponent>().position) < 300)
 		{
-			c->GetComponent<ColliderComponent>().Draw();
+			//c->GetComponent<ColliderComponent>().Draw();
 		}
 	}
 	for (auto& h : hunted)

@@ -89,10 +89,7 @@ public:
 		moving = false;
 		move_tries = 0;
 		min_distance = 400;
-		for (int i = 0; i < path.size(); i++)
-		{
-			path.pop();
-		}
+		path = std::stack<Vector2D>();
 	}
 
 	void Explore()
@@ -126,21 +123,6 @@ public:
 	{
 		return path.empty();
 	}
-
-	void pushPoint(Vector2D skew)
-	{
-		if (!path.empty())
-		{
-			path.top() += skew;
-			//path.push(skew + transform->position);
-		}
-		else
-		{
-			path.push(skew + transform->position);
-		}
-		
-	}
-
 
 	void LinkComponentPointers() override
 	{

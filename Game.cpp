@@ -77,33 +77,34 @@ void Game::Init(const char * title, int xpos, int ypos, int width, int height, b
 	assets->AddTexture("collider", "assets/colliderTex.png");
 	assets->AddTexture("food", "assets/foodItem.png");
 	assets->AddTexture("terrain", "assets/tileset.png");
-	assets->AddTexture("player", "assets/player_anim.png");
+	assets->AddTexture("player", "assets/player_anim_alpha.png");
+	assets->AddTexture("hunted", "assets/hunted_anim_alpha.png");
 	assets->AddTexture("enemy", "assets/enemy.png");
 
 	assets->AddTexture("enemy2", "assets/player2.png");
 
 	// Load map
-	map = new Map("terrain", 32, 1.5f);
+	map = new Map("terrain", 32, 1.8f);
 	map->LoadMap("assets/tilemap.txt", 40, 40);
 
 	// Load navigation
-	navigation.LoadMesh("assets/collisionmap.txt", 40, 40, 32, 32, 1.5f);
+	navigation.LoadMesh("assets/collisionmap.txt", 40, 40, 32, 32, 1.8f);
 
-	player = &assets->CreatePlayer(Vector2D(225,200), 265, 207, 0.2f);
+	player = &assets->CreatePlayer(Vector2D(225,200), 265, 207, 0.25f);
 
 	// Load collision
-	collision.LoadMesh("assets/collisionmap.txt", 40, 40, 32, 32, 1.5f);
+	collision.LoadMesh("assets/collisionmap.txt", 40, 40, 32, 32, 1.8f);
 
 	// Initialize camera
 	auto& t = player->GetComponent<TransformComponent>();
 	camera.Init(t.position.x, t.position.y, 800, 600);
 
 	// Create Hunted
-	for (int i = 0; i < 1; i++)
+	for (int i = 0; i < 10; i++)
 	{
-		for (int j = 0; j < 1; j++)
+		for (int j = 0; j < 10; j++)
 		{
-			assets->CreateHunted(Vector2D(200+i * 60, 600+j * 60), 265, 207, 0.1f);
+			assets->CreateHunted(Vector2D(200+i * 60, 400+j * 60), 265, 207, 0.12f);
 		}
 	}
 	
@@ -112,16 +113,16 @@ void Game::Init(const char * title, int xpos, int ypos, int width, int height, b
 	{
 		for (int j = 0; j < 5; j++)
 		{
-			assets->CreateFood(Vector2D(rand_float(100,400), rand_float(500, 800)), 407, 451, 0.1f);
+			assets->CreateFood(Vector2D(rand_float(100,400), rand_float(500, 800)), 407, 451, 0.12f);
 		}
 	}
 
 	// Create Predators
-	for (int i = 0; i < 0; i++)
+	for (int i = 0; i < 4; i++)
 	{
-		for (int j = 0; j < 0; j++)
+		for (int j = 0; j < 4; j++)
 		{
-			assets->CreatePredator(Vector2D(400 + i * 60, 100 + j * 60), 236, 233, 0.13f);
+			assets->CreatePredator(Vector2D(400 + i * 60, 100 + j * 60), 236, 233, 0.18f);
 		}
 	}
 }

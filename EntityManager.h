@@ -25,7 +25,7 @@ public:
 
 	
 	std::vector<Entity*>& FindEntitiesInArea(const Vector2D& position, Group mGroup, const float& dist);
-	Entity* FindOneEntityInArea(const Vector2D& position, Group mGroup, const float& dist);
+	Entity* FindOneEntityInArea(const Vector2D& position, const Group& mGroup, const float& dist);
 	
 	std::set<Entity*>& getDeletedEntities();
 
@@ -85,22 +85,9 @@ public:
 		return compPath[index_path++];
 	}	
 
-	template<typename ...TArgs>
-	StateComponent& addStateComponent(Entity& entity, TArgs && ...args)
-	{
-		compState[index_state] = StateComponent(std::forward<TArgs>(args)...);
-		entity.AddColliderComponent<StateComponent>(&compState[index_state]);
-		return compState[index_state++];
-	}
-
 	std::array<TileComponent, 2000>& getTiles()
 	{
 		return compTile;
-	}
-
-	std::array<StateComponent, 2000>& getStates()
-	{
-		return compState;
 	}
 
 	int getIndexStaticCol()
@@ -121,12 +108,11 @@ public:
 private:
 	std::array<TransformComponent, 2000> compTran;
 	std::array<SpriteComponent, 2000> compSprite;
-	std::array<KeyboardController, 2000> compKeyboard;
+	std::array<KeyboardController, 1> compKeyboard;
 	std::array<ColliderComponent, 2000> compStaticColl;
 	std::array<ColliderComponent, 2000> compDynamicColl;
 	std::array<TileComponent, 2000> compTile;
 	std::array<PathfindingComponent, 2000> compPath;
-	std::array<StateComponent, 2000> compState;
 
 	int index_tran = 0;
 	int index_sprites = 0;
@@ -135,7 +121,6 @@ private:
 	int index_dynamic_coll = 0;
 	int index_tiles = 0;
 	int index_path = 0;
-	int index_state = 0;
 
 	std::vector<std::unique_ptr<Entity>> entities;
 	std::array<std::vector<Entity*>, maxGroups> groupedEntities; // same as entities, but grouped for rendering

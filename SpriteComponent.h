@@ -72,27 +72,32 @@ public:
 		animationSpeed = animations[animName].animationSpeed;
 	}
 
-	void PlayAnim(std::string anim)
+	void PlayAnim(std::string anim, long int ticks)
 	{
-		if (!anim.empty())
+		if (ticks % 10 == 0)
 		{
-			Play(anim);
-		}
-		else
-		{
-			if (transform->getVelocity().x > 0)
+			if (!anim.empty())
 			{
-				spriteFlip = SDL_FLIP_NONE;
-				Play("walk");
+				Play(anim);
 			}
-			else if (transform->getVelocity().x < 0)
+			else
 			{
-				spriteFlip = SDL_FLIP_HORIZONTAL;
-				Play("walk");
-			}
-			if (transform->getVelocity().y == 0)
-			{
-				Play("idle");
+				
+				if (transform->getVelocity().x > 0)
+				{
+					spriteFlip = SDL_FLIP_NONE;
+					Play("walk");
+				}
+				else if (transform->getVelocity().x < 0)
+				{
+					spriteFlip = SDL_FLIP_HORIZONTAL;
+					Play("walk");
+				}
+				else if (transform->getVelocity().y == 0)
+				{
+					Play("idle");
+				}
+				
 			}
 		}
 	}

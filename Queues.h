@@ -17,10 +17,10 @@ class PathfindingQueue
 {
 public:
 	void makePathfindingRequest(Entity * entity);
-	void makePathfindingRequest(Entity* entity, const Vector2D& target);
+	void makePathfindingRequest(Entity * entity, const Vector2D& target);
 	void makePathfindingRequest(Entity * entity, Entity * targetEntity);
 	void executePathfindingRequests(double maxTime);
-	void UpdateDeletedEntities(std::set<Entity*> entities);
+	void UpdateDeletedEntities(std::set<Entity*>& entities);
 
 private:
 	std::map<Entity*, PathfindingRequest> pathfinding_requests;

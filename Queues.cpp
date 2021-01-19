@@ -57,7 +57,7 @@ void PathfindingQueue::executePathfindingRequests(double maxTime)
 	}
 }
 
-void PathfindingQueue::UpdateDeletedEntities(std::set<Entity*> entities)
+void PathfindingQueue::UpdateDeletedEntities(std::set<Entity*>& entities)
 {
 	deletedEntities.insert(entities.begin(), entities.end());
 }

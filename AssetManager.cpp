@@ -29,9 +29,6 @@ Entity& AssetManager::CreatePlayer(Vector2D position, int sizeX, int sizeY, floa
 	manager->addKeyboardController(player);
 	manager->AddToGroup(&player, Game::groupPlayers);
 
-	auto& state = manager->addStateComponent(player, "player");
-	state.initS("calm", 100);
-
 	return player;
 }
 
@@ -39,10 +36,11 @@ Entity& AssetManager::CreateHunted(Vector2D position, int sizeX, int sizeY, floa
 {
 	auto& hunted = manager->AddEntity<Hunted>(manager->GetGroup(Game::groupPlayers)[0]);
 	manager->addTransformComponent(hunted, position.x, position.y, sizeX, sizeY, scale);
-	auto& sprite = manager->addSpriteComponent(hunted, "player", true);
+	auto& sprite = manager->addSpriteComponent(hunted, "hunted", true);
 	sprite.addAnimation("idle", 0, 10, 150);
 	sprite.addAnimation("walk", 1, 9, 50);
 	sprite.addAnimation("eat", 2, 6, 50);
+	sprite.addAnimation("dead", 3, 1, 50);
 
 
 	manager->addDynamicColliderComponent(hunted,"hunted");
@@ -62,9 +60,6 @@ Entity & AssetManager::CreateFood(Vector2D position, int sizeX, int sizeY, float
 	manager->addDynamicColliderComponent(foodItem, "food");
 	manager->AddToGroup(&foodItem, Game::groupFood);
 
-	auto& state = manager->addStateComponent(foodItem, "food");
-	state.initS("food", 10);
-
 	return foodItem;
 }
 
@@ -77,18 +72,6 @@ Entity & AssetManager::CreatePredator(Vector2D position, int sizeX, int sizeY, f
 	auto& pathfinder = manager->addPathfindingComponent(predator);
 
 	manager->AddToGroup(&predator, Game::groupPredators);
-
-	auto& state = manager->addStateComponent(predator, "predator");
-	state.initS("health", 100);
-	state.initS("hunger", 50);
-	state.initS("carrion", 0);
-
-	state.initB("exploring", 100);
-	state.initB("attacking", 100);
-	state.initB("fleeing", 0);
-
-	state.initTarget("current", nullptr);
-	state.initTarget("origin", nullptr);
 
 	return predator;
 }

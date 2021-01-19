@@ -30,8 +30,6 @@ int main(int argc,  char *argv[])
 			game->Update();
 			lag -= frameDelay;
 			game->ExecuteQueues(frameDelay - lag);
-			start = std::chrono::high_resolution_clock().now();
-			//game->ExecuteQueues(6);
 		}
 		
 		auto end = std::chrono::high_resolution_clock().now();
@@ -40,12 +38,7 @@ int main(int argc,  char *argv[])
 		{
 			std::cout << totaltime.count() << std::endl;
 		}
-
-
 		game->Render();
-		
-
-		
 	}
 	game->Clean(); // delete game memory
 

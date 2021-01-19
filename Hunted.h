@@ -40,7 +40,7 @@ public:
 		{
 			carrion = 100;
 			isDead = true;
-			setAnimation("dead");
+			GetComponent<PathfindingComponent>().Stop();
 		}
 		if (food > 0)
 		{
@@ -124,7 +124,7 @@ public:
 			}
 			break;
 		case followingStaticTarget:
-			result = s_followStaticTarget(state_switch, this, target, targetPosition, 5);
+			result = s_followStaticTarget(state_switch, this, target, 5);
 			switch (result)
 			{
 			case rSUCCESS:
@@ -172,7 +172,6 @@ public:
 			break;
 		case waitingForFear:
 			result = s_DecThis(state_switch, this, target, fear, -10, 0, 40);
-			std::cout << result << " fear result" << std::endl;
 			switch (result)
 			{
 			case rCONTINUE:
@@ -218,15 +217,15 @@ public:
 
 	void whenDead() override
 	{
+		setAnimation("dead");
 		carrion--;
 		if (carrion <= 0)
 		{
-			std::cout << "deaed" << std::endl;
 			this->Destroy();
 		}
 	}
 
-	void refresh(std::set<Entity*> deletedEntities) override
+	void refresh(std::set<Entity*>& deletedEntities) override
 	{
 		if (deletedEntities.find(target) != deletedEntities.end())
 		{
@@ -258,12 +257,12 @@ public:
 	}
 
 private:
-	int hunger = 0;
-	int fear = 100;
+	int hunger = 100;
+	int fear = 0;
 	int food = 0;
 	int carrion = 0;
 
-	int b_exploring = 100;
+	int b_exploring = 0;
 	int b_returningToShepherd = 0;
 	int b_fleeing = 0;
 	

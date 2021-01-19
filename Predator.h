@@ -32,7 +32,9 @@ public:
 		}
 		if (health <= 0)
 		{
+			carrion = 100;
 			isDead = true;
+			GetComponent<PathfindingComponent>().Stop();
 		}
 		if (food > 0)
 		{
@@ -87,7 +89,7 @@ public:
 			}
 			break;
 		case followingDynamicTarget:
-			result = s_followDynamicTarget(state_switch, this, target, targetPosition, 20);
+			result = s_followDynamicTarget(state_switch, this, target, targetPosition, 20, 300);
 			switch (result)
 			{
 			case rSUCCESS:
@@ -125,7 +127,7 @@ public:
 			}
 			break;
 		case eating:
-			result = s_transfer_IncDec(state_switch, this, target, food, targetValue, 50, -50, 100, 0, 20);
+			result = s_transfer_IncDec(state_switch, this, target, food, targetValue, 1, -1, 100, 0, 20);
 			switch (result)
 			{
 			case rSUCCESS:
@@ -153,10 +155,15 @@ public:
 
 	void whenDead() override
 	{
-		
+		carrion--;
+		if (carrion <= 0)
+		{
+			std::cout << "deaed" << std::endl;
+			this->Destroy();
+		}
 	}
 
-	void refresh(std::set<Entity*> deletedEntities) override
+	void refresh(std::set<Entity*>& deletedEntities) override
 	{
 		if (deletedEntities.find(target) != deletedEntities.end())
 		{
@@ -167,6 +174,7 @@ public:
 private:
 	int hunger = 50;
 	int food = 0;
+	int carrion = 0;
 
 	int b_exploring = 100;
 

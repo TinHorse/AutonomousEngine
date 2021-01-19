@@ -45,13 +45,6 @@ void EntityManager::Update()
 		if (index-- <= 0) { break; };
 		comp.Update();
 	}
-	index = index_state;
-	for (auto& comp : compState)
-	{
-		if (index-- <= 0) { break; };
-		comp.Update();
-		comp.UpdateTargetEntities(deleted_entities);
-	}
 }
 
 void EntityManager::Refresh()
@@ -162,27 +155,6 @@ void EntityManager::Refresh()
 			index++;
 		}
 
-		index = 0;
-		for (auto& comp : compState)
-		{
-			if (index >= index_state) { break; };
-			if (!comp.IsActive())
-			{
-				while (index_state > 0 && !compState[index_state - 1].IsActive())
-				{
-					index_state--;
-				}
-				if (index_state > 0 && index_state != index)
-				{
-					Entity* entity = compState[index_state - 1].entity;
-					std::swap(compState[index], compState[index_state - 1]);
-					entity->SetComponent<StateComponent>(&compState[index]);
-					index_state--;
-				}
-			}
-			index++;
-		}
-
 		// removes entity groups if they are inactive. This is called the erase-remove idiom
 		for (auto i(0u); i < maxGroups; i++)
 		{
@@ -243,7 +215,7 @@ std::vector<Entity*>& EntityManager::FindEntitiesInArea(const Vector2D& position
 	return entities_in_area;
 }
 
-Entity* EntityManager::FindOneEntityInArea(const Vector2D& position, Group mGroup, const float& dist)
+Entity* EntityManager::FindOneEntityInArea(const Vector2D& position, const Group& mGroup, const float& dist)
 {
 	for (auto& e : GetGroup(mGroup))
 	{

@@ -24,7 +24,7 @@ static Result s_explore(bool state_switch, Entity * entity)
 	return rSUCCESS;
 }
 
-static Result s_followDynamicTarget(bool state_switch, Entity * entity, Entity * target, Vector2D& targetPosition, const float& min_radius)
+static Result s_followDynamicTarget(bool state_switch, Entity * entity, Entity * target, Vector2D& targetPosition, const float& min_radius, const float max_distance = 0)
 {
 	if (target)
 	{
@@ -32,6 +32,11 @@ static Result s_followDynamicTarget(bool state_switch, Entity * entity, Entity *
 		{
 			entity->GetComponent<PathfindingComponent>().Stop();
 			return rSUCCESS;
+		}
+		else if (max_distance && Math::distanceNoSqrt(targetPosition, target->GetComponent<TransformComponent>().position) > pow(max_distance, 2))
+		{
+			target = nullptr;
+			return rNO_TARGET;
 		}
 		else if (entity->GetComponent<PathfindingComponent>().isStopped() || Math::distanceNoSqrt(targetPosition, target->GetComponent<TransformComponent>().position) > 40000 || state_switch)
 		{
@@ -43,7 +48,7 @@ static Result s_followDynamicTarget(bool state_switch, Entity * entity, Entity *
 	return rNO_TARGET;
 }
 
-static Result s_followStaticTarget(bool state_switch, Entity * entity, Entity * target, Vector2D& targetPosition, const float& min_radius)
+static Result s_followStaticTarget(bool state_switch, Entity * entity, Entity * target, const float& min_radius)
 {
 	if (target)
 	{
@@ -55,7 +60,6 @@ static Result s_followStaticTarget(bool state_switch, Entity * entity, Entity * 
 		else if (entity->GetComponent<PathfindingComponent>().isStopped() || state_switch)
 		{
 			pathfindingQueue.makePathfindingRequest(entity, target);
-			targetPosition = target->GetComponent<TransformComponent>().position;
 		}
 		return rCONTINUE;
 	}

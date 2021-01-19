@@ -25,9 +25,6 @@ public:
 				animation = "";
 				updateBehaviour();
 			}
-
-			// Play animation
-			GetComponent<SpriteComponent>().PlayAnim(animation);
 		}
 		else
 		{
@@ -36,6 +33,9 @@ public:
 				whenDead();
 			}
 		}
+
+		// Play animation
+		GetComponent<SpriteComponent>().PlayAnim(animation, Ticks);
 	}
 	virtual void updateState() = 0;
 	virtual void updateQueries() = 0;

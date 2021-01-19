@@ -92,7 +92,6 @@ public:
 			}
 			if (transform->getVelocity().y == 0)
 			{
-				spriteFlip = SDL_FLIP_NONE;
 				Play("idle");
 			}
 		}

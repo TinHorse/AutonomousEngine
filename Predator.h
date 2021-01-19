@@ -3,10 +3,13 @@
 #include "StateMachine.h"
 #include "Entities.h"
 
-class Predator : public Entity
+class Predator : public Agent
 {
 public:
-	Predator(EntityManager& mManager) : Entity(mManager){}
+	Predator(EntityManager& mManager) : Agent(mManager)
+	{
+		health = 100;
+	}
 
 	Predator() = default;
 
@@ -19,61 +22,47 @@ public:
 		followingDynamicTarget,
 	};
 
-	void update() override
+	void updateState() override
 	{
-		auto ticks = incrementTicks();
-		if (ticks % i_state_update == 0)
+		hunger++;
+
+		if (hunger > 100)
 		{
-			if (!isDead)
-			{
-				hunger++;
-
-				if (hunger > 100)
-				{
-					health--;
-				}
-				if (health <= 0)
-				{
-					isDead = true;
-				}
-				if (food > 0)
-				{
-					hunger -= 10;
-					food--;
-				}
-
-				// update behaviour state
-				if (hunger >= 50)
-				{
-					b_exploring += 10;
-				}
-
-				// update behaviour based on state
-				if (b_exploring >= 100)
-				{
-					state.push(exploring, 0);
-					b_exploring = 0;
-				}
-			}
+			health--;
 		}
-		if (ticks % i_behaviour_update == 0)
+		if (health <= 0)
 		{
-			currentState = state.current();
-			updateBehaviour();
-			if (state.current() != currentState)
-			{
-				state_switch = true;
-			}
-			else
-			{
-				state_switch = false;
-			}
+			isDead = true;
+		}
+		if (food > 0)
+		{
+			hunger -= 10;
+			food--;
+		}
+
+		// update behaviour state
+		if (hunger >= 50)
+		{
+			b_exploring += 10;
+		}
+
+		// update behaviour based on state
+		if (b_exploring >= 100)
+		{
+			state.push(exploring, 0);
+			b_exploring = 0;
 		}
 	}
 
-	void updateBehaviour()
+	void updateQueries() override
 	{
-		switch (state.current())
+		
+	}
+
+	void updateBehaviour() override
+	{
+		currentState = state.current();
+		switch (currentState)
 		{
 		case idle:
 			break;
@@ -98,7 +87,7 @@ public:
 			}
 			break;
 		case followingDynamicTarget:
-			result = s_followDynamicTarget(state_switch, this, target, targetPosition, 30);
+			result = s_followDynamicTarget(state_switch, this, target, targetPosition, 20);
 			switch (result)
 			{
 			case rSUCCESS:
@@ -124,7 +113,6 @@ public:
 					if (temp)
 					{
 						targetValue = &temp->getCarrion();
-						std::cout << temp->getHealth() << " health" << std::endl;
 					}
 				}
 				break;
@@ -153,6 +141,19 @@ public:
 				break;
 			}
 		}
+		if (state.current() != currentState)
+		{
+			state_switch = true;
+		}
+		else
+		{
+			state_switch = false;
+		}
+	}
+
+	void whenDead() override
+	{
+		
 	}
 
 	void refresh(std::set<Entity*> deletedEntities) override
@@ -164,11 +165,8 @@ public:
 	}
 
 private:
-	int health = 100;
 	int hunger = 50;
 	int food = 0;
-
-	bool isDead = false;
 
 	int b_exploring = 100;
 
@@ -179,7 +177,6 @@ private:
 	int * targetValue;
 
 	StateMachine<Behaviour> state;
-	bool state_switch = false;
 	Behaviour currentState;
 };
 

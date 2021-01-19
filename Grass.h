@@ -12,12 +12,16 @@ public:
 
 	void update() override
 	{
-		auto ticks = incrementTicks();
-		if (ticks % i_state_update == 0)
+		incrementTicks();
+		if (Ticks % i_state_update == 0)
 		{
 			if (food <= 0)
 			{
-				Destroy();
+				carrion--;
+				if (carrion <= 0)
+				{
+					Destroy();
+				}
 			}
 		}
 	}
@@ -29,4 +33,5 @@ public:
 
 private:
 	int food = 100;
+	int carrion = 10;
 };

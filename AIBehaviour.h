@@ -13,6 +13,8 @@ enum Result : std::size_t
 	rNO_TARGET
 };
 
+
+
 static Result s_explore(bool state_switch, Entity * entity)
 {
 	if (entity->GetComponent<PathfindingComponent>().isStopped() || state_switch)
@@ -60,16 +62,40 @@ static Result s_followStaticTarget(bool state_switch, Entity * entity, Entity * 
 	return rNO_TARGET;
 }
 
-static Result s_DecOther(bool state_switch, Entity * entity, Entity * entityDec, int * varDec, int decrementB, int capB, float max_transfer_radius)
+static Result s_runAway(bool state_switch, Entity * entity, Entity * enemy, float radius)
 {
-	if (entityDec)
+	if (enemy)
 	{
-		if (Collision::AABBExtended(entity->GetComponent<ColliderComponent>(), entityDec->GetComponent<ColliderComponent>(), max_transfer_radius) || state_switch)
+		if (!Collision::AABBExtended(enemy->GetComponent<ColliderComponent>(), entity->GetComponent<ColliderComponent>(), radius))
 		{
-			if (*varDec > capB)
+			return rSUCCESS;
+		}
+		else if (entity->GetComponent<PathfindingComponent>().isStopped() || state_switch)
+		{
+			Vector2D safe = entity->GetComponent<TransformComponent>().position;
+			safe -= enemy->GetComponent<TransformComponent>().position;
+			safe.Normalize() * 200;
+			pathfindingQueue.makePathfindingRequest(entity, safe);
+		}
+		return rCONTINUE;
+	}
+	return rNO_TARGET;
+};
+
+
+
+
+
+
+static Result s_IncThis(bool state_switch, Entity * entity, Entity * entityOther, int & var, int increment, int cap, float max_transfer_radius)
+{
+	if (entityOther)
+	{
+		if (Collision::AABBExtended(entity->GetComponent<ColliderComponent>(), entityOther->GetComponent<ColliderComponent>(), max_transfer_radius) || state_switch)
+		{
+			if (var < cap)
 			{
-				*varDec += decrementB;
-				std::cout << *varDec << " var dec " << std::endl;
+				var += increment;
 				return rCONTINUE;
 			}
 			return rSUCCESS;
@@ -78,6 +104,44 @@ static Result s_DecOther(bool state_switch, Entity * entity, Entity * entityDec,
 	}
 	return rNO_TARGET;
 }
+
+static Result s_DecThis(bool state_switch, Entity * entity, Entity * entityOther, int & var, int decrement, int cap, float max_transfer_radius)
+{
+	if (entityOther)
+	{
+		if (Collision::AABBExtended(entity->GetComponent<ColliderComponent>(), entityOther->GetComponent<ColliderComponent>(), max_transfer_radius) || state_switch)
+		{
+			if (var > cap)
+			{
+				var += decrement;
+				return rCONTINUE;
+			}
+			return rSUCCESS;
+		}
+		return rFAIL;
+	}
+	return rNO_TARGET;
+}
+
+static Result s_DecOther(bool state_switch, Entity * entity, Entity * entityDec, int * var, int decrement, int cap, float max_transfer_radius)
+{
+	if (entityDec)
+	{
+		if (Collision::AABBExtended(entity->GetComponent<ColliderComponent>(), entityDec->GetComponent<ColliderComponent>(), max_transfer_radius) || state_switch)
+		{
+			if (*var > cap)
+			{
+				*var += decrement;
+				return rCONTINUE;
+			}
+			return rSUCCESS;
+		}
+		return rFAIL;
+	}
+	return rNO_TARGET;
+}
+
+
 
 
 static Result s_transfer_IncDec(bool state_switch, Entity * entityInc, Entity * entityDec, int& varInc, int * varDec, int incrementA, int decrementB, int capA, int capB, float max_transfer_radius)
@@ -90,7 +154,6 @@ static Result s_transfer_IncDec(bool state_switch, Entity * entityInc, Entity * 
 			{
 				varInc += incrementA;
 				*varDec += decrementB;
-				std::cout << varInc << " carrion" << std::endl;
 				return rCONTINUE;
 			}
 			return rSUCCESS;
@@ -118,24 +181,3 @@ static Result s_transfer_DecInc(bool state_switch, Entity * entityDec, Entity * 
 	}
 	return rNO_TARGET;
 }
-
-static Result s_runAway(bool state_switch, Entity * entity, Entity * enemy, float radius)
-{
-	if (enemy)
-	{
-		if (!Collision::AABBExtended(enemy->GetComponent<ColliderComponent>(), entity->GetComponent<ColliderComponent>(), radius))
-		{
-			return rSUCCESS;
-		}
-		else if (entity->GetComponent<PathfindingComponent>().isStopped() || state_switch)
-		{
-			Vector2D safe = entity->GetComponent<TransformComponent>().position;
-			safe -= enemy->GetComponent<TransformComponent>().position;
-			safe.Normalize() * 200;
-			//std::cout << safe << std::endl;
-			pathfindingQueue.makePathfindingRequest(entity, safe);
-		}
-		return rCONTINUE;
-	}
-	return rNO_TARGET;
-};

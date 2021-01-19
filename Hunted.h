@@ -3,12 +3,13 @@
 #include "StateMachine.h"
 #include "Entities.h"
 
-class Hunted : public Entity
+class Hunted : public Agent
 {
 public:
-	Hunted(EntityManager& mManager, Entity * _origin) : Entity(mManager)
+	Hunted(EntityManager& mManager, Entity * _origin) : Agent(mManager)
 	{
 		origin = _origin;
+		health = 100;
 	}
 
 	Hunted() = default;
@@ -25,108 +26,67 @@ public:
 		goingToOrigin
 	};
 
-	void update() override
+	void updateState() override
 	{
-		auto ticks = incrementTicks();
-		if (ticks % i_state_update == 0)
+		// Update state variables
+		fear++;
+		hunger++;
+
+		if (hunger > 100)
 		{
-			// Update state variables
-			if (!isDead)
-			{
-				fear++;
-				hunger++;
+			health--;
+		}
+		if (health <= 0)
+		{
+			carrion = 100;
+			isDead = true;
+			setAnimation("dead");
+		}
+		if (food > 0)
+		{
+			hunger -= 10;
+			food--;
+		}
 
-				if (hunger > 100)
-				{
-					health--;
-				}
-				if (health <= 0)
-				{
-					carrion = 100;
-					isDead = true;
-					//setAnimation("dead");
-				}
-				if (food > 0)
-				{
-					hunger -= 10;
-					food--;
-				}
-
-				// Update behaviour variables
-				if (fear >= 100)
-				{
-					b_returningToShepherd += 10;
-				}
-				if (hunger >= 50)
-				{
-					b_exploring += 10;
-				}
-
-				// Update state machine based on behaviour variables
-				if (b_returningToShepherd >= 100)
-				{
-					state.push(goingToOrigin, 1);
-					b_returningToShepherd = 0;
-				}
-
-				if (b_exploring >= 100)
-				{
-					state.push(exploring, 0);
-					b_exploring = 0;
-				}
-			}
-			else
-			{
-				carrion--;
-				if (carrion <= 0)
-				{
-					std::cout << "deaed" << std::endl;
-					this->Destroy();
-				}
-			}
+		// Update behaviour variables
+		if (fear >= 100)
+		{
+			b_returningToShepherd += 10;
+		}
+		if (hunger >= 50)
+		{
+			b_exploring += 10;
 		}
 
 
-		// Queries
-		if (ticks % i_query_update == 0)
+		// Update state machine based on behaviour variables
+		if (b_returningToShepherd >= 100)
 		{
-			if (!isDead)
-			{
-				auto e = manager.FindOneEntityInArea(GetComponent<TransformComponent>().position, Game::groupPredators, 100);
-				if (e)
-				{
-					enemy = e;
-					state.push(fleeing, 2);
-					std::cout << "fleeing" << std::endl;
-				}
-			}
+			state.push(goingToOrigin, 1);
+			b_returningToShepherd = 0;
 		}
 
-		// Update Behaviour
-		if (ticks % i_behaviour_update == 0)
+		if (b_exploring >= 100)
 		{
-			if (!isDead)
-			{
-				currentState = state.current();
-				animation = "";
-				updateBehaviour();
-				if (state.current() != currentState)
-				{
-					state_switch = true;
-				}
-				else
-				{
-					state_switch = false;
-				}
-			}
+			state.push(exploring, 0);
+			b_exploring = 0;
 		}
-
-		// Play animation
-		GetComponent<SpriteComponent>().PlayAnim(animation);
 	}
 
-	void updateBehaviour()
+	void updateQueries() override
 	{
+		// Queries
+		auto e = manager.FindOneEntityInArea(GetComponent<TransformComponent>().position, Game::groupPredators, 100);
+		if (e)
+		{
+			enemy = e;
+			state.push(fleeing, 2);
+		}
+	}
+
+	void updateBehaviour() override
+	{
+		currentState = state.current();
 		switch (currentState)
 		{
 		case idle:
@@ -141,6 +101,7 @@ public:
 					targetValue = &temp->getFood();
 					targetPosition = temp->GetComponent<TransformComponent>().position;
 				}
+				state.pop();
 				state.push(eating, 0);
 				state.push(followingStaticTarget, 0);
 			}
@@ -150,7 +111,7 @@ public:
 			}
 			break;
 		case followingDynamicTarget:
-			result = s_followDynamicTarget(state_switch, this, target, targetPosition, 30);
+			result = s_followDynamicTarget(state_switch, this, target, targetPosition, 20);
 			switch (result)
 			{
 			case rSUCCESS:
@@ -158,12 +119,12 @@ public:
 				break;
 			case rNO_TARGET:
 				target = nullptr;
-				state.push(exploring, 0);
+				state.pop();
 				break;
 			}
 			break;
 		case followingStaticTarget:
-			result = s_followStaticTarget(state_switch, this, target, targetPosition, 30);
+			result = s_followStaticTarget(state_switch, this, target, targetPosition, 5);
 			switch (result)
 			{
 			case rSUCCESS:
@@ -176,12 +137,11 @@ public:
 			}
 			break;
 		case eating:
-			result = s_transfer_IncDec(state_switch, this, target, food, targetValue, 1, -50, 100, 0, 20);
-			setAnimation("eat");
-			break;
+			result = s_transfer_IncDec(state_switch, this, target, food, targetValue, 1, -10, 10, 0, 10);
 			switch (result)
 			{
 			case rCONTINUE:
+				setAnimation("eat");
 				break;
 			case rSUCCESS:
 				target = nullptr;
@@ -194,6 +154,7 @@ public:
 				state.pop();
 				break;
 			}
+			break;
 		case goingToOrigin:
 			target = origin;
 			if (target)
@@ -203,12 +164,29 @@ public:
 				{
 					targetValue = &temp->getFear();
 					targetPosition = temp->GetComponent<TransformComponent>().position;
+					state.pop();
+					state.push(waitingForFear, 1);
 					state.push(followingDynamicTarget, 1);
 				}
 			}
 			break;
 		case waitingForFear:
-			result = s_transfer_DecInc(state_switch, this, target, fear, targetValue, 5, 0, 0, 1, 50);
+			result = s_DecThis(state_switch, this, target, fear, -10, 0, 40);
+			std::cout << result << " fear result" << std::endl;
+			switch (result)
+			{
+			case rCONTINUE:
+				break;
+			case rSUCCESS:
+				state.pop();
+				break;
+			case rFAIL:
+				state.push(followingDynamicTarget, 1);
+				break;
+			case rNO_TARGET:
+				state.pop();
+				break;
+			}
 			break;
 		case fleeing:
 			result = s_runAway(state_switch, this, enemy, 100);
@@ -218,10 +196,33 @@ public:
 				break;
 			case rSUCCESS:
 				state.pop();
+				enemy = nullptr;
+				break;
 			case rFAIL:
 				state.pop();
+				break;
 			}
 			break;
+		}
+
+		// check state switch
+		if (state.current() != currentState)
+		{
+			state_switch = true;
+		}
+		else
+		{
+			state_switch = false;
+		}
+	}
+
+	void whenDead() override
+	{
+		carrion--;
+		if (carrion <= 0)
+		{
+			std::cout << "deaed" << std::endl;
+			this->Destroy();
 		}
 	}
 
@@ -241,11 +242,6 @@ public:
 		}
 	}
 
-	void setAnimation(const char * anim)
-	{
-		animation = anim;
-	}
-
 	int& getHealth()
 	{
 		return health;
@@ -262,13 +258,10 @@ public:
 	}
 
 private:
-	int health = 100;
 	int hunger = 0;
-	int fear = 0;
+	int fear = 100;
 	int food = 0;
 	int carrion = 0;
-
-	bool isDead = false;
 
 	int b_exploring = 100;
 	int b_returningToShepherd = 0;
@@ -279,13 +272,9 @@ private:
 	Entity * enemy = nullptr;
 
 	Vector2D targetPosition;
-	Result result;
 	int * targetValue;
 
 	StateMachine<Behaviour> state;
-	bool state_switch = false;
 	Behaviour currentState;
-
-	std::string animation = "";
 };
 

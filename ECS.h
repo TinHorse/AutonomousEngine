@@ -153,9 +153,14 @@ public:
 		// NOTE on static cast: new_type value = static_cast <new_type> (expression);
 	}
 
-	const long int& incrementTicks()
+	void incrementTicks()
 	{
-		return Ticks++;
+		Ticks++;
+	}
+
+	const long int& getTicks()
+	{
+		return Ticks;
 	}
 	
 protected:

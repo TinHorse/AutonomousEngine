@@ -99,11 +99,11 @@ void Game::Init(const char * title, int xpos, int ypos, int width, int height, b
 	camera.Init(t.position.x, t.position.y, 800, 600);
 
 	// Create Hunted
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 1; i++)
 	{
-		for (int j = 0; j < 10; j++)
+		for (int j = 0; j < 1; j++)
 		{
-			assets->CreateHunted(Vector2D(300+i * 60, 300+j * 60), 265, 207, 0.1f);
+			assets->CreateHunted(Vector2D(200+i * 60, 600+j * 60), 265, 207, 0.1f);
 		}
 	}
 	
@@ -112,14 +112,14 @@ void Game::Init(const char * title, int xpos, int ypos, int width, int height, b
 	{
 		for (int j = 0; j < 5; j++)
 		{
-			assets->CreateFood(Vector2D(rand_float(400,600), rand_float(200, 400)), 407, 451, 0.1f);
+			assets->CreateFood(Vector2D(rand_float(100,400), rand_float(500, 800)), 407, 451, 0.1f);
 		}
 	}
 
 	// Create Predators
-	for (int i = 0; i < 2; i++)
+	for (int i = 0; i < 0; i++)
 	{
-		for (int j = 0; j < 2; j++)
+		for (int j = 0; j < 0; j++)
 		{
 			assets->CreatePredator(Vector2D(400 + i * 60, 100 + j * 60), 236, 233, 0.13f);
 		}

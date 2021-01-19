@@ -27,13 +27,17 @@ public:
 		{
 			next = path.top();
 			transform->addVelocity((next - transform->position).Normalize());
-			if (Math::distanceNoSqrt(transform->position, path.top()) < 900)
+			if (Math::distanceNoSqrt(transform->position, path.top()) < min_distance)
 			{
 				// else, pull up next target
 				path.pop();
 				if (!path.empty())
 				{
 					max_moves = ((Math::distance(path.top(), transform->position)) / transform->speed) * 1.5f;
+					if (has_target && path.size() == 1)
+					{
+						min_distance = 1;
+					}
 				}
 				else
 				{
@@ -54,6 +58,7 @@ public:
 
 	void FindPath(const Vector2D& target)
 	{
+		has_target = false;
 		ClearPath();
 
 		navigation.CalculatePath(entity, path, target, true);
@@ -66,6 +71,7 @@ public:
 
 	void FindPathToTarget(Entity* target_entity)
 	{
+		has_target = true;
 		ClearPath();
 
 		navigation.CalculatePath(entity, path, target_entity->GetComponent<TransformComponent>().position, true);
@@ -82,6 +88,7 @@ public:
 	{
 		moving = false;
 		move_tries = 0;
+		min_distance = 400;
 		for (int i = 0; i < path.size(); i++)
 		{
 			path.pop();
@@ -155,10 +162,10 @@ private:
 	std::stack<Vector2D> path;
 	Vector2D next;
 	bool moving;
-	Entity *target;
+	bool has_target = false;
 
 	// movement tries
 	int move_tries;
 	int max_moves;
-	float previous_dist;
+	float min_distance;
 };

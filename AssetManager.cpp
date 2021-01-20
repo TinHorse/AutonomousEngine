@@ -3,6 +3,8 @@
 #include "EntityManager.h"
 #include "Entities.h"
 
+extern Collisionmesh collision;
+
 AssetManager::AssetManager(EntityManager *man) : manager(man)
 {
 	
@@ -25,7 +27,8 @@ Entity& AssetManager::CreatePlayer(Vector2D position, int sizeX, int sizeY, floa
 	sprite.addAnimation("walk", 1, 9, 50);
 	sprite.addAnimation("eat", 2, 6, 50);
 
-	manager->addStaticColliderComponent(player, "player");
+	manager->addDynamicColliderComponent(player, "player", true);
+
 	manager->addKeyboardController(player);
 	manager->AddToGroup(&player, Game::groupPlayers);
 
@@ -43,7 +46,7 @@ Entity& AssetManager::CreateHunted(Vector2D position, int sizeX, int sizeY, floa
 	sprite.addAnimation("dead", 3, 1, 50);
 
 
-	manager->addDynamicColliderComponent(hunted,"hunted");
+	manager->addDynamicColliderComponent(hunted,"hunted", true);
 	manager->addPathfindingComponent(hunted);
 
 	manager->AddToGroup(&hunted, Game::groupHunted);
@@ -55,9 +58,9 @@ Entity& AssetManager::CreateHunted(Vector2D position, int sizeX, int sizeY, floa
 Entity & AssetManager::CreateFood(Vector2D position, int sizeX, int sizeY, float scale)
 {
 	auto& foodItem = manager->AddEntity<Grass>();
-	manager->addTransformComponent(foodItem, position.x, position.y, sizeX, sizeY, scale);
+	auto& transform = manager->addTransformComponent(foodItem, position.x, position.y, sizeX, sizeY, scale);
 	manager->addSpriteComponent(foodItem, "food", false);
-	manager->addDynamicColliderComponent(foodItem, "food");
+	auto& col = manager->addDynamicColliderComponent(foodItem, "food", false);
 	manager->AddToGroup(&foodItem, Game::groupFood);
 
 	return foodItem;
@@ -68,7 +71,7 @@ Entity & AssetManager::CreatePredator(Vector2D position, int sizeX, int sizeY, f
 	auto& predator = manager->AddEntity<Predator>();
 	manager->addTransformComponent(predator, position.x, position.y, sizeX, sizeY, scale);
 	manager->addSpriteComponent(predator, "enemy2", false);
-	manager->addDynamicColliderComponent(predator, "predator");
+	manager->addDynamicColliderComponent(predator, "predator", true);
 	auto& pathfinder = manager->addPathfindingComponent(predator);
 
 	manager->AddToGroup(&predator, Game::groupPredators);

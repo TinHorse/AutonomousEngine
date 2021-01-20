@@ -85,34 +85,15 @@ public:
 		return compPath[index_path++];
 	}	
 
-	std::array<TileComponent, 2000>& getTiles()
-	{
-		return compTile;
-	}
-
-	int getIndexStaticCol()
-	{
-		return index_static_coll;
-	}
-
-	int getIndexDynamicCol()
-	{
-		return index_dynamic_coll;
-	}
-
-	std::array<ColliderComponent, 2000>& getDynamicCols()
-	{
-		return compDynamicColl;
-	}
 
 private:
-	std::array<TransformComponent, 2000> compTran;
-	std::array<SpriteComponent, 2000> compSprite;
+	std::array<TransformComponent, 5000> compTran;
+	std::array<SpriteComponent, 5000> compSprite;
 	std::array<KeyboardController, 1> compKeyboard;
-	std::array<ColliderComponent, 2000> compStaticColl;
-	std::array<ColliderComponent, 2000> compDynamicColl;
-	std::array<TileComponent, 2000> compTile;
-	std::array<PathfindingComponent, 2000> compPath;
+	std::array<ColliderComponent, 5000> compStaticColl;
+	std::array<ColliderComponent, 5000> compDynamicColl;
+	std::array<TileComponent, 5000> compTile;
+	std::array<PathfindingComponent, 5000> compPath;
 
 	int index_tran = 0;
 	int index_sprites = 0;

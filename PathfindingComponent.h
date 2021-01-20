@@ -42,6 +42,7 @@ public:
 				else
 				{
 					moving = false;
+					recalc = true;
 					transform->velocity = { 0,0 };
 					return;
 				}
@@ -51,7 +52,7 @@ public:
 			max_moves--;
 			if (max_moves < 0)
 			{
-				ClearPath();
+				recalc = true;
 			}
 		}
 	}
@@ -65,6 +66,7 @@ public:
 		if (!path.empty())
 		{
 			moving = true;
+			recalc = false;
 			max_moves = ((Math::distance(path.top(), transform->position)) / transform->speed) * 1.5f;
 		}
 	}
@@ -79,15 +81,16 @@ public:
 		if (!path.empty())
 		{
 			moving = true;
+			recalc = false;
 			max_moves = ((Math::distance(path.top(), transform->position)) / transform->speed) * 1.5f;
 		}
-
 	}
 
 	void ClearPath()
 	{
 		moving = false;
 		move_tries = 0;
+		recalc = false;
 		min_distance = 400;
 		path = std::stack<Vector2D>();
 	}
@@ -117,12 +120,6 @@ public:
 		v += position;
 		return Vector2D(v);
 	}
-	
-
-	bool PathIsEmpty()
-	{
-		return path.empty();
-	}
 
 	void LinkComponentPointers() override
 	{
@@ -134,9 +131,9 @@ public:
 		moving = false;
 	}
 
-	const bool& isStopped()
+	const bool& recalcFlag()
 	{
-		return !moving;
+		return (recalc || !moving);
 	}
 
 private:
@@ -145,6 +142,7 @@ private:
 	Vector2D next;
 	bool moving;
 	bool has_target = false;
+	bool recalc = false;
 
 	// movement tries
 	int move_tries;

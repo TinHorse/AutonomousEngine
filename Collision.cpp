@@ -3,6 +3,7 @@
 
 bool Collision::AABB(const SDL_Rect& rectA, const SDL_Rect& rectB)
 {
+	//std::cout << "direct ";
 	if (
 		rectA.x + rectA.w > rectB.x &&
 		rectA.y + rectA.h > rectB.y &&
@@ -17,6 +18,7 @@ bool Collision::AABB(const SDL_Rect& rectA, const SDL_Rect& rectB)
 
 bool Collision::AABB(const SDL_Rect& rectA, const int& Bx, const int& By, const int& Bw, const int& Bh)
 {
+	//std::cout << "rect ";
 	if (
 		rectA.x + rectA.w > Bx &&
 		rectA.y + rectA.h > By &&
@@ -31,6 +33,7 @@ bool Collision::AABB(const SDL_Rect& rectA, const int& Bx, const int& By, const 
 
 bool Collision::AABB(const ColliderComponent & colA, const ColliderComponent & colB)
 {
+	//std::cout << "collider ";
 	if (AABB(colA.collider, colB.collider))
 	{
 		return true;
@@ -40,6 +43,7 @@ bool Collision::AABB(const ColliderComponent & colA, const ColliderComponent & c
 
 bool Collision::AABBExtended(const SDL_Rect& rectA, const SDL_Rect& rectB, float extra_radius)
 {
+	//std::cout << "extended rect ";
 	if (
 		rectA.x + rectA.w + extra_radius > rectB.x &&
 		rectA.y + rectA.h + extra_radius > rectB.y &&
@@ -54,6 +58,7 @@ bool Collision::AABBExtended(const SDL_Rect& rectA, const SDL_Rect& rectB, float
 
 bool Collision::AABBExtended(const ColliderComponent & colA, const ColliderComponent & colB, float extra_radius)
 {
+	//std::cout << "extended collider ";
 	if (AABBExtended(colA.collider, colB.collider, extra_radius))
 	{
 		return true;

@@ -51,11 +51,11 @@ void Navmesh::LoadMesh(const char * path, int sX, int sY, int sTileX, int sTileY
 			stream.get(c);
 			if (c == '1')
 			{
-				mesh[(y*cols) + x] = Node(x+0.5f,y + 0.5f,true);
+				mesh[(y*cols) + x] = Node(x,y,true);
 			}
 			else
 			{
-				mesh[(y*cols) + x] = Node(x + 0.5f, y + 0.5f, false);
+				mesh[(y*cols) + x] = Node(x, y, false);
 			}
 
 			stream.ignore();

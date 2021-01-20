@@ -90,22 +90,22 @@ void Game::Init(const char * title, int xpos, int ypos, int width, int height, b
 	// Load navigation
 	navigation.LoadMesh("assets/collisionmap.txt", 40, 40, 32, 32, 1.8f);
 
-	// Create player
-	player = &assets->CreatePlayer(Vector2D(225,200), 265, 207, 0.23f);
-
 	// Load collision
 	collision.LoadMesh("assets/collisionmap.txt", 40, 40, 32, 32, 1.8f);
+
+	// Create player
+	player = &assets->CreatePlayer(Vector2D(225,200), 265, 207, 0.23f);
 
 	// Initialize camera
 	auto& t = player->GetComponent<TransformComponent>();
 	camera.Init(t.position.x, t.position.y, 800, 600);
 
 	// Create Hunted
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 30; i++)
 	{
-		for (int j = 0; j < 10; j++)
+		for (int j = 0; j < 30; j++)
 		{
-			assets->CreateHunted(Vector2D(200+i * 60, 400+j * 60), 265, 207, 0.12f);
+			assets->CreateHunted(Vector2D(200+i * 40, 400+j * 40), 265, 207, 0.12f);
 		}
 	}
 	
@@ -158,7 +158,6 @@ void Game::Update()
 	
 	manager.Update();
 
-
 	for (auto& h : hunted)
 	{
 		h->update();
@@ -171,12 +170,14 @@ void Game::Update()
 	{
 		p->update();
 	}
+	
 
 	Vector2D offset(-400, -300);
 	camera.Update(offset + player->GetComponent<TransformComponent>().position);
 
 	// Collision
-	collision.CalculateCollision();
+	collision.update();
+
 	auto end = std::chrono::high_resolution_clock().now();
 	auto totaltime = std::chrono::duration_cast<milliseconds>(end - start);
 	if (totaltime.count() < 500)
@@ -193,7 +194,7 @@ void Game::ExecuteQueues(double maxTime)
 	pathfindingQueue.UpdateDeletedEntities(manager.getDeletedEntities());
 	if (maxTime > 0)
 	{
-		pathfindingQueue.executePathfindingRequests(maxTime / 2);
+		pathfindingQueue.executePathfindingRequests(maxTime);
 	}
 }
 
@@ -217,7 +218,7 @@ void Game::Render() // note that all draw functions have to be called inside the
 	{
 		if (Math::distance(c->GetComponent<TransformComponent>().position, player->GetComponent<TransformComponent>().position) < 300)
 		{
-			//c->GetComponent<ColliderComponent>().Draw();
+			c->GetComponent<ColliderComponent>().Draw();
 		}
 	}
 	for (auto& h : hunted)

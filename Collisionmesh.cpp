@@ -2,71 +2,64 @@
 #include "Collision.h"
 #include <fstream>
 #include "EntityManager.h"
+
 extern EntityManager manager;
 
-int Collisionmesh::mesh_index = 1;
-
-int Collisionmesh::operator()(const int& x, const int& y)
+void ColCell::addCollider(ColliderComponent * collider)
 {
-	if (boundsCheck(y * cols + x))
+	colliders.push_back(collider);
+}
+
+std::vector<ColCell*>& ColCell::getRegion()
+{
+	return region;
+}
+
+void Collisionmesh::update()
+{
+	for (auto& v : cells)
 	{
-		return collision_mesh[y * cols + x];
+		for (auto& v2 : v)
+		{
+			v2.colliders.clear();
+		}
 	}
-	else
-	{
-		return 0;
-	}
-}
-
-const std::array<ColliderComponent*,9>& Collisionmesh::getRegion(const int& x, const int& y)
-{
-	mesh_neighbours[0] = getNodeAtPosition(y* cols + x);
-	mesh_neighbours[1] = getNodeAtPosition(y* cols + x + 1);
-	mesh_neighbours[2] = getNodeAtPosition((y + 1) * cols + x + 1);
-	mesh_neighbours[3] = getNodeAtPosition((y + 1) * cols + x);
-	mesh_neighbours[4] = getNodeAtPosition((y + 1) * cols + x - 1);
-	mesh_neighbours[5] = getNodeAtPosition(y* cols + x - 1);
-	mesh_neighbours[6] = getNodeAtPosition((y - 1) * cols + x - 1);
-	mesh_neighbours[7] = getNodeAtPosition((y - 1) * cols + x);
-	mesh_neighbours[8] = getNodeAtPosition((y - 1) * cols + x + 1);
-
-	return mesh_neighbours;
-}
-
-bool Collisionmesh::boundsCheck(const int& index)
-{
-	return (index >= 0 && index < collision_mesh.size());
-}
-
-bool Collisionmesh::doesNodeExist(const int& index)
-{
-	return (index >= 0 && index < collision_mesh.size() && collision_mesh[index] != 0);
-}
-
-ColliderComponent* Collisionmesh::getNodeAtPosition(const int& index)
-{
-	if (index >= 0 && index < collision_mesh.size() && collision_mesh[index] != 0)
-	{
-		return mesh_nodes[(collision_mesh[index])];
-	}
-	return nullptr;
-}
-
-void Collisionmesh::addNode(ColliderComponent* comp)
-{
-	mesh_nodes.insert(std::make_pair(++mesh_index, comp));
 }
 
 void Collisionmesh::LoadMesh(const char * path, int sX, int sY, int sTileX, int sTileY, int scale)
 {
-	cols = sX;
-	rows = sY;
-	tileSizeX = sTileX * scale;
-	tileSizeY = sTileY * scale;
+	float scalar = 2.f;
+
+	cols = sX / scalar;
+	rows = sY / scalar;
+
+	cells = std::vector<std::vector<ColCell>>(rows, std::vector<ColCell>(cols));
+	// watch out for x,y
+	
+	tileSizeX = sTileX * scale * scalar;
+	tileSizeY = sTileY * scale * scalar;
 
 	char c;
 	std::fstream stream;
 	stream.open(path);
+
+	for (int y = 0; y < rows; ++y)
+	{
+		for (int x = 0; x < cols; ++x)
+		{
+			getCell(x, y) = ColCell(x, y, x * tileSizeX, y * tileSizeY, tileSizeX, tileSizeY);
+		}
+	}
+
+	for (auto& v : cells)
+	{
+		for (auto& v2 : v)
+		{
+			auto r = getRegion(v2.indexX, v2.indexY);
+			v2.region.insert(v2.region.end(),r.begin(), r.end());
+		}
+	}
+
 	for (int y = 0; y < sY; ++y)
 	{
 		for (int x = 0; x < sX; ++x)
@@ -75,128 +68,78 @@ void Collisionmesh::LoadMesh(const char * path, int sX, int sY, int sTileX, int 
 			if (c == '1')
 			{
 				auto& tileCol(manager.AddEntity());
-				manager.addTransformComponent(tileCol, x * tileSizeX, y * tileSizeY, tileSizeX, tileSizeY, scale);
-				manager.addStaticColliderComponent(tileCol, "terrain", x * tileSizeX, y * tileSizeY, tileSizeX);
-				manager.AddToGroup(&tileCol, Game::groupColliders);
-				addNode(&tileCol.GetComponent<ColliderComponent>());
-				collision_mesh.push_back(mesh_index);
-			}
-			else
-			{
-				collision_mesh.push_back(0);
-			}
+				manager.addTransformComponent(tileCol, x * (tileSizeX / scalar), y * (tileSizeY / scalar), tileSizeX / scalar, tileSizeY / scalar, scale);
+				manager.addDynamicColliderComponent(tileCol, "terrain", false);
 
+				manager.AddToGroup(&tileCol, Game::groupColliders);
+			}
 			stream.ignore();
 		}
 	}
 	stream.close();
 }
 
-void Collisionmesh::CalculateCollision()
+bool Collisionmesh::checkBounds(const int & x, const int & y)
 {
-	int colcount = 0;
-	Vector2D force;
-	int x, y;
-
-	int index = manager.getIndexDynamicCol();
-	for (auto& dynCol : manager.getDynamicCols())
-	{
-		if (index-- <= 0) { break; }
-
-		if (dynCol.entity->HasComponent<PathfindingComponent>())
-		{
-			// determine node position
-			x = dynCol.transform->position.x / tileSizeX;
-			y = dynCol.transform->position.y / tileSizeY;
-
-			// check collision with static colliders
-			force.Zero();
-			bool staticCol = false;
-
-			for (auto *n : getRegion(x, y))
-			{
-				if (n != nullptr)
-				{
-					if (Collision::AABB(dynCol, *n))
-					{
-						force += Collision::CalculateOpposingForce(dynCol, *n);
-					}
-				}
-			}
-
-			dynCol.transform->addCollisionResponseStatic(force.Normalize());
-			force.Zero();
-			// check collision with other agents
-			if (!staticCol)
-			{
-				int other_index = manager.getIndexDynamicCol();
-				for (auto& dynCol2 : manager.getDynamicCols())
-				{
-					if (other_index-- <= 0) { break; }
-					if (dynCol.entity != dynCol2.entity)
-					{
-						if (Collision::AABB(dynCol, dynCol2))
-						{
-							force += Collision::CalculateOpposingForce(dynCol, dynCol2);
-						}
-					}
-				}
-				dynCol.transform->addCollisionResponseDynamic(force.Normalize());
-				//force.x = -force.x;
-				//dynCol.entity->GetComponent<PathfindingComponent>().pushPoint(force.Normalize() * 5);
-			}
-		}
-		
-	}
-
-	for (auto& entity : manager.GetGroup(Game::groupPlayers))
-	{
-		auto& dynCol = entity->GetComponent<ColliderComponent>();
-		// determine node position
-		x = dynCol.transform->position.x / tileSizeX;
-		y = dynCol.transform->position.y / tileSizeY;
-
-		// check collision with static colliders
-		force.Zero();
-		bool staticCol = false;
-
-		for (auto *n : getRegion(x, y))
-		{
-			if (n != nullptr)
-			{
-				if (Collision::AABB(dynCol, *n))
-				{
-					force += Collision::CalculateOpposingForce(dynCol, *n);
-				}
-			}
-		}
-
-		dynCol.transform->addCollisionResponseStatic(force);
-		force.Zero();
-
-		// check collision with other agents
-		if (!staticCol)
-		{
-			int other_index = manager.getIndexDynamicCol();
-			for (auto& dynCol2 : manager.getDynamicCols())
-			{
-				if (other_index-- <= 0) { break; }
-				if (dynCol.entity != dynCol2.entity)
-				{
-					if (Collision::AABB(dynCol, dynCol2))
-					{
-						if (dynCol2.entity->HasComponent<PathfindingComponent>())
-						{
-							dynCol2.entity->GetComponent<TransformComponent>().addCollisionResponseDynamic(Collision::CalculateOpposingForce(dynCol2, dynCol));
-						}
-						else
-						{
-							force += Collision::CalculateOpposingForce(dynCol, dynCol2);
-						}
-					}
-				}
-			}
-			dynCol.transform->addCollisionResponseDynamic(force);
-		}
-	}
+	return (x >= 0 && y >= 0 && x < rows && y < cols);
 }
+
+std::vector<ColCell*> Collisionmesh::getRegion(int x, int y)
+{
+	std::vector<ColCell*> region;
+	region.push_back(&cells[x][y]);
+	if (checkBounds(x - 1, y - 1))
+		region.push_back(&cells[x - 1][y - 1]);
+	if (checkBounds(x, y - 1))
+		region.push_back(&cells[x][y - 1]);
+	if (checkBounds(x + 1, y - 1))
+		region.push_back(&cells[x + 1][y - 1]);
+	if (checkBounds(x + 1, y))
+		region.push_back(&cells[x + 1][y]);
+	if (checkBounds(x + 1, y + 1))
+		region.push_back(&cells[x + 1][y + 1]);
+	if (checkBounds(x, y + 1))
+		region.push_back(&cells[x][y + 1]);
+	if (checkBounds(x - 1, y + 1))
+		region.push_back(&cells[x - 1][y + 1]);
+	if (checkBounds(x - 1, y))
+		region.push_back(&cells[x - 1][y]);
+
+	return region;
+}
+
+void Collisionmesh::registerCollider(ColliderComponent * col)
+{
+	int x = col->collider.x;
+	int y = col->collider.y;
+	int w = col->collider.w;
+	int h = col->collider.h;
+
+	if (checkBounds(x / tileSizeX, y / tileSizeY))
+	{
+		auto& cell = getCell(x / tileSizeX, y / tileSizeY);
+		cell.addCollider(col);
+		col->current_cell = &cell;
+	}
+
+	/*
+	if (checkBounds((x + w) / tileSizeX, y / tileSizeY))
+	{
+		auto& cell = getCell((x + w) / tileSizeX, y / tileSizeY);
+		cell.addCollider(col);
+	}
+
+	if (checkBounds(x / tileSizeX, (y + h) / tileSizeY))
+	{
+		auto& cell = getCell(x / tileSizeX, (y + h) / tileSizeY);
+		cell.addCollider(col);
+	}
+
+	if (checkBounds((x + w) / tileSizeX, (y + h) / tileSizeY))
+	{
+		auto& cell = getCell((x + w) / tileSizeX, (y + h) / tileSizeY);
+		cell.addCollider(col);
+	}
+	*/
+}
+

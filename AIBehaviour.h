@@ -17,7 +17,7 @@ enum Result : std::size_t
 
 static Result s_explore(bool state_switch, Entity * entity)
 {
-	if (entity->GetComponent<PathfindingComponent>().isStopped() || state_switch)
+	if (entity->GetComponent<PathfindingComponent>().recalcFlag() || state_switch)
 	{
 		pathfindingQueue.makePathfindingRequest(entity);
 	}
@@ -38,7 +38,7 @@ static Result s_followDynamicTarget(bool state_switch, Entity * entity, Entity *
 			target = nullptr;
 			return rNO_TARGET;
 		}
-		else if (entity->GetComponent<PathfindingComponent>().isStopped() || Math::distanceNoSqrt(targetPosition, target->GetComponent<TransformComponent>().position) > 40000 || state_switch)
+		else if (entity->GetComponent<PathfindingComponent>().recalcFlag() || Math::distanceNoSqrt(targetPosition, target->GetComponent<TransformComponent>().position) > 40000 || state_switch)
 		{
 			pathfindingQueue.makePathfindingRequest(entity, target);
 			targetPosition = target->GetComponent<TransformComponent>().position;
@@ -57,7 +57,7 @@ static Result s_followStaticTarget(bool state_switch, Entity * entity, Entity * 
 			entity->GetComponent<PathfindingComponent>().Stop();
 			return rSUCCESS;
 		}
-		else if (entity->GetComponent<PathfindingComponent>().isStopped() || state_switch)
+		else if (entity->GetComponent<PathfindingComponent>().recalcFlag() || state_switch)
 		{
 			pathfindingQueue.makePathfindingRequest(entity, target);
 		}
@@ -74,7 +74,7 @@ static Result s_runAway(bool state_switch, Entity * entity, Entity * enemy, floa
 		{
 			return rSUCCESS;
 		}
-		else if (entity->GetComponent<PathfindingComponent>().isStopped() || state_switch)
+		else if (entity->GetComponent<PathfindingComponent>().recalcFlag() || state_switch)
 		{
 			Vector2D safe = entity->GetComponent<TransformComponent>().position;
 			safe -= enemy->GetComponent<TransformComponent>().position;

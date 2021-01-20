@@ -82,7 +82,6 @@ public:
 			}
 			else
 			{
-				
 				if (transform->getVelocity().x > 0)
 				{
 					spriteFlip = SDL_FLIP_NONE;

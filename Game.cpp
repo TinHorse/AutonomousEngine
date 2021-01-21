@@ -101,11 +101,11 @@ void Game::Init(const char * title, int xpos, int ypos, int width, int height, b
 	camera.Init(t.position.x, t.position.y, 800, 600);
 
 	// Create Hunted
-	for (int i = 0; i < 30; i++)
+	for (int i = 0; i < 25; i++)
 	{
-		for (int j = 0; j < 30; j++)
+		for (int j = 0; j < 20; j++)
 		{
-			assets->CreateHunted(Vector2D(200+i * 40, 400+j * 40), 265, 207, 0.12f);
+			assets->CreateHunted(Vector2D(100+i * 40, 100+j * 40), 265, 207, 0.12f);
 		}
 	}
 	

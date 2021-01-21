@@ -49,7 +49,6 @@ public:
 				}
 			}
 
-			//std::cout << max_moves << std::endl;
 			max_moves--;
 			if (max_moves < 0)
 			{
@@ -64,8 +63,8 @@ public:
 		has_target = false;
 		ClearPath();
 
-		navigation.CalculatePath(entity, path, target, true);
-		if (!path.empty())
+		recalc = true;
+		if (navigation.CalculatePath(entity, path, target))
 		{
 			moving = true;
 			recalc = false;
@@ -78,9 +77,8 @@ public:
 		has_target = true;
 		ClearPath();
 
-		navigation.CalculatePath(entity, path, target_entity->GetComponent<TransformComponent>().position, true);
-
-		if (!path.empty())
+		recalc = true;
+		if (navigation.CalculatePath(entity, path, target_entity->GetComponent<TransformComponent>().position))
 		{
 			moving = true;
 			recalc = false;

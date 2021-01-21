@@ -38,7 +38,7 @@ public:
 
 	void Init(int mCols, int mRows);
 	void LoadMesh(const char *path, int sX, int sY, int sTileX, int sTileY, int scale);
-	void CalculatePath(Entity* entity, std::stack<Vector2D>& path, const Vector2D targetLoc, bool earlyExit);
+	bool CalculatePath(Entity* entity, std::stack<Vector2D>& path, const Vector2D targetLoc);
 	void ClearMesh();
 
 	Node &operator()(const int& x, const int& y);
@@ -49,6 +49,8 @@ public:
 private:
 	int tileSizeX, tileSizeY;
 	int cols, rows;
+
+	int highest = 0;
 
 	// visited map
 	std::map<int, bool> visited;

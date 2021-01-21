@@ -64,17 +64,12 @@ void Navmesh::LoadMesh(const char * path, int sX, int sY, int sTileX, int sTileY
 	stream.close();
 }
 
-void Navmesh::CalculatePath(Entity* entity, std::stack<Vector2D>& path, const Vector2D targetLoc, bool earlyExit)
+bool Navmesh::CalculatePath(Entity* entity, std::stack<Vector2D>& path, const Vector2D targetLoc)
 {
 	int totalNodes = 0;
 
 	const Vector2D& curLoc = entity->GetComponent<TransformComponent>().position;
 	Vector2D targLoc = targetLoc;
-
-	if (Math::distance(curLoc, targetLoc) > 300)
-	{
-		targLoc = (Vector2D(targLoc - curLoc).Normalize() * 300) + curLoc;
-	}
 
 	int closestX = (curLoc.x / tileSizeX);
 	int closestY = (curLoc.y / tileSizeY);
@@ -89,7 +84,15 @@ void Navmesh::CalculatePath(Entity* entity, std::stack<Vector2D>& path, const Ve
 	
 	// check if start or target are out of bounds, check if target is obstacle
 	if (!current || !target)
-		return;
+		return false;
+
+	if (Math::distance(current->x, current->y, target->x, target->y) > 9)
+	{
+		//std::cout << Math::distance(curLoc, targLoc) << " dist" << std::endl;
+		int targX = target->x;
+		int targY = target->y;
+		target = getNodeAt((targX - current->x) / 2 + current->x, (targY - current->y) / 2 + current->y);
+	}
 
 	if (target->isObstacle)
 	{
@@ -99,7 +102,7 @@ void Navmesh::CalculatePath(Entity* entity, std::stack<Vector2D>& path, const Ve
 			break;
 		}
 		if(target->isObstacle)
-			return;
+			return false;
 	}
 
 	// list yet to be tested
@@ -113,7 +116,7 @@ void Navmesh::CalculatePath(Entity* entity, std::stack<Vector2D>& path, const Ve
 	goals[current] = Math::distanceNoSqrt(current->x, current->y, target->x, target->y);
 
 	//int num_nodes_tested = 0;
-	//int max_nodes_to_test = Math::distanceNoSqrt(current->x, current->y, target->x, target->y);
+	//int max_nodes_to_test = 50;
 	//std::cout << "max nodse to test " << max_nodes_to_test << " at distance " << sqrt(goals[current]) << std::endl;
 	// while there are nodes not yet tested
 	while (!not_tested.empty() && current != target)
@@ -182,8 +185,10 @@ void Navmesh::CalculatePath(Entity* entity, std::stack<Vector2D>& path, const Ve
 
 	if (!path.empty())
 		path.pop();
-		//if (!path.empty())
-			//path.pop();
+	if (!path.empty())
+		return true;
+	else
+		return false;
 }
 
 void Navmesh::ClearMesh()

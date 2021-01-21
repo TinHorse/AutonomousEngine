@@ -68,7 +68,7 @@ void Collisionmesh::LoadMesh(const char * path, int sX, int sY, int sTileX, int 
 			if (c == '1')
 			{
 				auto& tileCol(manager.AddEntity());
-				manager.addTransformComponent(tileCol, x * (tileSizeX / scalar), y * (tileSizeY / scalar), tileSizeX / scalar, tileSizeY / scalar, scale);
+				manager.addTransformComponent(tileCol, x * (tileSizeX / scalar), y * (tileSizeY / scalar), tileSizeX / scalar, tileSizeY / scalar, scale, false);
 				manager.addDynamicColliderComponent(tileCol, "terrain", false);
 
 				manager.AddToGroup(&tileCol, Game::groupColliders);
@@ -88,12 +88,6 @@ std::vector<ColCell*> Collisionmesh::getRegion(int x, int y)
 {
 	std::vector<ColCell*> region;
 	region.push_back(&cells[x][y]);
-	if (checkBounds(x - 1, y - 1))
-		region.push_back(&cells[x - 1][y - 1]);
-	if (checkBounds(x, y - 1))
-		region.push_back(&cells[x][y - 1]);
-	if (checkBounds(x + 1, y - 1))
-		region.push_back(&cells[x + 1][y - 1]);
 	if (checkBounds(x + 1, y))
 		region.push_back(&cells[x + 1][y]);
 	if (checkBounds(x + 1, y + 1))
@@ -102,8 +96,6 @@ std::vector<ColCell*> Collisionmesh::getRegion(int x, int y)
 		region.push_back(&cells[x][y + 1]);
 	if (checkBounds(x - 1, y + 1))
 		region.push_back(&cells[x - 1][y + 1]);
-	if (checkBounds(x - 1, y))
-		region.push_back(&cells[x - 1][y]);
 
 	return region;
 }

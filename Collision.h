@@ -22,6 +22,6 @@ struct Collision
 	static bool SAT(const ColliderComponent& colA, const ColliderComponent& colB);
 
 
-	static Vector2D CalculateOpposingForce(const SDL_Rect& rectA, const SDL_Rect& rectB);
-	static Vector2D CalculateOpposingForce(const ColliderComponent& colA, const ColliderComponent& colB);
+	static Vector2D CalculateOpposingForce(const SDL_Rect& rectA, const SDL_Rect& rectB, const Vector2D& centreA, const Vector2D& centreB);
+	static Vector2D CalculateOpposingForce(const ColliderComponent& colA, const ColliderComponent& colB, const Vector2D& centreA, const Vector2D& centreB);
 };

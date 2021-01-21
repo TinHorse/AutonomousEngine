@@ -152,25 +152,25 @@ void Game::Update()
 {
 	GameTime++; // increment game time
 
-	auto start = std::chrono::high_resolution_clock().now();
+	
 	
 	manager.Refresh();
 	
 	manager.Update();
 
-	for (auto& h : hunted)
+	for (auto* h : hunted)
 	{
 		h->update();
 	}
-	for (auto& f : foods)
+	for (auto* f : foods)
 	{
 		f->update();
 	}
-	for (auto& p : predators)
+	for (auto* p : predators)
 	{
 		p->update();
 	}
-	
+
 
 	Vector2D offset(-400, -300);
 	camera.Update(offset + player->GetComponent<TransformComponent>().position);
@@ -178,24 +178,30 @@ void Game::Update()
 	// Collision
 	collision.update();
 
-	auto end = std::chrono::high_resolution_clock().now();
-	auto totaltime = std::chrono::duration_cast<milliseconds>(end - start);
-	if (totaltime.count() < 500)
-	{
-		average_time += totaltime.count();
-	}
-	//std::cout << average_time / GameTime << std::endl;
-	//std::cout << totaltime.count() << std::endl;
+	
 
 }
 
 void Game::ExecuteQueues(double maxTime)
 {
+	auto start = std::chrono::high_resolution_clock().now();
+	//std::cout << maxTime << " Max time" << std::endl;
+
 	pathfindingQueue.UpdateDeletedEntities(manager.getDeletedEntities());
 	if (maxTime > 0)
 	{
 		pathfindingQueue.executePathfindingRequests(maxTime);
 	}
+	auto end = std::chrono::high_resolution_clock().now();
+
+	auto totaltime = std::chrono::duration_cast<microseconds>(end - start);
+	if (totaltime.count() < 500)
+	{
+		average_time += totaltime.count();
+	}
+
+	//std::cout << average_time / GameTime << std::endl;
+	//std::cout << totaltime.count() << std::endl;
 }
 
 
@@ -203,39 +209,39 @@ void Game::Render() // note that all draw functions have to be called inside the
 {
 	SDL_RenderClear(renderer);
 
-	for (auto& t : tiles)
+	for (auto* t : tiles)
 	{
 		if (Math::distance(t->GetComponent<TileComponent>().position, player->GetComponent<TransformComponent>().position) < 300)
 		{
 			t->GetComponent<TileComponent>().Draw();
 		}
 	}
-	for (auto& p : players)
+	for (auto* p : players)
 	{
 		p->GetComponent<SpriteComponent>().Draw();
 	}
-	for (auto& c : colliders)
+	for (auto* c : colliders)
 	{
 		if (Math::distance(c->GetComponent<TransformComponent>().position, player->GetComponent<TransformComponent>().position) < 300)
 		{
 			c->GetComponent<ColliderComponent>().Draw();
 		}
 	}
-	for (auto& h : hunted)
+	for (auto* h : hunted)
 	{
 		if (Math::distance(h->GetComponent<TransformComponent>().position, player->GetComponent<TransformComponent>().position) < 300)
 		{
 			h->GetComponent<SpriteComponent>().Draw();
 		}
 	}
-	for (auto& f : foods)
+	for (auto* f : foods)
 	{
 		if (Math::distance(f->GetComponent<TransformComponent>().position, player->GetComponent<TransformComponent>().position) < 300)
 		{
 		f->GetComponent<SpriteComponent>().Draw();
 		}
 	}
-	for (auto& p : predators)
+	for (auto* p : predators)
 	{
 		if (Math::distance(p->GetComponent<TransformComponent>().position, player->GetComponent<TransformComponent>().position) < 300)
 		{

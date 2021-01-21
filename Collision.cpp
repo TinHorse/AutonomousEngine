@@ -98,24 +98,25 @@ bool Collision::SAT(const ColliderComponent & colA, const ColliderComponent & co
 	return false;
 }
 
-Vector2D Collision::CalculateOpposingForce(const SDL_Rect & rectA, const SDL_Rect & rectB)
+Vector2D Collision::CalculateOpposingForce(const SDL_Rect & rectA, const SDL_Rect & rectB, const Vector2D& centreA, const Vector2D& centreB)
 {
-	Vector2D mid(rectA.x + (rectA.w / 2.f), rectA.y + (rectA.h / 2.f));
-	if (mid.x > rectB.x + rectB.w)
+	float mag = ((((rectA.w + rectA.h) / 4.f) + ((rectB.w + rectB.h) / 4.f)) / Math::distanceNoSqrt(centreA, centreB));
+
+	if (centreA.x > rectB.x + rectB.w)
 	{
-		return Vector2D(1, 0);
+		return Vector2D(mag, 0);
 	}
-	if (mid.x < rectB.x)
+	if (centreA.x < rectB.x)
 	{
-		return Vector2D(-1, 0);
+		return Vector2D(-mag, 0);
 	}
-	if (mid.y > rectB.y + rectB.h)
+	if (centreA.y > rectB.y + rectB.h)
 	{
-		return Vector2D(0, 1);
+		return Vector2D(0, mag);
 	}
-	if (mid.y < rectB.y)
+	if (centreA.y < rectB.y)
 	{
-		return Vector2D(0, -1);
+		return Vector2D(0, -mag);
 	}
 	else
 	{
@@ -124,7 +125,7 @@ Vector2D Collision::CalculateOpposingForce(const SDL_Rect & rectA, const SDL_Rec
 
 }
 
-Vector2D Collision::CalculateOpposingForce(const ColliderComponent & colA, const ColliderComponent & colB)
+Vector2D Collision::CalculateOpposingForce(const ColliderComponent & colA, const ColliderComponent & colB, const Vector2D& centreA, const Vector2D& centreB)
 {
-	return CalculateOpposingForce(colA.collider, colB.collider);
+	return CalculateOpposingForce(colA.collider, colB.collider, centreA, centreB);
 }

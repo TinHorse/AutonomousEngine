@@ -19,7 +19,10 @@ static Result s_explore(bool state_switch, Entity * entity)
 {
 	if (entity->GetComponent<PathfindingComponent>().recalcFlag() || state_switch)
 	{
-		pathfindingQueue.makePathfindingRequest(entity);
+		if (!entity->GetComponent<PathfindingComponent>().skip())
+		{
+			pathfindingQueue.makePathfindingRequest(entity);
+		}
 	}
 	return rSUCCESS;
 }
@@ -59,7 +62,10 @@ static Result s_followStaticTarget(bool state_switch, Entity * entity, Entity * 
 		}
 		else if (entity->GetComponent<PathfindingComponent>().recalcFlag() || state_switch)
 		{
-			pathfindingQueue.makePathfindingRequest(entity, target);
+			if (!entity->GetComponent<PathfindingComponent>().skip())
+			{
+				pathfindingQueue.makePathfindingRequest(entity, target);
+			}
 		}
 		return rCONTINUE;
 	}
@@ -79,13 +85,12 @@ static Result s_runAway(bool state_switch, Entity * entity, Entity * enemy, floa
 			Vector2D safe = entity->GetComponent<TransformComponent>().position;
 			safe -= enemy->GetComponent<TransformComponent>().position;
 			safe.Normalize() * 200;
-			pathfindingQueue.makePathfindingRequest(entity, safe);
+			pathfindingQueue.makePathfindingRequest(entity, safe + entity->GetComponent<TransformComponent>().position);
 		}
 		return rCONTINUE;
 	}
 	return rNO_TARGET;
 };
-
 
 
 

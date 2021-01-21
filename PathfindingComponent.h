@@ -44,6 +44,7 @@ public:
 					moving = false;
 					recalc = true;
 					transform->velocity = { 0,0 };
+					skips = 3;
 					return;
 				}
 			}
@@ -53,6 +54,7 @@ public:
 			if (max_moves < 0)
 			{
 				recalc = true;
+				skips = 2;
 			}
 		}
 	}
@@ -136,6 +138,11 @@ public:
 		return (recalc || !moving);
 	}
 
+	bool skip()
+	{
+		return (skips-- > 0);
+	}
+
 private:
 	TransformComponent *transform;
 	std::stack<Vector2D> path;
@@ -143,6 +150,7 @@ private:
 	bool moving;
 	bool has_target = false;
 	bool recalc = false;
+	int skips = 0;
 
 	// movement tries
 	int move_tries;

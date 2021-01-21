@@ -37,7 +37,7 @@ int main(int argc,  char *argv[])
 		{
 			game->Update();
 			lag -= frameDelay;
-			game->ExecuteQueues((frameDelay - lag) - 2);
+			game->ExecuteQueues(frameDelay - lag);
 		}
 		
 		auto end = std::chrono::high_resolution_clock().now();

@@ -21,6 +21,7 @@ void EntityManager::Update()
 		if (index-- <= 0) { break; };
 		comp.Update();
 	}
+
 	index = index_static_coll;
 	for (auto& comp : compStaticColl)
 	{
@@ -33,6 +34,9 @@ void EntityManager::Update()
 		if (index-- <= 0) { break; };
 		comp.Update();
 	}
+	
+
+
 	index = index_tiles;
 	for (auto& comp : compTile)
 	{
@@ -60,11 +64,11 @@ void EntityManager::Refresh()
 
 	if (deleted_entities.size() > 0)
 	{
-		for (auto& e : GetGroup(Game::groupHunted))
+		for (auto* e : GetGroup(Game::groupHunted))
 		{
 			e->refresh(deleted_entities);
 		}
-		for (auto& e : GetGroup(Game::groupPredators))
+		for (auto* e : GetGroup(Game::groupPredators))
 		{
 			e->refresh(deleted_entities);
 		}
@@ -205,7 +209,7 @@ std::vector<Entity*>& EntityManager::GetGroup(Group mGroup)
 std::vector<Entity*>& EntityManager::FindEntitiesInArea(const Vector2D& position, Group mGroup, const float& dist)
 {
 	entities_in_area.clear();
-	for (auto& e : GetGroup(mGroup))
+	for (auto* e : GetGroup(mGroup))
 	{
 		if (Collision::CircularCollision(e->GetComponent<TransformComponent>().position, position, dist))
 		{
@@ -217,7 +221,7 @@ std::vector<Entity*>& EntityManager::FindEntitiesInArea(const Vector2D& position
 
 Entity* EntityManager::FindOneEntityInArea(const Vector2D& position, const Group& mGroup, const float& dist)
 {
-	for (auto& e : GetGroup(mGroup))
+	for (auto* e : GetGroup(mGroup))
 	{
 		if (Collision::CircularCollision(e->GetComponent<TransformComponent>().position, position, dist))
 		{

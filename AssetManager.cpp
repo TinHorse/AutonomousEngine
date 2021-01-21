@@ -20,14 +20,14 @@ AssetManager::~AssetManager()
 Entity& AssetManager::CreatePlayer(Vector2D position, int sizeX, int sizeY, float scale)
 {
 	Entity& player = manager->AddEntity<Player>();
-	manager->addTransformComponent(player, position.x, position.y, sizeX, sizeY, scale);
+	manager->addTransformComponent(player, position.x, position.y, sizeX, sizeY, scale, true);
 
 	auto& sprite = manager->addSpriteComponent(player, "player", true);
 	sprite.addAnimation("idle", 0, 10, 150);
 	sprite.addAnimation("walk", 1, 9, 50);
 	sprite.addAnimation("eat", 2, 6, 50);
 
-	manager->addDynamicColliderComponent(player, "player", true);
+	manager->addDynamicColliderComponent(player, "player", true, true);
 
 	manager->addKeyboardController(player);
 	manager->AddToGroup(&player, Game::groupPlayers);
@@ -38,7 +38,7 @@ Entity& AssetManager::CreatePlayer(Vector2D position, int sizeX, int sizeY, floa
 Entity& AssetManager::CreateHunted(Vector2D position, int sizeX, int sizeY, float scale)
 {
 	auto& hunted = manager->AddEntity<Hunted>(manager->GetGroup(Game::groupPlayers)[0]);
-	manager->addTransformComponent(hunted, position.x, position.y, sizeX, sizeY, scale);
+	manager->addTransformComponent(hunted, position.x, position.y, sizeX, sizeY, scale, true);
 	auto& sprite = manager->addSpriteComponent(hunted, "hunted", true);
 	sprite.addAnimation("idle", 0, 10, 150);
 	sprite.addAnimation("walk", 1, 9, 50);
@@ -58,7 +58,7 @@ Entity& AssetManager::CreateHunted(Vector2D position, int sizeX, int sizeY, floa
 Entity & AssetManager::CreateFood(Vector2D position, int sizeX, int sizeY, float scale)
 {
 	auto& foodItem = manager->AddEntity<Grass>();
-	auto& transform = manager->addTransformComponent(foodItem, position.x, position.y, sizeX, sizeY, scale);
+	auto& transform = manager->addTransformComponent(foodItem, position.x, position.y, sizeX, sizeY, scale, false);
 	manager->addSpriteComponent(foodItem, "food", false);
 	auto& col = manager->addDynamicColliderComponent(foodItem, "food", false);
 	manager->AddToGroup(&foodItem, Game::groupFood);
@@ -69,7 +69,7 @@ Entity & AssetManager::CreateFood(Vector2D position, int sizeX, int sizeY, float
 Entity & AssetManager::CreatePredator(Vector2D position, int sizeX, int sizeY, float scale)
 {
 	auto& predator = manager->AddEntity<Predator>();
-	manager->addTransformComponent(predator, position.x, position.y, sizeX, sizeY, scale);
+	manager->addTransformComponent(predator, position.x, position.y, sizeX, sizeY, scale, true);
 	manager->addSpriteComponent(predator, "enemy2", false);
 	manager->addDynamicColliderComponent(predator, "predator", true);
 	auto& pathfinder = manager->addPathfindingComponent(predator);

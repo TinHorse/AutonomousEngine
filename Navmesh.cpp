@@ -93,7 +93,7 @@ void Navmesh::CalculatePath(Entity* entity, std::stack<Vector2D>& path, const Ve
 
 	if (target->isObstacle)
 	{
-		for (auto& n : getNeighbours(target->x, target->y))
+		for (auto* n : getNeighbours(target->x, target->y))
 		{
 			if (!n->isObstacle)
 			{
@@ -142,7 +142,7 @@ void Navmesh::CalculatePath(Entity* entity, std::stack<Vector2D>& path, const Ve
 
 
 		// check all neighbours
-		for (Node * n : getNeighbours(current->x, current->y))
+		for (auto* n : getNeighbours(current->x, current->y))
 		{
 			if (n != nullptr)
 			{

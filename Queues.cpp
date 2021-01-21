@@ -19,13 +19,14 @@ void PathfindingQueue::makePathfindingRequest(Entity * entity, Entity * targetEn
 
 void PathfindingQueue::executePathfindingRequests(double maxTime)
 {
-	double beginTime = SDL_GetTicks();
+	double beginTime = SDL_GetTicks() - 3.f;
 	double currTime;
 
 	int num_requests = 0;
 	while (!pathfinding_requests.empty())
 	{
 		currTime = SDL_GetTicks();
+		///std::cout << " diff " << ((currTime - beginTime)) <<std::endl;
 		if ((currTime - beginTime) >= maxTime) { break; }
 
 		auto mapIndex = pathfinding_requests.begin();

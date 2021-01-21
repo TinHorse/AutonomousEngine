@@ -10,6 +10,7 @@ public:
 	Vector2D collision_response;
 	Vector2D previous_velocity;
 	float speed = 1.5f;
+	bool dynamic = false;
 
 	int height = 128;
 	int width = 128;
@@ -20,26 +21,29 @@ public:
 		position.Zero();
 	}
 
-	TransformComponent(int sc)
+	TransformComponent(int sc, bool dyn)
 	{
 		position.x = 500;
 		position.y = 500;
 		scale = sc;
+		dynamic = dyn;
 	}
 
-	TransformComponent(float x, float y)
+	TransformComponent(float x, float y, bool dyn)
 	{
 		position.x = x;
 		position.y = y;
+		dynamic = dyn;
 	}
 
-	TransformComponent(float x, float y, int w, int h, float sc)
+	TransformComponent(float x, float y, int w, int h, float sc, bool dyn)
 	{
 		position.x = x;
 		position.y = y;
 		width = w;
 		height = h;
 		scale = sc;
+		dynamic = dyn;
 	}
 
 	void Init() override
@@ -49,17 +53,34 @@ public:
 
 	void Update() override
 	{
-		velocity += collision_response;
-		collision_response.Zero();
-		
-		velocity.Normalize();
-		position += velocity * speed;
-		previous_velocity = velocity;
-		velocity.Zero();
-		
+		if (dynamic)
+		{
+			float mag = 0;
+			if (collision_response.x || collision_response.y)
+			{
+				if (!velocity.x && !velocity.y)
+				{
+					position += collision_response.Normalize() * (speed);
+					collision_response.Zero();
+					return;
+				}
+				else
+				{
+					mag = speed / 2.f;
+					position += collision_response.Normalize() * (speed - mag);
+				}
+				collision_response.Zero();
+			}
+			//velocity* 0.5f;
+
+			velocity.Normalize();
+			position += velocity * (speed - mag);
+			previous_velocity = velocity;
+			velocity.Zero();
+		}
 	}
 
-	void addVelocity(const Vector2D& force)
+	void addVelocity(const Vector2D force)
 	{
 		velocity += force;
 	}

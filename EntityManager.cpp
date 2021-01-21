@@ -66,11 +66,11 @@ void EntityManager::Refresh()
 	{
 		for (auto* e : GetGroup(Game::groupHunted))
 		{
-			e->refresh(deleted_entities);
+			e->refresh();
 		}
 		for (auto* e : GetGroup(Game::groupPredators))
 		{
-			e->refresh(deleted_entities);
+			e->refresh();
 		}
 
 		// remove inactive components
@@ -231,7 +231,7 @@ Entity* EntityManager::FindOneEntityInArea(const Vector2D& position, const Group
 	return nullptr;
 }
 
-std::set<Entity*>& EntityManager::getDeletedEntities()
+std::set<Entity*>* EntityManager::getDeletedEntities()
 {
-	return deleted_entities;
+	return &deleted_entities;
 }

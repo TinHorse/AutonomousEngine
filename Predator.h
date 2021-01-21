@@ -163,9 +163,9 @@ public:
 		}
 	}
 
-	void refresh(std::set<Entity*>& deletedEntities) override
+	void refresh() override
 	{
-		if (deletedEntities.find(target) != deletedEntities.end())
+		if (deletedEntities->find(target) != deletedEntities->end())
 		{
 			target = nullptr;
 		}

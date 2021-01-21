@@ -95,11 +95,8 @@ void Navmesh::CalculatePath(Entity* entity, std::stack<Vector2D>& path, const Ve
 	{
 		for (auto* n : getNeighbours(target->x, target->y))
 		{
-			if (!n->isObstacle)
-			{
-				target = n;
-				break;
-			}
+			target = n;
+			break;
 		}
 		if(target->isObstacle)
 			return;
@@ -140,36 +137,35 @@ void Navmesh::CalculatePath(Entity* entity, std::stack<Vector2D>& path, const Ve
 		current = not_tested.top();
 		visited[current->ID] = true;
 
+		bool vis;
+		long int lowestGoal;
+		long int local;
 
 		// check all neighbours
 		for (auto* n : getNeighbours(current->x, current->y))
 		{
-			if (n != nullptr)
+			// check if neighbour has already been visited and make sure it is not an obstacle
+			vis = visited[n->ID];
+			if (!visited[n->ID])
 			{
-				// check if neighbour has already been visited and make sure it is not an obstacle
-				bool vis = visited[n->ID];
-				bool isObstacle = n->isObstacle;
-				if (!visited[n->ID] && !n->isObstacle)
-				{
-					not_tested.push(n);
-				}
+				not_tested.push(n);
+			}
 
-				// calculate the neighbour's local goals
-				long int lowestGoal = goals[current] + Math::distanceNoSqrt(n->x, n->y, current->x, current->y);
+			// calculate the neighbour's local goals
+			lowestGoal = goals[current] + Math::distanceNoSqrt(n->x, n->y, current->x, current->y);
 
-				long int local = goals[n];
-				// check if the lowest local goal is smaller than the neighbour's previous local goal
-				if (lowestGoal < goals[n])
-				{
-					// set the neighbour's parent to the current node
-					parents[n] = current;
+			local = goals[n];
+			// check if the lowest local goal is smaller than the neighbour's previous local goal
+			if (lowestGoal < goals[n])
+			{
+				// set the neighbour's parent to the current node
+				parents[n] = current;
 
-					// update the neighbour's local goal
-					goals[n] = lowestGoal;
+				// update the neighbour's local goal
+				goals[n] = lowestGoal;
 
-					// set the neighbour's global goal to the local goal plus the distance to the target
-					n->globalDist = goals[n] + Math::distanceNoSqrt(n->x, n->y, target->x, target->y);
-				}
+				// set the neighbour's global goal to the local goal plus the distance to the target
+				n->globalDist = goals[n] + Math::distanceNoSqrt(n->x, n->y, target->x, target->y);
 			}
 		}
 	}
@@ -196,6 +192,7 @@ void Navmesh::ClearMesh()
 	{
 		n.globalDist = LONG_MAX;
 	}
+
 	for (auto& it : visited)
 	{
 		it.second = false;
@@ -235,39 +232,48 @@ Node * Navmesh::getNodeAt(const int& x, const int& y)
 	}
 }
 
-const std::array<Node*, 8>& Navmesh::getNeighbours(const int& x, const int& y)
+const std::vector<Node*>& Navmesh::getNeighbours(const int& x, const int& y)
 {
+	neighbours.clear();
 	int index = y * cols + x + 1;
 	if (index >= 0 && index < mesh.size()) {
-		neighbours[0] = (&mesh[index]);
+		if(!mesh[index].isObstacle)
+			neighbours.push_back(&mesh[index]);
 	}
 	index = (y + 1) * cols + x + 1;
 	if (index >= 0 && index < mesh.size()) {
-		neighbours[1] = (&mesh[index]);
+		if (!mesh[index].isObstacle)
+			neighbours.push_back(&mesh[index]);
 	}
 	index = (y + 1) * cols + x;
 	if (index >= 0 && index < mesh.size()) {
-		neighbours[2] = (&mesh[index]);
+		if (!mesh[index].isObstacle)
+			neighbours.push_back(&mesh[index]);
 	}
 	index = (y + 1) * cols + x - 1;
 	if (index >= 0 && index < mesh.size()) {
-		neighbours[3] = (&mesh[index]);
+		if (!mesh[index].isObstacle)
+			neighbours.push_back(&mesh[index]);
 	}
 	index = (y)* cols + x - 1;
 	if (index >= 0 && index < mesh.size()) {
-		neighbours[4] = (&mesh[index]);
+		if (!mesh[index].isObstacle)
+			neighbours.push_back(&mesh[index]);
 	}
 	index = (y - 1) * cols + x - 1;
 	if (index >= 0 && index < mesh.size()) {
-		neighbours[5] = (&mesh[index]);
+		if (!mesh[index].isObstacle)
+			neighbours.push_back(&mesh[index]);
 	}
 	index = (y - 1) * cols + x;
 	if (index >= 0 && index < mesh.size()) {
-		neighbours[6] = (&mesh[index]);
+		if (!mesh[index].isObstacle)
+			neighbours.push_back(&mesh[index]);
 	}
 	index = (y - 1) * cols + x + 1;
 	if (index >= 0 && index < mesh.size()) {
-		neighbours[7] = (&mesh[index]);
+		if (!mesh[index].isObstacle)
+			neighbours.push_back(&mesh[index]);
 	}
 
 	return neighbours;

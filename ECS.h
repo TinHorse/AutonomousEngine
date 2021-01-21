@@ -73,15 +73,18 @@ protected:
 class Entity
 {
 public:
-	Entity(EntityManager& mManager) : manager(mManager) 
+	Entity(EntityManager& mManager) : manager(mManager)
 	{
 		Ticks = TickMaster++;
 	}
+	friend EntityManager;
+
 	bool IsActive() const;
 	virtual void update() {}
-	virtual void refresh(std::set<Entity*>& deletedEntities) {}
+	virtual void refresh() {}
 	void Destroy();
 	virtual ~Entity();
+	std::set<Entity*>* deletedEntities;
 
 	bool HasGroup(Group mGroup); // checks if entity is part of a specific group
 	void AddToGroup(Group mGroup); // adds entity to specified group

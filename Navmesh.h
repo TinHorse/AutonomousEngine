@@ -43,7 +43,7 @@ public:
 
 	Node &operator()(const int& x, const int& y);
 	Node *getNodeAt(const int& x, const int& y);
-	const std::array<Node*, 8>& getNeighbours(const int& x, const int& y);
+	const std::vector<Node*>& getNeighbours(const int& x, const int& y);
 	bool boundsCheck(const int& index);
 
 private:
@@ -56,11 +56,11 @@ private:
 	// current parent node map
 	std::map<Node*, Node*> parents;
 
-	// fLocal and fGlobal map
+	// fLocal map
 	std::map<Node*, long int> goals;
 
 	std::vector<Node> mesh;
-	std::array<Node*, 8> neighbours;
+	std::vector<Node*> neighbours;
 
 	Node nullNode;
 };

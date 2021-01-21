@@ -34,11 +34,11 @@ void PathfindingQueue::executePathfindingRequests(double maxTime)
 		auto request = mapIndex->second;
 		num_requests++;
 		// check for deleted entities
-		if (deletedEntities.find(entity) == deletedEntities.end())
+		if (deletedEntities->find(entity) == deletedEntities->end())
 		{
 			if (request.targetEntity)
 			{
-				if (deletedEntities.find(request.targetEntity) == deletedEntities.end())
+				if (deletedEntities->find(request.targetEntity) == deletedEntities->end())
 				{
 					request.entity->GetComponent<PathfindingComponent>().FindPathToTarget(request.targetEntity);
 				}
@@ -58,7 +58,7 @@ void PathfindingQueue::executePathfindingRequests(double maxTime)
 	}
 }
 
-void PathfindingQueue::UpdateDeletedEntities(std::set<Entity*>& entities)
+void PathfindingQueue::UpdateDeletedEntities(std::set<Entity*>* entities)
 {
-	deletedEntities.insert(entities.begin(), entities.end());
+	deletedEntities = entities;
 }

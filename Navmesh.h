@@ -50,8 +50,6 @@ private:
 	int tileSizeX, tileSizeY;
 	int cols, rows;
 
-	int highest = 0;
-
 	// visited map
 	std::map<int, bool> visited;
 

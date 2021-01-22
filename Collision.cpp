@@ -98,34 +98,49 @@ bool Collision::SAT(const ColliderComponent & colA, const ColliderComponent & co
 	return false;
 }
 
-Vector2D Collision::CalculateOpposingForce(const SDL_Rect & rectA, const SDL_Rect & rectB, const Vector2D& centreA, const Vector2D& centreB)
+Vector2D Collision::CalculateOpposingForce(const SDL_Rect & rectA, const SDL_Rect & rectB, const Vector2D& centreA, const Vector2D& centreB, bool dynamic)
 {
-	float mag = ((((rectA.w + rectA.h) / 4.f) + ((rectB.w + rectB.h) / 4.f)) / Math::distanceNoSqrt(centreA, centreB));
+	float mag = INT_MAX / (Math::distance(centreA, centreB) + 1);
+
+	if (dynamic)
+		mag /= 10.f;
+	float mag2 = mag / 5.f;
 
 	if (centreA.x > rectB.x + rectB.w)
 	{
-		return Vector2D(mag, 0);
+		if (centreA.y > centreB.y)
+			return Vector2D(mag, mag2);
+		else
+			return Vector2D(mag, -mag2);
 	}
 	if (centreA.x < rectB.x)
 	{
-		return Vector2D(-mag, 0);
+		if (centreA.y > centreB.y)
+			return Vector2D(-mag, mag2);
+		else
+			return Vector2D(-mag, -mag2);
 	}
 	if (centreA.y > rectB.y + rectB.h)
 	{
-		return Vector2D(0, mag);
+		if (centreA.x > centreB.x)
+			return Vector2D(mag2, mag);
+		else
+			return Vector2D(-mag2, mag);
 	}
 	if (centreA.y < rectB.y)
 	{
-		return Vector2D(0, -mag);
+		if (centreA.x > centreB.x)
+			return Vector2D(mag2, -mag);
+		else
+			return Vector2D(-mag2, -mag);
 	}
-	else
-	{
-		return Vector2D(rectA.x + (rectA.w / 2.f) - rectB.x + (rectB.w / 2.f),rectA.y + (rectA.h / 2.f) - rectB.y + (rectB.h / 2.f)).Normalize();
-	}
+	
+	//std::cout << "other" << std::endl;
+	return Vector2D(rectA.x + (rectA.w / 2.f) - rectB.x + (rectB.w / 2.f),rectA.y + (rectA.h / 2.f) - rectB.y + (rectB.h / 2.f)).Normalize() * mag;
 
 }
 
-Vector2D Collision::CalculateOpposingForce(const ColliderComponent & colA, const ColliderComponent & colB, const Vector2D& centreA, const Vector2D& centreB)
+Vector2D Collision::CalculateOpposingForce(const ColliderComponent & colA, const ColliderComponent & colB, const Vector2D& centreA, const Vector2D& centreB, bool dynamic)
 {
-	return CalculateOpposingForce(colA.collider, colB.collider, centreA, centreB);
+	return CalculateOpposingForce(colA.collider, colB.collider, centreA, centreB, dynamic);
 }

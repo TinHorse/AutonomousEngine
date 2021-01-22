@@ -255,6 +255,10 @@ void Game::Clean()
 {
 	SDL_DestroyWindow(window);
 	SDL_DestroyRenderer(renderer);
+
+	delete assets;
+	delete map;
+
 	SDL_Quit();
 	std::cout << "game cleaned \n";
 }

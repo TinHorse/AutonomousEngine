@@ -37,25 +37,34 @@ void Navmesh::Init(int mCols, int mRows)
 
 void Navmesh::LoadMesh(const char * path, int sX, int sY, int sTileX, int sTileY, int scale)
 {
-	Init(sX, sY);
+	int scalar = 2;
+	Init(sX*scalar, sY*scalar);
 	tileSizeX = sTileX * scale;
 	tileSizeY = sTileY * scale;
 
-	char c;
-	std::fstream stream;
-	stream.open(path);
 	for (int y = 0; y < sY; ++y)
 	{
 		for (int x = 0; x < sX; ++x)
 		{
+			mesh[(y*cols) + x] = Node(x,y,true);
+		}
+	}
+
+	char c;
+	std::fstream stream;
+	stream.open(path);
+	for (int y = 0; y < sY; y += scalar)
+	{
+		for (int x = 0; x < sX; x += scalar)
+		{
 			stream.get(c);
 			if (c == '1')
 			{
-				mesh[(y*cols) + x] = Node(x,y,true);
+				//mesh[(y*cols) + x] = Node(x, y, true);
 			}
 			else
 			{
-				mesh[(y*cols) + x] = Node(x, y, false);
+				//mesh[(y*cols) + x] = Node(x, y, false);
 			}
 
 			stream.ignore();
@@ -66,7 +75,7 @@ void Navmesh::LoadMesh(const char * path, int sX, int sY, int sTileX, int sTileY
 
 bool Navmesh::CalculatePath(Entity* entity, std::stack<Vector2D>& path, const Vector2D targetLoc)
 {
-	int totalNodes = 0;
+	bool path_change = false;
 
 	const Vector2D& curLoc = entity->GetComponent<TransformComponent>().position;
 	Vector2D targLoc = targetLoc;
@@ -86,31 +95,51 @@ bool Navmesh::CalculatePath(Entity* entity, std::stack<Vector2D>& path, const Ve
 	if (!current || !target)
 		return false;
 
+	// check if distance is greater than the limit
 	if (Math::distance(current->x, current->y, target->x, target->y) > 9)
 	{
 		//std::cout << Math::distance(curLoc, targLoc) << " dist" << std::endl;
 		int targX = target->x;
 		int targY = target->y;
 		target = getNodeAt((targX - current->x) / 2 + current->x, (targY - current->y) / 2 + current->y);
+		// set up data structures
+		path_change = true;
+		ClearMesh();
 	}
 
+	// check if the distance between this and the target node is smaller than 2. If it is, return. Else, clear data structures
+	else if (Math::distance(current->x, current->y, target->x, target->y) < 2)
+	{
+		path.push(Vector2D(target->x * tileSizeX, target->y * tileSizeY));
+		return true;
+	}
+	else
+	{
+		// set up data structures
+		ClearMesh();
+	}
+
+
+	//check if the target is an obstacle. If it is, search the nearby nodes for a non-obstacle
 	if (target->isObstacle)
 	{
 		for (auto* n : getNeighbours(target->x, target->y))
 		{
 			target = n;
+			path_change = true;
 			break;
 		}
 		if(target->isObstacle)
 			return false;
 	}
 
+	// If the target is still the original target, push it
+	if(!path_change)
+		path.push(targetLoc);
+
 	// list yet to be tested
 	std::priority_queue<Node*, std::vector<Node*>, NodeCompare> not_tested;
 	not_tested.push(current);
-
-	// set up data structures
-	ClearMesh();
 
 	// Initialize currrent
 	goals[current] = Math::distanceNoSqrt(current->x, current->y, target->x, target->y);

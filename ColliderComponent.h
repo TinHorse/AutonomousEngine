@@ -34,9 +34,6 @@ public:
 		tag = mTag;
 		dynamic = _dynamic;
 		overridden = _overridden;
-
-		centre.x = this->collider.x + (this->collider.w / 2);
-		centre.y = this->collider.y + (this->collider.h / 2);
 	}
 	ColliderComponent(std::string mTag, int xpos, int ypos, int size, bool _dynamic)
 	{
@@ -45,9 +42,6 @@ public:
 		collider.y = ypos;
 		collider.w = collider.h = size;
 		dynamic = _dynamic;
-
-		centre.x = this->collider.x + (this->collider.w / 2);
-		centre.y = this->collider.y + (this->collider.h / 2);
 	}
 
 	void Init() override
@@ -62,6 +56,8 @@ public:
 		collider.w = transform->width * transform->scale;
 		collider.h = transform->height * transform->scale;
 		destRect = { collider.x, collider.y, collider.w, collider.h };
+		centre.x = this->collider.x + (this->collider.w / 2);
+		centre.y = this->collider.y + (this->collider.h / 2);
 	}
 
 	void Update() override
@@ -92,27 +88,44 @@ public:
 						{
 							if (Collision::AABB(*this, *body))
 							{
+								
 								if (body->dynamic)
 								{
-									soft_collision += Collision::CalculateOpposingForce(*this, *body, centre, body->centre);
+									soft_collision += Collision::CalculateOpposingForce(*this, *body, centre, body->centre, true);
 									body->addSoftCollisionOpposite(soft_collision);
 								}
 								else
 								{
-									hard_collision += Collision::CalculateOpposingForce(*this, *body, centre, body->centre);
+									hard_collision += Collision::CalculateOpposingForce(*this, *body, centre, body->centre, false);
 								}
 							}
 						}
 					}
 				}
-				if (hard_collision.x || hard_collision.y || overridden)
+				//if (hard_collision.x || hard_collision.y || overridden)
+				//{
+				//	soft_collision.Zero();
+				//}
+
+				if (overridden)
 				{
 					soft_collision.Zero();
 				}
 
 				transform->addCollisionResponse(soft_collision + hard_collision);
-				soft_collision.Zero();
-				hard_collision.Zero();
+
+				soft_collision * 0.2f;
+				if (soft_collision.x < 0.01f || soft_collision.y < 0.01f)
+				{
+					soft_collision.Zero();
+				}
+				hard_collision * 0.2f;
+				if (hard_collision.x < 0.01f || hard_collision.y < 0.01f)
+				{
+					hard_collision.Zero();
+				}
+
+				
 			}
 		}
 		else
@@ -125,7 +138,7 @@ public:
 					{
 						if (Collision::AABB(*this, *body))
 						{
-							body->addHardCollisionOpposite(Collision::CalculateOpposingForce(*this, *body, centre, body->centre));
+							body->addHardCollisionOpposite(Collision::CalculateOpposingForce(*body, *this, centre, body->centre, false));
 						}
 					}
 				}

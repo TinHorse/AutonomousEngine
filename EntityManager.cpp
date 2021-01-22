@@ -3,10 +3,12 @@
 
 void EntityManager::Update()
 {
-	int index = 0;
+	int index;
+
+	index = index_tran;
 	for (auto& comp : compTran)
 	{
-		if (index++ >= index_tran) { break; };
+		if (index-- <= 0) { break; };
 		comp.Update();
 	}
 	index = index_sprites;

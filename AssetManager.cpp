@@ -22,10 +22,10 @@ Entity& AssetManager::CreatePlayer(Vector2D position, int sizeX, int sizeY, floa
 	Entity& player = manager->AddEntity<Player>();
 	manager->addTransformComponent(player, position.x, position.y, sizeX, sizeY, scale, true);
 
-	auto& sprite = manager->addSpriteComponent(player, "player", true);
-	sprite.addAnimation("idle", 0, 10, 150);
-	sprite.addAnimation("walk", 1, 9, 50);
-	sprite.addAnimation("eat", 2, 6, 50);
+	auto& sprite = manager->addSpriteComponent(player, "player", false);
+	//sprite.addAnimation("idle", 0, 10, 150);
+	//sprite.addAnimation("walk", 1, 9, 50);
+	//sprite.addAnimation("eat", 2, 6, 50);
 
 	manager->addDynamicColliderComponent(player, "player", true, true);
 

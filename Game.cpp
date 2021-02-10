@@ -77,7 +77,7 @@ void Game::Init(const char * title, int xpos, int ypos, int width, int height, b
 	assets->AddTexture("collider", "assets/colliderTex.png");
 	assets->AddTexture("food", "assets/foodItem.png");
 	assets->AddTexture("terrain", "assets/tileset.png");
-	assets->AddTexture("player", "assets/player_anim_alpha.png");
+	assets->AddTexture("player", "assets/ship_one_BlueAlpha.png");
 	assets->AddTexture("hunted", "assets/hunted_anim_alpha.png");
 	assets->AddTexture("enemy", "assets/enemy.png");
 
@@ -94,16 +94,16 @@ void Game::Init(const char * title, int xpos, int ypos, int width, int height, b
 	collision.LoadMesh("assets/collisionmap.txt", 40, 40, 32, 32, 1.8f);
 
 	// Create player
-	player = &assets->CreatePlayer(Vector2D(225,200), 265, 207, 0.23f);
+	player = &assets->CreatePlayer(Vector2D(225,200), 85, 205, 0.2f);
 
 	// Initialize camera
 	auto& t = player->GetComponent<TransformComponent>();
 	camera.Init(t.position.x, t.position.y, 800, 600);
 
 	// Create Hunted
-	for (int i = 0; i < 25; i++)
+	for (int i = 0; i < 5; i++)
 	{
-		for (int j = 0; j < 20; j++)
+		for (int j = 0; j < 5; j++)
 		{
 			assets->CreateHunted(Vector2D(100+i * 40, 100+j * 40), 265, 207, 0.12f);
 		}
@@ -119,9 +119,9 @@ void Game::Init(const char * title, int xpos, int ypos, int width, int height, b
 	}
 
 	// Create Predators
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < 2; i++)
 	{
-		for (int j = 0; j < 4; j++)
+		for (int j = 0; j < 2; j++)
 		{
 			assets->CreatePredator(Vector2D(400 + i * 60, 100 + j * 60), 236, 233, 0.18f);
 		}

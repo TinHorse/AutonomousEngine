@@ -1,13 +1,23 @@
 #pragma once
-#include "Game.h"
+//#include "Game.h"
 #include "ECS.h"
-//#include "Components.h"
+
 
 class KeyboardController : public Component
 {
 public:
 	TransformComponent *transform;
 	SpriteComponent *sprite;
+
+	enum Key : std::size_t
+	{
+		idle,
+		walk_up,
+		walk_right,
+		walk_down,
+		walk_left,
+		interact
+	};
 
 	void Init() override
 	{
@@ -17,32 +27,38 @@ public:
 	{
 		const Uint8* keystate = SDL_GetKeyboardState(NULL);
 		transform->velocity.Zero();
+		currentKey = idle;
 		if (keystate)
 		{
 			if (keystate[SDL_SCANCODE_W])
 			{
 				transform->velocity.y = -1;
-				sprite->Play("walk");
+				currentKey = walk_up;
+				//sprite->Play("walk");
 			}
 			if (keystate[SDL_SCANCODE_S]) {
 				transform->velocity.y = 1;
-				sprite->Play("walk");
+				currentKey = walk_down;
+				//sprite->Play("walk");
 			}
 			if (keystate[SDL_SCANCODE_A])
 			{
 				transform->velocity.x = -1;
-				sprite->Play("walk");
+				currentKey = walk_left;
+				//sprite->Play("walk");
 				sprite->spriteFlip = SDL_FLIP_HORIZONTAL;
 			}
 			if (keystate[SDL_SCANCODE_D])
 			{
 				transform->velocity.x = 1;
-				sprite->Play("walk");
+				currentKey = walk_right;
+				//sprite->Play("walk");
 				sprite->spriteFlip = SDL_FLIP_NONE;
 			}
 			if (keystate[SDL_SCANCODE_SPACE])
 			{
-				sprite->Play("eat");
+				currentKey = interact;
+				//sprite->Play("eat");
 			}
 
 		}
@@ -93,4 +109,12 @@ public:
 		transform = &entity->GetComponent <TransformComponent>();
 		sprite = &entity->GetComponent<SpriteComponent>();
 	}
+
+	const Key& current()
+	{
+		return currentKey;
+	}
+
+private:
+	Key currentKey;
 };

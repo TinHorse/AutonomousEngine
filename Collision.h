@@ -1,6 +1,12 @@
 #pragma once
 #include "SDL.h"
 #include "Vector2D.h"
+#include <array>
+
+struct Rect
+{
+	std::array<Vector2D, 4> edges;
+};
 
 class ColliderComponent;
 
@@ -19,7 +25,8 @@ struct Collision
 	static bool CircularCollision(const ColliderComponent& colA, const ColliderComponent& colB, float radius); // Distance based collision
 
 
-	static bool SAT(const ColliderComponent& colA, const ColliderComponent& colB);
+	static Vector2D SAT(const SDL_Rect& cA, const SDL_Rect& cB);
+	static Vector2D SAT(const Rect& cA, const Rect& cB, const Vector2D& centreA, const Vector2D& centreB);
 
 
 	static Vector2D CalculateOpposingForce(const SDL_Rect& rectA, const SDL_Rect& rectB, const Vector2D& centreA, const Vector2D& centreB, bool dynamic);

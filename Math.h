@@ -38,3 +38,22 @@ static int rand_float(float low, float high)
 	static Dist uid{};
 	return uid(rd, Dist::param_type{ low,high });
 }
+
+static Vector2D rotate_point(const float& cx, const float& cy, const float& angle, Vector2D point)
+{
+	float s = sin(angle);
+	float c = cos(angle);
+
+	// translate point back to origin
+	point.x -= cx;
+	point.y -= cy;
+
+	// rotate point
+	float xnew = point.x * c - point.y * s;
+	float ynew = point.x * s + point.y * c;
+
+	// translate point back
+	point.x = xnew + cx;
+	point.y = ynew + cy;
+	return point;
+}

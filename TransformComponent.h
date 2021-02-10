@@ -9,12 +9,14 @@ public:
 	Vector2D velocity;
 	Vector2D collision_response;
 	Vector2D previous_velocity;
+	Vector2D centre;
 	float speed = 1.5f;
 	bool dynamic = false;
 
 	int height = 128;
 	int width = 128;
 	float scale = 1;
+	float angle = 0.f;
 
 	TransformComponent()
 	{
@@ -49,34 +51,25 @@ public:
 	void Init() override
 	{
 		velocity.Zero();
+
+		centre.x = position.x + ((width * scale) / 2);
+		centre.y = position.y + ((height * scale) / 2);
 	}
 
 	void Update() override
 	{
 		if (dynamic)
 		{
-			float mag = 0;
-			if (collision_response.x || collision_response.y)
-			{
-				if (!velocity.x && !velocity.y)
-				{
-					position += collision_response.Normalize() * (speed);
-					collision_response.Zero();
-					return;
-				}
-				else
-				{
-					mag = speed / 2.f;
-					position += collision_response.Normalize() * (speed - mag);
-				}
-				collision_response.Zero();
-			}
-			//velocity* 0.5f;
+			position += collision_response;
+			collision_response.Zero();
 
 			velocity.Normalize();
-			position += velocity * (speed - mag);
+			position += velocity * speed;
 			previous_velocity = velocity;
 			velocity.Zero();
+
+			centre.x = position.x + ((width * scale) / 2);
+			centre.y = position.y + ((height * scale) / 2);
 		}
 	}
 

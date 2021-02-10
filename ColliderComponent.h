@@ -8,14 +8,16 @@
 
 extern Collisionmesh collision;
 
+
 // The collider component is used to define a collision rectangle that checks for collisions with other rectangles
 
 class ColliderComponent : public Component
 {
 public:
 	SDL_Rect collider;
+	Rect collider_offset;
+
 	std::string tag;
-	Vector2D centre;
 
 	SDL_Texture *texture;
 	SDL_Rect srcRect, destRect;
@@ -56,18 +58,31 @@ public:
 		collider.w = transform->width * transform->scale;
 		collider.h = transform->height * transform->scale;
 		destRect = { collider.x, collider.y, collider.w, collider.h };
-		centre.x = this->collider.x + (this->collider.w / 2);
-		centre.y = this->collider.y + (this->collider.h / 2);
+
+		collider_offset.edges[0] = { float(collider.x), float(collider.y) };
+		collider_offset.edges[1] = { float(collider.x) + collider.w, float(collider.y) };
+		collider_offset.edges[2] = { float(collider.x) + collider.w, float(collider.y + collider.h) };
+		collider_offset.edges[3] = { float(collider.x), float(collider.y + collider.h) };
 	}
 
 	void Update() override
 	{
-		if (tag != "terrain")
+		if (dynamic)
 		{
 			collider.x = static_cast<int>(transform->position.x);
 			collider.y = static_cast<int>(transform->position.y);
-			//collider.w = transform->width * transform->scale;
-			//collider.h = transform->height * transform->scale;
+
+			/*
+			collider_offset.edges[0] = rotate_point(transform->centre.x, transform->centre.y, transform->angle, Vector2D(collider.x, collider.y));
+			collider_offset.edges[1] = rotate_point(transform->centre.x, transform->centre.y, transform->angle, Vector2D(collider.x + collider.w, collider.y));
+			collider_offset.edges[2] = rotate_point(transform->centre.x, transform->centre.y, transform->angle, Vector2D(collider.x + collider.w, collider.y + collider.h));
+			collider_offset.edges[3] = rotate_point(transform->centre.x, transform->centre.y, transform->angle, Vector2D(collider.x, collider.y + collider.h));
+			*/
+
+			collider_offset.edges[0] = { float(collider.x), float(collider.y) };
+			collider_offset.edges[1] = { float(collider.x) + collider.w, float(collider.y) };
+			collider_offset.edges[2] = { float(collider.x) + collider.w, float(collider.y + collider.h) };
+			collider_offset.edges[3] = { float(collider.x), float(collider.y + collider.h) };
 		}
 
 		destRect.x = collider.x - Game::camera.getX();
@@ -78,70 +93,31 @@ public:
 		{
 			if (current_cell)
 			{
-				centre.x = this->collider.x + (this->collider.w / 2);
-				centre.y = this->collider.y + (this->collider.h / 2);
 				for (auto* c : current_cell->getRegion())
 				{
 					for (auto* body : c->colliders)
 					{
 						if (body != this)
 						{
-							if (Collision::AABB(*this, *body))
+							if (body->dynamic)
 							{
-								
-								if (body->dynamic)
-								{
-									soft_collision += Collision::CalculateOpposingForce(*this, *body, centre, body->centre, true);
-									body->addSoftCollisionOpposite(soft_collision);
-								}
-								else
-								{
-									hard_collision += Collision::CalculateOpposingForce(*this, *body, centre, body->centre, false);
-								}
+								soft_collision += Collision::SAT(this->collider_offset, body->collider_offset, this->transform->centre, body->transform->centre);
+							}
+							else
+							{
+								soft_collision += Collision::SAT(this->collider_offset, body->collider_offset, this->transform->centre, body->transform->centre) * 2.f;
 							}
 						}
 					}
 				}
-				//if (hard_collision.x || hard_collision.y || overridden)
-				//{
-				//	soft_collision.Zero();
-				//}
 
-				if (overridden)
+				if (overridden && soft_collision.x)
 				{
-					soft_collision.Zero();
+					std::cout << soft_collision << std::endl;
 				}
 
-				transform->addCollisionResponse(soft_collision + hard_collision);
-
-				soft_collision * 0.2f;
-				if (soft_collision.x < 0.01f || soft_collision.y < 0.01f)
-				{
-					soft_collision.Zero();
-				}
-				hard_collision * 0.2f;
-				if (hard_collision.x < 0.01f || hard_collision.y < 0.01f)
-				{
-					hard_collision.Zero();
-				}
-
-				
-			}
-		}
-		else
-		{
-			for (auto* c : current_cell->getRegion())
-			{
-				for (auto* body : c->colliders)
-				{
-					if (body != this)
-					{
-						if (Collision::AABB(*this, *body))
-						{
-							body->addHardCollisionOpposite(Collision::CalculateOpposingForce(*body, *this, centre, body->centre, false));
-						}
-					}
-				}
+				transform->addCollisionResponse(soft_collision);
+				soft_collision.Zero();
 			}
 		}
 	}

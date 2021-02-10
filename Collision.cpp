@@ -93,10 +93,128 @@ bool Collision::CircularCollision(const ColliderComponent & colA, const Collider
 	return false;
 }
 
-bool Collision::SAT(const ColliderComponent & colA, const ColliderComponent & colB)
+Vector2D Collision::SAT(const SDL_Rect& cA, const SDL_Rect& cB)
 {
-	return false;
+
+	std::vector<Vector2D> edgesA;
+	std::vector<Vector2D> edgesB;
+
+	float overlap = INFINITY;
+
+	//for (int col = 0; col < 2; col++)
+	{
+		edgesA.push_back(Vector2D(cA.x, cA.y));
+		edgesA.push_back(Vector2D(cA.x + cA.w, cA.y));
+		edgesA.push_back(Vector2D(cA.x + cA.w, cA.y + cA.h));
+		edgesA.push_back(Vector2D(cA.x, cA.y + cA.h));
+
+		edgesB.push_back(Vector2D(cB.x, cB.y));
+		edgesB.push_back(Vector2D(cB.x + cB.w, cB.y));
+		edgesB.push_back(Vector2D(cB.x + cB.w, cB.y + cB.h));
+		edgesB.push_back(Vector2D(cB.x, cB.y + cB.h));
+
+		//std::cout << "SDL Version" << std::endl;
+		for (auto& e : edgesB)
+		{
+			//std::cout << e << "    " << std::endl;
+		}
+		//std::cout << std::endl;
+
+		for (int a = 0; a < edgesA.size(); a++)
+		{
+			// Find axis projection of each edge A
+			int b = (a + 1) % edgesA.size();
+			Vector2D axisProj = { -(edgesA[b].y - edgesA[a].y), (edgesA[b].x - edgesA[a].x) };
+			
+			// Find min max of colA
+			float min_cA = INFINITY; float max_cA = -INFINITY;
+			for (int p = 0; p < edgesA.size(); p++)
+			{
+				float q = (edgesA[p].x * axisProj.x + edgesA[p].y * axisProj.y);
+				min_cA = std::min(min_cA, q);
+				max_cA = std::max(max_cA, q);
+			}
+
+			// Find min max of colB
+			float min_cB = INFINITY; float max_cB = -INFINITY;
+			for (int p = 0; p < edgesB.size(); p++)
+			{
+				float q = (edgesB[p].x * axisProj.x + edgesB[p].y * axisProj.y);
+				min_cB = std::min(min_cB, q);
+				max_cB = std::max(max_cB, q);
+			}
+
+			// Calculate overlap along projected axis
+			overlap = std::min(std::min(max_cA, max_cB) - std::max(min_cA, min_cB), overlap);
+
+
+			if (!(max_cB >= min_cA && max_cA >= min_cB))
+				return Vector2D(0,0);
+
+		}
+
+		// displace colA along the vector between the two object centres
+		Vector2D centreA = { float(cA.x + (cA.w / 2)), float(cA.y + (cA.h / 2)) };
+		Vector2D centreB = { float(cB.x + (cB.w / 2)), float(cB.y + (cB.h / 2)) };
+
+		Vector2D displacement = { centreB - centreA };
+
+		displacement * overlap;
+		displacement.Normalize() * -1.f;
+
+		return displacement;
+	}
 }
+
+
+Vector2D Collision::SAT(const Rect& cA, const Rect& cB, const Vector2D& centreA, const Vector2D& centreB)
+{
+	float overlap = INFINITY;
+
+	for (int a = 0; a < cA.edges.size(); a++)
+	{
+		// Find axis projection of each edge A
+		int b = (a + 1) % cA.edges.size();
+		Vector2D axisProj = { -(cA.edges[b].y - cA.edges[a].y), (cA.edges[b].x - cA.edges[a].x) };
+
+		// Find min max of colA
+		float min_cA = INFINITY; float max_cA = -INFINITY;
+		for (int p = 0; p < cA.edges.size(); p++)
+		{
+			float q = (cA.edges[p].x * axisProj.x + cA.edges[p].y * axisProj.y);
+			min_cA = std::min(min_cA, q);
+			max_cA = std::max(max_cA, q);
+		}
+
+		// Find min max of colB
+		float min_cB = INFINITY; float max_cB = -INFINITY;
+		for (int p = 0; p < cB.edges.size(); p++)
+		{
+			float q = (cB.edges[p].x * axisProj.x + cB.edges[p].y * axisProj.y);
+			min_cB = std::min(min_cB, q);
+			max_cB = std::max(max_cB, q);
+		}
+
+		// Calculate overlap along projected axis
+		overlap = std::min(std::min(max_cA, max_cB) - std::max(min_cA, min_cB), overlap);
+
+
+		if (!(max_cB >= min_cA && max_cA >= min_cB))
+			return Vector2D(0, 0);
+
+	}
+
+	// displace colA along the vector between the two object centres
+	Vector2D centB = centreB;
+	Vector2D displacement = { centB - centreA };
+
+	displacement * overlap;
+	displacement.Normalize() * -1.f;
+
+	return displacement;
+}
+
+
 
 Vector2D Collision::CalculateOpposingForce(const SDL_Rect & rectA, const SDL_Rect & rectB, const Vector2D& centreA, const Vector2D& centreB, bool dynamic)
 {

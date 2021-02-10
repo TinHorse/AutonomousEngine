@@ -16,7 +16,7 @@ public:
 			{
 				updateState();
 			}
-			if (Ticks % -i_query_update == 0)
+			if (Ticks % i_query_update == 0)
 			{
 				updateQueries();
 			}

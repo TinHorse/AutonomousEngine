@@ -37,34 +37,25 @@ void Navmesh::Init(int mCols, int mRows)
 
 void Navmesh::LoadMesh(const char * path, int sX, int sY, int sTileX, int sTileY, int scale)
 {
-	int scalar = 2;
-	Init(sX*scalar, sY*scalar);
+	Init(sX, sY);
 	tileSizeX = sTileX * scale;
 	tileSizeY = sTileY * scale;
-
-	for (int y = 0; y < sY; ++y)
-	{
-		for (int x = 0; x < sX; ++x)
-		{
-			mesh[(y*cols) + x] = Node(x,y,true);
-		}
-	}
 
 	char c;
 	std::fstream stream;
 	stream.open(path);
-	for (int y = 0; y < sY; y += scalar)
+	for (int y = 0; y < sY; y++)
 	{
-		for (int x = 0; x < sX; x += scalar)
+		for (int x = 0; x < sX; x ++)
 		{
 			stream.get(c);
 			if (c == '1')
 			{
-				//mesh[(y*cols) + x] = Node(x, y, true);
+				mesh[(y*cols) + x] = Node(x, y, true);
 			}
 			else
 			{
-				//mesh[(y*cols) + x] = Node(x, y, false);
+				mesh[(y*cols) + x] = Node(x, y, false);
 			}
 
 			stream.ignore();

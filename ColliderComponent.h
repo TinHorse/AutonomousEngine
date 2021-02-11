@@ -72,17 +72,24 @@ public:
 			collider.x = static_cast<int>(transform->position.x);
 			collider.y = static_cast<int>(transform->position.y);
 
-			/*
-			collider_offset.edges[0] = rotate_point(transform->centre.x, transform->centre.y, transform->angle, Vector2D(collider.x, collider.y));
-			collider_offset.edges[1] = rotate_point(transform->centre.x, transform->centre.y, transform->angle, Vector2D(collider.x + collider.w, collider.y));
-			collider_offset.edges[2] = rotate_point(transform->centre.x, transform->centre.y, transform->angle, Vector2D(collider.x + collider.w, collider.y + collider.h));
-			collider_offset.edges[3] = rotate_point(transform->centre.x, transform->centre.y, transform->angle, Vector2D(collider.x, collider.y + collider.h));
-			*/
+			double rad_angle = toRad(transform->angle);
+			auto pos = transform->position;
+			Vector2D centre;
+			float sc = transform->scale;
 
-			collider_offset.edges[0] = { float(collider.x), float(collider.y) };
-			collider_offset.edges[1] = { float(collider.x) + collider.w, float(collider.y) };
-			collider_offset.edges[2] = { float(collider.x) + collider.w, float(collider.y + collider.h) };
-			collider_offset.edges[3] = { float(collider.x), float(collider.y + collider.h) };
+			centre.x = transform->centre.x;
+			centre.y = transform->centre.y;
+
+			collider_offset.edges[0] = rotate_point(0,0, rad_angle, Vector2D(- sc * transform->width /2, -sc * transform->height/2)).Add(centre);
+			collider_offset.edges[1] = rotate_point(0,0, rad_angle, Vector2D(sc * transform->width / 2, -sc * transform->height / 2)).Add(centre);
+			collider_offset.edges[2] = rotate_point(0,0, rad_angle, Vector2D(sc * transform->width / 2, sc * transform->height / 2)).Add(centre);
+			collider_offset.edges[3] = rotate_point(0,0, rad_angle, Vector2D(-sc * transform->width / 2, sc * transform->height / 2)).Add(centre);
+			
+
+			//collider_offset.edges[0] = { float(collider.x), float(collider.y) };
+			//collider_offset.edges[1] = { float(collider.x) + collider.w, float(collider.y) };
+			//collider_offset.edges[2] = { float(collider.x) + collider.w, float(collider.y + collider.h) };
+			//collider_offset.edges[3] = { float(collider.x), float(collider.y + collider.h) };
 		}
 
 		destRect.x = collider.x - Game::camera.getX();
@@ -113,7 +120,7 @@ public:
 
 				if (overridden && soft_collision.x)
 				{
-					std::cout << soft_collision << std::endl;
+					//std::cout << soft_collision << std::endl;
 				}
 
 				transform->addCollisionResponse(soft_collision);

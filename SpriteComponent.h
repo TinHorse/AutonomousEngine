@@ -62,7 +62,11 @@ public:
 
 	void Draw() override
 	{
-		TextureManager::Draw(texture, srcRect, destRect, spriteFlip);
+		SDL_Point pt;
+		pt.x = transform->position.x;
+		pt.y = transform->position.y;
+
+		TextureManager::Draw(texture, srcRect, destRect, spriteFlip, transform->angle , &pt);
 	}
 
 	void Play(std::string animName)

@@ -52,7 +52,7 @@ int main(int argc,  char *argv[])
 		curr++;
 		if (curr % MAX_TIME == 0)
 		{
-			std::cout << extra_time << " EXTRA TIME" << std::endl;
+			//std::cout << extra_time << " EXTRA TIME" << std::endl;
 			total_time += extra_time;
 			extra_time = 0;
 		}

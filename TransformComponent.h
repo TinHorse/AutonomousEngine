@@ -1,4 +1,5 @@
 #pragma once
+#include "SDL.h"
 #include "ECS.h"
 #include "Vector2D.h"
 
@@ -9,8 +10,9 @@ public:
 	Vector2D velocity;
 	Vector2D collision_response;
 	Vector2D previous_velocity;
-	Vector2D centre;
+	SDL_Point centre;
 	float speed = 1.5f;
+	float top_speed = 1.5f;
 	bool dynamic = false;
 
 	int height = 128;
@@ -60,6 +62,7 @@ public:
 	{
 		if (dynamic)
 		{
+			
 			position += collision_response;
 			collision_response.Zero();
 
@@ -68,8 +71,18 @@ public:
 			previous_velocity = velocity;
 			velocity.Zero();
 
+			
 			centre.x = position.x + ((width * scale) / 2);
 			centre.y = position.y + ((height * scale) / 2);
+			
+			
+			if (angle)
+			{
+				if (speed < 0.1f) speed = 0;
+				Vector2D direction = rotate_point(0, 0, toRad(angle), Vector2D(0,-1.f));
+				position += direction * speed;
+				velocity.Zero();
+			}
 		}
 	}
 

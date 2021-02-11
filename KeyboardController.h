@@ -32,25 +32,33 @@ public:
 		{
 			if (keystate[SDL_SCANCODE_W])
 			{
-				transform->velocity.y = -1;
-				currentKey = walk_up;
-				//sprite->Play("walk");
+				if (transform->speed < transform->top_speed)
+				{
+					transform->speed += 0.1f;
+					currentKey = walk_up;
+					//sprite->Play("walk");
+				}
 			}
 			if (keystate[SDL_SCANCODE_S]) {
-				transform->velocity.y = 1;
-				currentKey = walk_down;
-				//sprite->Play("walk");
+				if (transform->speed > 0)
+				{
+					transform->speed -= 0.1f;
+					currentKey = walk_down;
+					//sprite->Play("walk");
+				}
 			}
 			if (keystate[SDL_SCANCODE_A])
 			{
-				transform->velocity.x = -1;
+				transform->angle--;
+				//transform->velocity.x = -1;
 				currentKey = walk_left;
 				//sprite->Play("walk");
 				sprite->spriteFlip = SDL_FLIP_HORIZONTAL;
 			}
 			if (keystate[SDL_SCANCODE_D])
 			{
-				transform->velocity.x = 1;
+				transform->angle++;
+				//transform->velocity.x = 1;
 				currentKey = walk_right;
 				//sprite->Play("walk");
 				sprite->spriteFlip = SDL_FLIP_NONE;
@@ -67,21 +75,21 @@ public:
 			switch (Game::event.key.keysym.sym)
 			{
 			case SDLK_w:
-				transform->velocity.y = 0;
+				//transform->velocity.y = 0;
 				if (!transform->velocity.x)
 				{
 					sprite->Play("idle");
 				}
 				break;
 			case SDLK_s:
-				transform->velocity.y = 0;
+				//transform->velocity.y = 0;
 				if (!transform->velocity.x)
 				{
 					sprite->Play("idle");
 				}
 				break;
 			case SDLK_a:
-				transform->velocity.x = 0;
+				//transform->velocity.x = 0;
 				if (!transform->velocity.y)
 				{
 					sprite->Play("idle");
@@ -90,7 +98,7 @@ public:
 				//sprite->spriteFlip = SDL_FLIP_NONE;
 				break;
 			case SDLK_d:
-				transform->velocity.x = 0;
+				//transform->velocity.x = 0;
 				if (!transform->velocity.y)
 				{
 					sprite->Play("idle");

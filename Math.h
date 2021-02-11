@@ -2,6 +2,8 @@
 #include "Vector2D.h"
 #include <random>
 
+#define PI 3.14159265359
+
 struct Math
 {
 	static float distance(const Vector2D& vA, const Vector2D& vB)
@@ -56,4 +58,9 @@ static Vector2D rotate_point(const float& cx, const float& cy, const float& angl
 	point.x = xnew + cx;
 	point.y = ynew + cy;
 	return point;
+}
+
+static double toRad(double degrees)
+{
+	return (degrees * PI / 180.f);
 }

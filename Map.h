@@ -4,7 +4,7 @@
 class Map
 {
 public:
-	Map(std::string tID, int mpTileSize, int mpScale);
+	Map(std::string tID, int mpTileSize, float mpScale);
 	~Map();
 
 	void AddTile(int srcX, int srcY, int xpos, int ypos);
@@ -12,7 +12,7 @@ public:
 
 private:
 	std::string texID;
-	int mapScale;
+	float mapScale;
 	int tileSize;
 	int scaledSize;
 };

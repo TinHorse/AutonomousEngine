@@ -42,7 +42,7 @@ public:
 	Collisionmesh() = default;
 
 	void update();
-	void LoadMesh(const char * path, int sX, int sY, int sTileX, int sTileY, int scale);
+	void LoadMesh(const char * path, int sX, int sY, int sTileX, int sTileY, float scale);
 
 	ColCell& getCell(int x, int y)
 	{

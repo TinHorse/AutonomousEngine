@@ -35,7 +35,7 @@ void Navmesh::Init(int mCols, int mRows)
 	ClearMesh();
 }
 
-void Navmesh::LoadMesh(const char * path, int sX, int sY, int sTileX, int sTileY, int scale)
+void Navmesh::LoadMesh(const char * path, int sX, int sY, int sTileX, int sTileY, float scale)
 {
 	Init(sX, sY);
 	tileSizeX = sTileX * scale;
@@ -89,7 +89,6 @@ bool Navmesh::CalculatePath(Entity* entity, std::stack<Vector2D>& path, const Ve
 	// check if distance is greater than the limit
 	if (Math::distance(current->x, current->y, target->x, target->y) > 9)
 	{
-		//std::cout << Math::distance(curLoc, targLoc) << " dist" << std::endl;
 		int targX = target->x;
 		int targY = target->y;
 		target = getNodeAt((targX - current->x) / 2 + current->x, (targY - current->y) / 2 + current->y);

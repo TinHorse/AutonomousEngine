@@ -64,3 +64,16 @@ static double toRad(double degrees)
 {
 	return (degrees * PI / 180.f);
 }
+
+static double toDeg(double radians)
+{
+	float deg = radians * 180.f / PI;
+	deg *= -1.f;
+	//if (deg < 0) deg += 360;
+	return deg;
+}
+
+static float angleToYAxisRad(const Vector2D& position)
+{
+	return atan2((position.x * -1.f), (-1.f * position.y));
+}

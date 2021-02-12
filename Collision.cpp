@@ -31,15 +31,7 @@ bool Collision::AABB(const SDL_Rect& rectA, const int& Bx, const int& By, const 
 	return false;
 }
 
-bool Collision::AABB(const ColliderComponent & colA, const ColliderComponent & colB)
-{
-	//std::cout << "collider ";
-	if (AABB(colA.collider, colB.collider))
-	{
-		return true;
-	}
-	return false;
-}
+
 
 bool Collision::AABBExtended(const SDL_Rect& rectA, const SDL_Rect& rectB, float extra_radius)
 {
@@ -56,15 +48,7 @@ bool Collision::AABBExtended(const SDL_Rect& rectA, const SDL_Rect& rectB, float
 	return false;
 }
 
-bool Collision::AABBExtended(const ColliderComponent & colA, const ColliderComponent & colB, float extra_radius)
-{
-	//std::cout << "extended collider ";
-	if (AABBExtended(colA.collider, colB.collider, extra_radius))
-	{
-		return true;
-	}
-	return false;
-}
+
 
 bool Collision::CircularCollision(const Vector2D & vecA, const Vector2D & vecB, float radius)
 {
@@ -84,16 +68,46 @@ bool Collision::CircularCollision(const SDL_Rect& rectA, const SDL_Rect& rectB, 
 	return false;
 }
 
-bool Collision::CircularCollision(const ColliderComponent & colA, const ColliderComponent & colB, float radius)
+
+bool Collision::SATQuery(const Rect& cA, const Rect& cB, float radial_scale)
 {
-	if (CircularCollision(colA.collider, colB.collider, radius))
+	float overlap = INFINITY;
+
+	for (int a = 0; a < cA.edges.size(); a++)
 	{
-		return true;
+		// Find axis projection of each edge A
+		int b = (a + 1) % cA.edges.size();
+		Vector2D axisProj = { -(cA.edges[b].y - cA.edges[a].y), (cA.edges[b].x - cA.edges[a].x) };
+
+		// Find min max of colA
+		float min_cA = INFINITY; float max_cA = -INFINITY;
+		for (int p = 0; p < cA.edges.size(); p++)
+		{
+			float q = radial_scale * (cA.edges[p].x * axisProj.x + cA.edges[p].y * axisProj.y);
+			min_cA = std::min(min_cA, q);
+			max_cA = std::max(max_cA, q);
+		}
+
+		// Find min max of colB
+		float min_cB = INFINITY; float max_cB = -INFINITY;
+		for (int p = 0; p < cB.edges.size(); p++)
+		{
+			float q = radial_scale * (cB.edges[p].x * axisProj.x + cB.edges[p].y * axisProj.y);
+			min_cB = std::min(min_cB, q);
+			max_cB = std::max(max_cB, q);
+		}
+
+		// Calculate overlap along projected axis
+		overlap = std::min(std::min(max_cA, max_cB) - std::max(min_cA, min_cB), overlap);
+
+
+		if (!(max_cB >= min_cA && max_cA >= min_cB))
+			return false;
+
 	}
-	return false;
+
+	return true;
 }
-
-
 
 Vector2D Collision::SAT(const Rect& cA, const Rect& cB, const SDL_Point& centreA, const SDL_Point& centreB)
 {
@@ -186,9 +200,4 @@ Vector2D Collision::CalculateOpposingForce(const SDL_Rect & rectA, const SDL_Rec
 	//std::cout << "other" << std::endl;
 	return Vector2D(rectA.x + (rectA.w / 2.f) - rectB.x + (rectB.w / 2.f),rectA.y + (rectA.h / 2.f) - rectB.y + (rectB.h / 2.f)).Normalize() * mag;
 
-}
-
-Vector2D Collision::CalculateOpposingForce(const ColliderComponent & colA, const ColliderComponent & colB, const Vector2D& centreA, const Vector2D& centreB, bool dynamic)
-{
-	return CalculateOpposingForce(colA.collider, colB.collider, centreA, centreB, dynamic);
 }

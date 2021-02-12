@@ -34,7 +34,7 @@ public:
 
 		if (hunger > 100)
 		{
-			health--;
+			//health--;
 		}
 		if (health <= 0)
 		{
@@ -89,6 +89,7 @@ public:
 		currentState = state.current();
 		switch (currentState)
 		{
+			/*
 		case idle:
 			break;
 		case exploring:
@@ -110,6 +111,7 @@ public:
 				s_explore(state_switch, this);
 			}
 			break;
+			*/
 		case followingDynamicTarget:
 			result = s_followDynamicTarget(state_switch, this, target, targetPosition, 20);
 			switch (result)
@@ -136,12 +138,13 @@ public:
 				break;
 			}
 			break;
+			/*
 		case eating:
 			result = s_transfer_IncDec(state_switch, this, target, food, targetValue, 1, -10, 10, 0, 10);
 			switch (result)
 			{
 			case rCONTINUE:
-				setAnimation("eat");
+				//setAnimation("eat");
 				break;
 			case rSUCCESS:
 				target = nullptr;
@@ -155,6 +158,7 @@ public:
 				break;
 			}
 			break;
+			*/
 		case goingToOrigin:
 			target = origin;
 			if (target)
@@ -170,6 +174,7 @@ public:
 				}
 			}
 			break;
+			/*
 		case waitingForFear:
 			result = s_DecThis(state_switch, this, target, fear, -10, 0, 40);
 			switch (result)
@@ -202,6 +207,7 @@ public:
 				break;
 			}
 			break;
+			*/
 		}
 
 		// check state switch
@@ -217,7 +223,7 @@ public:
 
 	void whenDead() override
 	{
-		setAnimation("dead");
+		//setAnimation("dead");
 		carrion--;
 		if (carrion <= 0)
 		{
@@ -257,13 +263,13 @@ public:
 	}
 
 private:
-	int hunger = 100;
-	int fear = 0;
+	int hunger = 0;
+	int fear = 100;
 	int food = 0;
 	int carrion = 0;
 
 	int b_exploring = 0;
-	int b_returningToShepherd = 0;
+	int b_returningToShepherd = 100;
 	int b_fleeing = 0;
 	
 	Entity * target = nullptr;

@@ -11,14 +11,14 @@ public:
 	Vector2D collision_response;
 	Vector2D previous_velocity;
 	SDL_Point centre;
-	float speed = 1.5f;
+	float speed = 0.f;
 	float top_speed = 1.5f;
 	bool dynamic = false;
 
 	int height = 128;
 	int width = 128;
 	float scale = 1;
-	float angle = 0.f;
+	int angle = 0;
 
 	TransformComponent()
 	{
@@ -66,23 +66,22 @@ public:
 			position += collision_response;
 			collision_response.Zero();
 
+			/*
 			velocity.Normalize();
-			position += velocity * speed;
+			position += velocity;
 			previous_velocity = velocity;
 			velocity.Zero();
-
+			*/
 			
 			centre.x = position.x + ((width * scale) / 2);
 			centre.y = position.y + ((height * scale) / 2);
 			
+			//if (angle < -180.f) angle = 179.f;
+			//else if (angle > 180.f) angle = -179.f;
 			
-			if (angle)
-			{
-				if (speed < 0.1f) speed = 0;
-				Vector2D direction = rotate_point(0, 0, toRad(angle), Vector2D(0,-1.f));
-				position += direction * speed;
-				velocity.Zero();
-			}
+			if (speed < 0.1f) speed = 0;
+			Vector2D direction = rotate_point(0, 0, toRad(angle), Vector2D(0,-1.f));
+			position += direction * speed;
 		}
 	}
 

@@ -26,7 +26,7 @@ void Collisionmesh::update()
 	}
 }
 
-void Collisionmesh::LoadMesh(const char * path, int sX, int sY, int sTileX, int sTileY, int scale)
+void Collisionmesh::LoadMesh(const char * path, int sX, int sY, int sTileX, int sTileY, float scale)
 {
 	float scalar = 2.f;
 
@@ -102,10 +102,10 @@ std::vector<ColCell*> Collisionmesh::getRegion(int x, int y)
 
 void Collisionmesh::registerCollider(ColliderComponent * col)
 {
-	int x = col->collider.x;
-	int y = col->collider.y;
-	int w = col->collider.w;
-	int h = col->collider.h;
+	int x = col->transform->position.x;
+	int y = col->transform->position.y;
+	//int w = col->transform->width;
+	//int h = col->transform->height;
 
 	if (checkBounds(x / tileSizeX, y / tileSizeY))
 	{

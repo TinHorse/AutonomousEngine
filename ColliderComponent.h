@@ -14,7 +14,6 @@ extern Collisionmesh collision;
 class ColliderComponent : public Component
 {
 public:
-	SDL_Rect collider;
 	Rect collider_offset;
 
 	std::string tag;
@@ -40,9 +39,12 @@ public:
 	ColliderComponent(std::string mTag, int xpos, int ypos, int size, bool _dynamic)
 	{
 		tag = mTag;
-		collider.x = xpos;
-		collider.y = ypos;
-		collider.w = collider.h = size;
+
+		collider_offset.edges[0] = { float(xpos), float(ypos) };
+		collider_offset.edges[1] = { float(xpos) + size, float(ypos) };
+		collider_offset.edges[2] = { float(xpos) + size, float(ypos + size) };
+		collider_offset.edges[3] = { float(xpos), float(ypos + size) };
+
 		dynamic = _dynamic;
 	}
 
@@ -53,25 +55,22 @@ public:
 
 		texture = TextureManager::LoadTexture("assets/colliderTex.png");
 		srcRect = { 0,0,320,320 };
-		collider.x = transform->position.x;
-		collider.y = transform->position.y;
-		collider.w = transform->width * transform->scale;
-		collider.h = transform->height * transform->scale;
-		destRect = { collider.x, collider.y, collider.w, collider.h };
+		int x = transform->position.x;
+		int y = transform->position.y;
+		int w = transform->width;
+		int h = transform->height;
+		destRect = { x, y, w, h };
 
-		collider_offset.edges[0] = { float(collider.x), float(collider.y) };
-		collider_offset.edges[1] = { float(collider.x) + collider.w, float(collider.y) };
-		collider_offset.edges[2] = { float(collider.x) + collider.w, float(collider.y + collider.h) };
-		collider_offset.edges[3] = { float(collider.x), float(collider.y + collider.h) };
+		collider_offset.edges[0] = { float(x), float(y) };
+		collider_offset.edges[1] = { float(x) + w, float(y) };
+		collider_offset.edges[2] = { float(x) + w, float(y + h) };
+		collider_offset.edges[3] = { float(x), float(y + h) };
 	}
 
 	void Update() override
 	{
 		if (dynamic)
 		{
-			collider.x = static_cast<int>(transform->position.x);
-			collider.y = static_cast<int>(transform->position.y);
-
 			double rad_angle = toRad(transform->angle);
 			auto pos = transform->position;
 			Vector2D centre;
@@ -92,8 +91,8 @@ public:
 			//collider_offset.edges[3] = { float(collider.x), float(collider.y + collider.h) };
 		}
 
-		destRect.x = collider.x - Game::camera.getX();
-		destRect.y = collider.y - Game::camera.getY();
+		destRect.x = transform->position.x - Game::camera.getX();
+		destRect.y = transform->position.y - Game::camera.getY();
 
 		collision.registerCollider(this);
 		if (dynamic)
@@ -112,7 +111,7 @@ public:
 							}
 							else
 							{
-								soft_collision += Collision::SAT(this->collider_offset, body->collider_offset, this->transform->centre, body->transform->centre) * 2.f;
+								hard_collision += Collision::SAT(this->collider_offset, body->collider_offset, this->transform->centre, body->transform->centre);
 							}
 						}
 					}
@@ -123,8 +122,14 @@ public:
 					//std::cout << soft_collision << std::endl;
 				}
 
-				transform->addCollisionResponse(soft_collision);
+				if (hard_collision.x || hard_collision.y)
+				{
+					transform->speed /= 2.f;
+				}
+
+				transform->addCollisionResponse((soft_collision * 0.5f) + hard_collision);
 				soft_collision.Zero();
+				hard_collision.Zero();
 			}
 		}
 	}

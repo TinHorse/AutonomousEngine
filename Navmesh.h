@@ -37,7 +37,7 @@ public:
 	~Navmesh();
 
 	void Init(int mCols, int mRows);
-	void LoadMesh(const char *path, int sX, int sY, int sTileX, int sTileY, int scale);
+	void LoadMesh(const char *path, int sX, int sY, int sTileX, int sTileY, float scale);
 	bool CalculatePath(Entity* entity, std::stack<Vector2D>& path, const Vector2D targetLoc);
 	void ClearMesh();
 

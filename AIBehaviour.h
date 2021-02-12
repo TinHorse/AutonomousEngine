@@ -31,7 +31,7 @@ static Result s_followDynamicTarget(bool state_switch, Entity * entity, Entity *
 {
 	if (target)
 	{
-		if (Collision::AABBExtended(target->GetComponent<ColliderComponent>(), entity->GetComponent<ColliderComponent>(), min_radius))
+		if (Collision::SATQuery(target->GetComponent<ColliderComponent>().collider_offset, entity->GetComponent<ColliderComponent>().collider_offset, min_radius))
 		{
 			entity->GetComponent<PathfindingComponent>().Stop();
 			return rSUCCESS;
@@ -55,7 +55,7 @@ static Result s_followStaticTarget(bool state_switch, Entity * entity, Entity * 
 {
 	if (target)
 	{
-		if (Collision::AABBExtended(target->GetComponent<ColliderComponent>(), entity->GetComponent<ColliderComponent>(), min_radius))
+		if (Collision::SATQuery(target->GetComponent<ColliderComponent>().collider_offset, entity->GetComponent<ColliderComponent>().collider_offset, min_radius))
 		{
 			entity->GetComponent<PathfindingComponent>().Stop();
 			return rSUCCESS;
@@ -76,7 +76,7 @@ static Result s_runAway(bool state_switch, Entity * entity, Entity * enemy, floa
 {
 	if (enemy)
 	{
-		if (!Collision::AABBExtended(enemy->GetComponent<ColliderComponent>(), entity->GetComponent<ColliderComponent>(), radius))
+		if (!Collision::SATQuery(enemy->GetComponent<ColliderComponent>().collider_offset, entity->GetComponent<ColliderComponent>().collider_offset, radius))
 		{
 			return rSUCCESS;
 		}
@@ -100,7 +100,7 @@ static Result s_IncThis(bool state_switch, Entity * entity, Entity * entityOther
 {
 	if (entityOther)
 	{
-		if (Collision::AABBExtended(entity->GetComponent<ColliderComponent>(), entityOther->GetComponent<ColliderComponent>(), max_transfer_radius) || state_switch)
+		if (Collision::SATQuery(entity->GetComponent<ColliderComponent>().collider_offset, entityOther->GetComponent<ColliderComponent>().collider_offset, max_transfer_radius) || state_switch)
 		{
 			if (var < cap)
 			{
@@ -118,7 +118,7 @@ static Result s_DecThis(bool state_switch, Entity * entity, Entity * entityOther
 {
 	if (entityOther)
 	{
-		if (Collision::AABBExtended(entity->GetComponent<ColliderComponent>(), entityOther->GetComponent<ColliderComponent>(), max_transfer_radius) || state_switch)
+		if (Collision::SATQuery(entity->GetComponent<ColliderComponent>().collider_offset, entityOther->GetComponent<ColliderComponent>().collider_offset, max_transfer_radius) || state_switch)
 		{
 			if (var > cap)
 			{
@@ -136,7 +136,7 @@ static Result s_DecOther(bool state_switch, Entity * entity, Entity * entityDec,
 {
 	if (entityDec)
 	{
-		if (Collision::AABBExtended(entity->GetComponent<ColliderComponent>(), entityDec->GetComponent<ColliderComponent>(), max_transfer_radius) || state_switch)
+		if (Collision::SATQuery(entity->GetComponent<ColliderComponent>().collider_offset, entityDec->GetComponent<ColliderComponent>().collider_offset, max_transfer_radius) || state_switch)
 		{
 			if (*var > cap)
 			{
@@ -157,7 +157,7 @@ static Result s_transfer_IncDec(bool state_switch, Entity * entityInc, Entity * 
 {
 	if (entityDec)
 	{
-		if (Collision::AABBExtended(entityInc->GetComponent<ColliderComponent>(), entityDec->GetComponent<ColliderComponent>(), max_transfer_radius) || state_switch)
+		if (Collision::SATQuery(entityInc->GetComponent<ColliderComponent>().collider_offset, entityDec->GetComponent<ColliderComponent>().collider_offset, max_transfer_radius) || state_switch)
 		{
 			if (varInc < capA && *varDec > capB)
 			{
@@ -176,7 +176,7 @@ static Result s_transfer_DecInc(bool state_switch, Entity * entityDec, Entity * 
 {
 	if (entityDec)
 	{
-		if (Collision::AABBExtended(entityInc->GetComponent<ColliderComponent>(), entityDec->GetComponent<ColliderComponent>(), max_transfer_radius) || state_switch)
+		if (Collision::SATQuery(entityInc->GetComponent<ColliderComponent>().collider_offset, entityDec->GetComponent<ColliderComponent>().collider_offset, max_transfer_radius) || state_switch)
 		{
 			if (varDec > capA && *varInc < capB)
 			{

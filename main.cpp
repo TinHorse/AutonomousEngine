@@ -58,7 +58,7 @@ int main(int argc,  char *argv[])
 		}
 		if (curr % (MAX_TIME * 6) == 0)
 		{
-			std::cout << total_time << " ::: TOTAL EXTRA TIME" << std::endl;
+			//std::cout << total_time << " ::: TOTAL EXTRA TIME" << std::endl;
 		}
 		/////
 

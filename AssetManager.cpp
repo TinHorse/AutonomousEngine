@@ -39,11 +39,11 @@ Entity& AssetManager::CreateHunted(Vector2D position, int sizeX, int sizeY, floa
 {
 	auto& hunted = manager->AddEntity<Hunted>(manager->GetGroup(Game::groupPlayers)[0]);
 	manager->addTransformComponent(hunted, position.x, position.y, sizeX, sizeY, scale, true);
-	auto& sprite = manager->addSpriteComponent(hunted, "hunted", true);
-	sprite.addAnimation("idle", 0, 10, 150);
-	sprite.addAnimation("walk", 1, 9, 50);
-	sprite.addAnimation("eat", 2, 6, 50);
-	sprite.addAnimation("dead", 3, 1, 50);
+	auto& sprite = manager->addSpriteComponent(hunted, "player", false);
+	//sprite.addAnimation("idle", 0, 10, 150);
+	//sprite.addAnimation("walk", 1, 9, 50);
+	//sprite.addAnimation("eat", 2, 6, 50);
+	//sprite.addAnimation("dead", 3, 1, 50);
 
 
 	manager->addDynamicColliderComponent(hunted,"hunted", true);
@@ -70,7 +70,7 @@ Entity & AssetManager::CreatePredator(Vector2D position, int sizeX, int sizeY, f
 {
 	auto& predator = manager->AddEntity<Predator>();
 	manager->addTransformComponent(predator, position.x, position.y, sizeX, sizeY, scale, true);
-	manager->addSpriteComponent(predator, "enemy2", false);
+	manager->addSpriteComponent(predator, "player", false);
 	manager->addDynamicColliderComponent(predator, "predator", true);
 	auto& pathfinder = manager->addPathfindingComponent(predator);
 

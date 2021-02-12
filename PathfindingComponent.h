@@ -26,7 +26,20 @@ public:
 		if (moving)
 		{
 			next = path.top();
-			transform->addVelocity((next - transform->position).Normalize());
+
+			float angle = angleToYAxisRad(next - transform->position);
+			float diff = 180.f + (toDeg(angle)) - transform->angle;
+			if (diff < 0) { diff += 360; }
+
+			if(diff > 183)
+				transform->angle += 1;
+			else if (diff < 177)
+				transform->angle -= 1;
+			
+			if (transform->speed < transform->top_speed)
+				transform->speed += 0.1f;
+				
+			//transform->addVelocity((next - transform->position).Normalize());
 			if (Math::distanceNoSqrt(transform->position, path.top()) < min_distance)
 			{
 				// else, pull up next target
@@ -36,7 +49,7 @@ public:
 					max_moves = ((Math::distance(path.top(), transform->position)) / transform->speed) * 1.5f;
 					if (has_target && path.size() == 1)
 					{
-						min_distance = 1;
+						min_distance = 900;
 					}
 				}
 				else
@@ -44,17 +57,20 @@ public:
 					moving = false;
 					recalc = true;
 					transform->velocity = { 0,0 };
+					transform->speed = 0.f;
 					skips = 3;
 					return;
 				}
 			}
 
+			/*
 			max_moves--;
 			if (max_moves < 0)
 			{
 				recalc = true;
 				skips = 2;
 			}
+			*/
 		}
 	}
 
@@ -91,7 +107,7 @@ public:
 		moving = false;
 		move_tries = 0;
 		recalc = false;
-		min_distance = 400;
+		min_distance = 2500;
 		path = std::stack<Vector2D>();
 	}
 
@@ -129,6 +145,7 @@ public:
 	void Stop()
 	{
 		moving = false;
+		transform->speed = 0.f;
 	}
 
 	const bool& recalcFlag()
@@ -153,5 +170,5 @@ private:
 	// movement tries
 	int move_tries;
 	int max_moves;
-	float min_distance;
+	float min_distance = 2500;
 };

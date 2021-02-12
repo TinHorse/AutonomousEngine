@@ -78,6 +78,7 @@ public:
 
 	void PlayAnim(std::string anim, long int ticks)
 	{
+		/*
 		if (ticks % 10 == 0)
 		{
 			if (!anim.empty())
@@ -103,6 +104,7 @@ public:
 				
 			}
 		}
+		*/
 	}
 
 	void LinkComponentPointers() override

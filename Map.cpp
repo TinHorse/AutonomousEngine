@@ -7,7 +7,7 @@
 
 extern EntityManager manager;
 
-Map::Map(std::string tID, int mpTileSize, int mpScale) : texID(tID), tileSize(mpTileSize), mapScale(mpScale)
+Map::Map(std::string tID, int mpTileSize, float mpScale) : texID(tID), tileSize(mpTileSize), mapScale(mpScale)
 {
 	scaledSize = mpTileSize * mpScale;
 }
@@ -21,7 +21,6 @@ void Map::AddTile(int srcX, int srcY, int xpos, int ypos)
 {
 	auto& tile(manager.AddEntity());
 	manager.addTileComponent(tile, srcX, srcY, xpos, ypos, mapScale, tileSize, texID);
-	//tile.AddComponent<TileComponent>(srcX, srcY, xpos, ypos, mapScale, tileSize, texID);
 	manager.AddToGroup(&tile, Game::groupTiles);
 }
 
@@ -39,9 +38,9 @@ void Map::LoadMap(std::string path, int sizeX, int sizeY)
 		for (int x = 0; x < sizeX; x++)
 		{
 			mapFile.get(t);
-			srcY = atoi(&t) * 32;
+			srcY = atoi(&t) * tileSize;
 			mapFile.get(t);
-			srcX = atoi(&t) * 32;
+			srcX = atoi(&t) * tileSize;
 			AddTile(srcX, srcY, x * scaledSize, y * scaledSize);
 			mapFile.ignore();
 		}

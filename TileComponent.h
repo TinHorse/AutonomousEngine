@@ -13,7 +13,7 @@ public:
 
 	TileComponent() = default;
 
-	TileComponent(int srcX, int srcY, int xpos, int ypos, int tscale, int tsize, std::string tID)
+	TileComponent(int srcX, int srcY, int xpos, int ypos, float tscale, int tsize, std::string tID)
 	{
 		texture = Game::assets->GetTexture(tID);
 		texID = tID;

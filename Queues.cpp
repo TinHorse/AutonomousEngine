@@ -34,23 +34,17 @@ void PathfindingQueue::executePathfindingRequests(double maxTime)
 		auto request = mapIndex->second;
 		num_requests++;
 		// check for deleted entities
-		if (deletedEntities->find(entity) == deletedEntities->end())
+		if (request.targetEntity)
 		{
-			if (request.targetEntity)
-			{
-				if (deletedEntities->find(request.targetEntity) == deletedEntities->end())
-				{
-					request.entity->GetComponent<PathfindingComponent>().FindPathToTarget(request.targetEntity);
-				}
-			}
-			else if(request.target != Vector2D(0,0))
-			{
-				request.entity->GetComponent<PathfindingComponent>().FindPath(request.target);
-			}
-			else
-			{
-				request.entity->GetComponent<PathfindingComponent>().Explore();
-			}
+			request.entity->GetComponent<PathfindingComponent>().FindPathToTarget(request.targetEntity);
+		}
+		else if (request.target != Vector2D(0, 0))
+		{
+			request.entity->GetComponent<PathfindingComponent>().FindPath(request.target);
+		}
+		else
+		{
+			request.entity->GetComponent<PathfindingComponent>().Explore();
 		}
 
 		// clear current request
@@ -58,7 +52,20 @@ void PathfindingQueue::executePathfindingRequests(double maxTime)
 	}
 }
 
-void PathfindingQueue::UpdateDeletedEntities(std::set<Entity*>* entities)
+void PathfindingQueue::refresh()
 {
-	deletedEntities = entities;
+	for (auto e : *deletedEntities)
+	{
+		if (pathfinding_requests.find(e) != pathfinding_requests.end())
+		{
+			pathfinding_requests.erase(e);
+		}
+		for (auto entity : pathfinding_requests)
+		{
+			if (entity.second.targetEntity == e)
+			{
+				pathfinding_requests.erase(e);
+			}
+		}
+	}
 }

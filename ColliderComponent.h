@@ -26,15 +26,17 @@ public:
 	Vector2D soft_collision;
 	Vector2D hard_collision;
 	bool dynamic = false;
-	bool overridden = false;
+
+	bool isColliding = false;
+	bool friction = true;
 
 	TransformComponent *transform;
 	ColliderComponent() = default;
-	ColliderComponent(std::string mTag, bool _dynamic, bool _overridden = false)
+	ColliderComponent(std::string mTag, bool _dynamic, bool _friction = true)
 	{
 		tag = mTag;
 		dynamic = _dynamic;
-		overridden = _overridden;
+		friction = _friction;
 	}
 	ColliderComponent(std::string mTag, int xpos, int ypos, int size, bool _dynamic)
 	{
@@ -57,8 +59,14 @@ public:
 		srcRect = { 0,0,320,320 };
 		int x = transform->position.x;
 		int y = transform->position.y;
-		int w = transform->width;
-		int h = transform->height;
+		int w = transform->width * transform->scale;
+		int h = transform->height * transform->scale;
+
+		if (!dynamic)
+		{
+			w *= 2;
+			h *= 2;
+		}
 		destRect = { x, y, w, h };
 
 		collider_offset.edges[0] = { float(x), float(y) };
@@ -97,6 +105,8 @@ public:
 		collision.registerCollider(this);
 		if (dynamic)
 		{
+			isColliding = false;
+
 			if (current_cell)
 			{
 				for (auto* c : current_cell->getRegion())
@@ -117,14 +127,21 @@ public:
 					}
 				}
 
-				if (overridden && soft_collision.x)
-				{
-					//std::cout << soft_collision << std::endl;
-				}
-
 				if (hard_collision.x || hard_collision.y)
 				{
-					transform->speed /= 2.f;
+					if (friction)
+					{
+						transform->speed /= 2.f;
+					}
+					isColliding = true;
+				}
+				else if (soft_collision.x || soft_collision.y)
+				{
+					if (friction)
+					{
+						transform->speed /= 1.05f;
+					}
+					isColliding = true;
 				}
 
 				transform->addCollisionResponse((soft_collision * 0.5f) + hard_collision);
@@ -136,7 +153,7 @@ public:
 
 	void Draw() override
 	{
-		TextureManager::Draw(texture, srcRect, destRect, SDL_FLIP_NONE);
+		TextureManager::Draw(texture, srcRect, destRect, SDL_FLIP_NONE, transform->angle, &transform->centre);
 	}
 
 	void LinkComponentPointers() override

@@ -16,6 +16,7 @@ public:
 	Entity& CreateHunted(Vector2D position, int sizeX = 32, int sizeY = 32, float scale = 1.f);
 	Entity& CreateFood(Vector2D position, int sizeX = 32, int sizeY = 32, float scale = 1.f);
 	Entity& CreatePredator(Vector2D position, int sizeX = 32, int sizeY = 32, float scale = 1.f);
+	Entity& CreateCannonBall(Vector2D position, int angle, float speed, int sizeX = 32, int sizeY = 32, float scale = 1.f);
 
 	// Texture Management
 	void AddTexture(std::string texID, const char *path);

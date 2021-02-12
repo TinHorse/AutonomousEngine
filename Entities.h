@@ -10,3 +10,4 @@ constexpr int i_behaviour_update = 30;
 #include "Grass.h"
 #include "Hunted.h"
 #include "Predator.h"
+#include "CannonBall.h"

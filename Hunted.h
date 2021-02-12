@@ -40,6 +40,7 @@ public:
 		{
 			carrion = 100;
 			isDead = true;
+			std::cout << "dead" << std::endl;
 			GetComponent<PathfindingComponent>().Stop();
 		}
 		if (food > 0)
@@ -224,11 +225,11 @@ public:
 	void whenDead() override
 	{
 		//setAnimation("dead");
-		carrion--;
-		if (carrion <= 0)
-		{
+		//carrion--;
+		//if (carrion <= 0)
+		//{
 			this->Destroy();
-		}
+		//}
 	}
 
 	void refresh() override

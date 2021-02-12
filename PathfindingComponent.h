@@ -56,7 +56,6 @@ public:
 				{
 					moving = false;
 					recalc = true;
-					transform->velocity = { 0,0 };
 					transform->speed = 0.f;
 					skips = 3;
 					return;

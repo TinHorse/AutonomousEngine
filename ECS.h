@@ -97,10 +97,11 @@ public:
 		return componentBitSet[GetComponentTypeID<T>()]; // Returns true if the queried component type (i.e. typename) is present. Since the BitSet stores bools for each component type, this code simply gets the component type ID of the queried component and checks the BitSet at that index.
 	}
 
-
+	/*
 	template<typename T, typename ...TArgs> // adds a component T to the entity (TArgs are constructor arguments of the component)
 	// NOTE: "typename ... var" means that this is a variadic template. variadic templates take a variable number of arguments.
 	// If you want the template to only take a positive number of arguments (i.e. not 0), then you can write it like above, with the first argument "typename T," followed by the variadic arguments "typename ...TArgs"
+	
 	T & AddComponent(TArgs && ...mArgs)
 	{
 		T *comp(new T(std::forward<TArgs>(mArgs)...)); // make new object of the specified component
@@ -112,9 +113,10 @@ public:
 		comp->Init(); // intialize component
 		return *comp;
 	}
+	*/
 
 	template<typename T>
-	T & AddColliderComponent(T* comp)
+	T & addComponent(T* comp)
 	{
 		comp->entity = this; // sets component's entity (owner) to the current entity
 		componentArray[GetComponentTypeID<T>()] = comp; // add component to the entity's component array

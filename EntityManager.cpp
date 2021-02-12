@@ -36,8 +36,6 @@ void EntityManager::Update()
 		if (index-- <= 0) { break; };
 		comp.Update();
 	}
-	
-
 
 	index = index_tiles;
 	for (auto& comp : compTile)
@@ -47,6 +45,12 @@ void EntityManager::Update()
 	}
 	index = index_path;
 	for (auto& comp : compPath)
+	{
+		if (index-- <= 0) { break; };
+		comp.Update();
+	}
+	index = index_proj;
+	for (auto& comp : compProjectile)
 	{
 		if (index-- <= 0) { break; };
 		comp.Update();
@@ -66,6 +70,8 @@ void EntityManager::Refresh()
 
 	if (deleted_entities.size() > 0)
 	{
+
+		// refresh agents
 		for (auto* e : GetGroup(Game::groupHunted))
 		{
 			e->refresh();
@@ -160,6 +166,26 @@ void EntityManager::Refresh()
 			}
 			index++;
 		}
+		index = 0;
+		for (auto& comp : compProjectile)
+		{
+			if (index >= index_proj) { break; };
+			if (!comp.IsActive())
+			{
+				while (index_proj > 0 && !compProjectile[index_proj - 1].IsActive())
+				{
+					index_proj--;
+				}
+				if (index_proj > 0 && index_proj != index)
+				{
+					Entity* entity = compProjectile[index_proj - 1].entity;
+					std::swap(compProjectile[index], compProjectile[index_proj - 1]);
+					entity->SetComponent<ProjectileComponent>(&compProjectile[index]);
+					index_proj--;
+				}
+			}
+			index++;
+		}
 
 		// removes entity groups if they are inactive. This is called the erase-remove idiom
 		for (auto i(0u); i < maxGroups; i++)
@@ -173,6 +199,7 @@ void EntityManager::Refresh()
 				std::end(v));
 		}
 
+		int size = entities.size();
 		// removes entities if they are inactive. This is called the erase-remove idiom
 		entities.erase(std::remove_if(std::begin(entities), std::end(entities), // iterates through entities
 			[](const std::unique_ptr<Entity> &mEntity) // creates unique ptr to each element

@@ -7,9 +7,7 @@ class TransformComponent : public Component
 {
 public:
 	Vector2D position;
-	Vector2D velocity;
 	Vector2D collision_response;
-	Vector2D previous_velocity;
 	SDL_Point centre;
 	float speed = 0.f;
 	float top_speed = 1.5f;
@@ -40,7 +38,7 @@ public:
 		dynamic = dyn;
 	}
 
-	TransformComponent(float x, float y, int w, int h, float sc, bool dyn)
+	TransformComponent(float x, float y, int w, int h, float sc, bool dyn, int _angle = 0, float _speed = 0.f)
 	{
 		position.x = x;
 		position.y = y;
@@ -48,12 +46,12 @@ public:
 		height = h;
 		scale = sc;
 		dynamic = dyn;
+		angle = _angle;
+		speed = _speed;
 	}
 
 	void Init() override
 	{
-		velocity.Zero();
-
 		centre.x = position.x + ((width * scale) / 2);
 		centre.y = position.y + ((height * scale) / 2);
 	}
@@ -62,22 +60,12 @@ public:
 	{
 		if (dynamic)
 		{
-			
 			position += collision_response;
 			collision_response.Zero();
-
-			/*
-			velocity.Normalize();
-			position += velocity;
-			previous_velocity = velocity;
-			velocity.Zero();
-			*/
 			
 			centre.x = position.x + ((width * scale) / 2);
 			centre.y = position.y + ((height * scale) / 2);
 			
-			//if (angle < -180.f) angle = 179.f;
-			//else if (angle > 180.f) angle = -179.f;
 			
 			if (speed < 0.1f) speed = 0;
 			Vector2D direction = rotate_point(0, 0, toRad(angle), Vector2D(0,-1.f));
@@ -85,19 +73,9 @@ public:
 		}
 	}
 
-	void addVelocity(const Vector2D force)
-	{
-		velocity += force;
-	}
-
 	void addCollisionResponse(const Vector2D& force)
 	{
 		collision_response += force;
-	}
-
-	const Vector2D& getVelocity()
-	{
-		return previous_velocity;
 	}
 
 };

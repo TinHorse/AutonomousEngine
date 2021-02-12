@@ -28,7 +28,7 @@ AssetManager *Game::assets = new AssetManager(&manager);
 Navmesh navigation;
 Collisionmesh collision;
 
-PathfindingQueue pathfindingQueue;
+PathfindingQueue pathfindingQueue(manager);
 
 
 bool Game::isRunning = false;
@@ -101,9 +101,9 @@ void Game::Init(const char * title, int xpos, int ypos, int width, int height, b
 	camera.Init(t.position.x, t.position.y, 2000, 2000);
 
 	// Create Hunted
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 15; i++)
 	{
-		for (int j = 0; j < 10; j++)
+		for (int j = 0; j < 15; j++)
 		{
 			assets->CreateHunted(Vector2D(400+i * 40, 400+j * 40), 85, 205, 0.2f);
 		}
@@ -134,6 +134,7 @@ auto& tiles(manager.GetGroup(Game::groupTiles));
 auto& hunted(manager.GetGroup(Game::groupHunted));
 auto& foods(manager.GetGroup(Game::groupFood));
 auto& predators(manager.GetGroup(Game::groupPredators));
+auto& projectiles(manager.GetGroup(Game::groupProjectiles));
 
 void Game::HandleEvents()
 {
@@ -170,6 +171,10 @@ void Game::Update()
 	{
 		p->update();
 	}
+	for (auto* p : projectiles)
+	{
+		p->update();
+	}
 
 
 	Vector2D offset(-400, -300);
@@ -184,10 +189,11 @@ void Game::Update()
 
 void Game::ExecuteQueues(double maxTime)
 {
+	pathfindingQueue.refresh();
+
 	auto start = std::chrono::high_resolution_clock().now();
 	//std::cout << maxTime << " Max time" << std::endl;
 
-	pathfindingQueue.UpdateDeletedEntities(manager.getDeletedEntities());
 	if (maxTime > 0)
 	{
 		pathfindingQueue.executePathfindingRequests(maxTime);
@@ -220,7 +226,7 @@ void Game::Render() // note that all draw functions have to be called inside the
 	{
 		if (Math::distance(c->GetComponent<TransformComponent>().position, player->GetComponent<TransformComponent>().position) < 300)
 		{
-			//c->GetComponent<ColliderComponent>().Draw();
+			c->GetComponent<ColliderComponent>().Draw();
 		}
 	}
 	for (auto* h : hunted)
@@ -228,6 +234,7 @@ void Game::Render() // note that all draw functions have to be called inside the
 		if (Math::distance(h->GetComponent<TransformComponent>().position, player->GetComponent<TransformComponent>().position) < 300)
 		{
 			h->GetComponent<SpriteComponent>().Draw();
+			h->GetComponent<ColliderComponent>().Draw();
 		}
 	}
 	for (auto* f : foods)
@@ -247,6 +254,16 @@ void Game::Render() // note that all draw functions have to be called inside the
 	for (auto* p : players)
 	{
 		p->GetComponent<SpriteComponent>().Draw();
+		p->GetComponent<ColliderComponent>().Draw();
+	}
+
+	for (auto* p : projectiles)
+	{
+		if (Math::distance(p->GetComponent<TransformComponent>().position, player->GetComponent<TransformComponent>().position) < 300)
+		{
+			p->GetComponent<ProjectileComponent>().Draw();
+			p->GetComponent<ColliderComponent>().Draw();
+		}
 	}
 
 	SDL_RenderPresent(renderer);

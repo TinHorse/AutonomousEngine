@@ -2,6 +2,7 @@
 #include "ECS.h"
 #include "Components.h"
 #include <set>
+#include <cassert>
 
 class EntityManager
 {
@@ -34,16 +35,18 @@ public:
 	template<typename ...TArgs>
 	TransformComponent& addTransformComponent(Entity& entity, TArgs && ...args)
 	{
+		assert(index_tran < 5000 && "index overflow");
 		compTran[index_tran] = TransformComponent(std::forward<TArgs>(args)...);
-		entity.AddColliderComponent<TransformComponent>(&compTran[index_tran]);
+		entity.addComponent<TransformComponent>(&compTran[index_tran]);
 		return compTran[index_tran++];
 	}
 
 	template<typename ...TArgs>
 	SpriteComponent& addSpriteComponent(Entity& entity, TArgs && ...args)
 	{
+		assert(index_tran < 5000 && "index overflow");
 		compSprite[index_sprites] = SpriteComponent(std::forward<TArgs>(args)...);
-		entity.AddColliderComponent<SpriteComponent>(&compSprite[index_sprites]);
+		entity.addComponent<SpriteComponent>(&compSprite[index_sprites]);
 		return compSprite[index_sprites++];
 	}
 
@@ -51,41 +54,54 @@ public:
 	KeyboardController& addKeyboardController(Entity& entity, TArgs && ...args)
 	{
 		compKeyboard[index_keyboard] = KeyboardController(std::forward<TArgs>(args)...);
-		entity.AddColliderComponent<KeyboardController>(&compKeyboard[index_keyboard]);
+		entity.addComponent<KeyboardController>(&compKeyboard[index_keyboard]);
 		return compKeyboard[index_keyboard++];
 	}
 
 	template<typename ...TArgs>
 	ColliderComponent& addStaticColliderComponent(Entity& entity, TArgs && ...args)
 	{
+		assert(index_tran < 5000 && "index overflow");
 		compStaticColl[index_static_coll] = ColliderComponent(std::forward<TArgs>(args)...);
-		entity.AddColliderComponent<ColliderComponent>(&compStaticColl[index_static_coll]);
+		entity.addComponent<ColliderComponent>(&compStaticColl[index_static_coll]);
 		return compStaticColl[index_static_coll++];
 	}
 
 	template<typename ...TArgs>
 	ColliderComponent& addDynamicColliderComponent(Entity& entity, TArgs && ...args)
 	{
+		assert(index_tran < 5000 && "index overflow");
 		compDynamicColl[index_dynamic_coll] = ColliderComponent(std::forward<TArgs>(args)...);
-		entity.AddColliderComponent<ColliderComponent>(&compDynamicColl[index_dynamic_coll]);
+		entity.addComponent<ColliderComponent>(&compDynamicColl[index_dynamic_coll]);
 		return compDynamicColl[index_dynamic_coll++];
 	}
 
 	template<typename ...TArgs>
 	TileComponent& addTileComponent(Entity& entity, TArgs && ...args)
 	{
+		assert(index_tran < 5000 && "index overflow");
 		compTile[index_tiles] = TileComponent(std::forward<TArgs>(args)...);
-		entity.AddColliderComponent<TileComponent>(&compTile[index_tiles]);
+		entity.addComponent<TileComponent>(&compTile[index_tiles]);
 		return compTile[index_tiles++];
 	}
 
 	template<typename ...TArgs>
 	PathfindingComponent& addPathfindingComponent(Entity& entity, TArgs && ...args)
 	{
+		assert(index_tran < 5000 && "index overflow");
 		compPath[index_path] = PathfindingComponent(std::forward<TArgs>(args)...);
-		entity.AddColliderComponent<PathfindingComponent>(&compPath[index_path]);
+		entity.addComponent<PathfindingComponent>(&compPath[index_path]);
 		return compPath[index_path++];
 	}	
+
+	template<typename ...TArgs>
+	ProjectileComponent& addProjectileComponent(Entity& entity, TArgs && ...args)
+	{
+		assert(index_tran < 5000 && "index overflow");
+		compProjectile[index_proj] = ProjectileComponent(std::forward<TArgs>(args)...);
+		entity.addComponent<ProjectileComponent>(&compProjectile[index_proj]);
+		return compProjectile[index_proj++];
+	}
 
 
 private:
@@ -96,6 +112,7 @@ private:
 	std::array<ColliderComponent, 5000> compDynamicColl;
 	std::array<TileComponent, 5000> compTile;
 	std::array<PathfindingComponent, 5000> compPath;
+	std::array<ProjectileComponent, 5000> compProjectile;
 
 	int index_tran = 0;
 	int index_sprites = 0;
@@ -104,6 +121,7 @@ private:
 	int index_dynamic_coll = 0;
 	int index_tiles = 0;
 	int index_path = 0;
+	int index_proj = 0;
 
 	std::vector<std::unique_ptr<Entity>> entities;
 	std::array<std::vector<Entity*>, maxGroups> groupedEntities; // same as entities, but grouped for rendering

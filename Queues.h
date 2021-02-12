@@ -1,6 +1,7 @@
 #pragma once
 #include "Components.h"
 #include <queue>
+#include "EntityManager.h"
 
 struct PathfindingRequest
 {
@@ -16,11 +17,16 @@ struct PathfindingRequest
 class PathfindingQueue
 {
 public:
+	PathfindingQueue(EntityManager& mManager)
+	{
+		deletedEntities = mManager.getDeletedEntities();
+	}
+
 	void makePathfindingRequest(Entity * entity);
 	void makePathfindingRequest(Entity * entity, const Vector2D& target);
 	void makePathfindingRequest(Entity * entity, Entity * targetEntity);
 	void executePathfindingRequests(double maxTime);
-	void UpdateDeletedEntities(std::set<Entity*>* entities);
+	void refresh();
 
 private:
 	std::map<Entity*, PathfindingRequest> pathfinding_requests;

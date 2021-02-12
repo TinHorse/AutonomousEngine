@@ -72,11 +72,23 @@ Entity & AssetManager::CreatePredator(Vector2D position, int sizeX, int sizeY, f
 	manager->addTransformComponent(predator, position.x, position.y, sizeX, sizeY, scale, true);
 	manager->addSpriteComponent(predator, "player", false);
 	manager->addDynamicColliderComponent(predator, "predator", true);
-	auto& pathfinder = manager->addPathfindingComponent(predator);
+	manager->addPathfindingComponent(predator);
 
 	manager->AddToGroup(&predator, Game::groupPredators);
 
 	return predator;
+}
+
+Entity & AssetManager::CreateCannonBall(Vector2D position, int angle, float speed, int sizeX, int sizeY, float scale)
+{
+	auto& ball = manager->AddEntity<CannonBall>();
+	manager->addTransformComponent(ball, position.x, position.y, sizeX, sizeY, scale, true, angle, speed);
+	manager->addDynamicColliderComponent(ball, "cannonBall", true, false);
+	manager->addProjectileComponent(ball, position.x, position.y, scale, sizeX, sizeY, "player");
+
+	manager->AddToGroup(&ball, Game::groupProjectiles);
+
+	return ball;
 }
 
 void AssetManager::AddTexture(std::string texID, const char *path)

@@ -1,5 +1,5 @@
 #pragma once
-//#include "Game.h"
+#include "Game.h"
 #include "ECS.h"
 
 
@@ -26,7 +26,6 @@ public:
 	void Update() override
 	{
 		const Uint8* keystate = SDL_GetKeyboardState(NULL);
-		transform->velocity.Zero();
 		currentKey = idle;
 		if (keystate)
 		{
@@ -35,7 +34,7 @@ public:
 				if (transform->speed < transform->top_speed)
 				{
 					transform->speed += 0.1f;
-					currentKey = walk_up;
+					//currentKey = walk_up;
 					//sprite->Play("walk");
 				}
 			}
@@ -43,30 +42,24 @@ public:
 				if (transform->speed > 0)
 				{
 					transform->speed -= 0.1f;
-					currentKey = walk_down;
-					//sprite->Play("walk");
+					//currentKey = walk_down;
 				}
 			}
 			if (keystate[SDL_SCANCODE_A])
 			{
 				transform->angle--;
-				//transform->velocity.x = -1;
-				currentKey = walk_left;
-				//sprite->Play("walk");
 				sprite->spriteFlip = SDL_FLIP_HORIZONTAL;
 			}
 			if (keystate[SDL_SCANCODE_D])
 			{
 				transform->angle++;
-				//transform->velocity.x = 1;
-				currentKey = walk_right;
-				//sprite->Play("walk");
 				sprite->spriteFlip = SDL_FLIP_NONE;
 			}
 			if (keystate[SDL_SCANCODE_SPACE])
 			{
-				currentKey = interact;
-				//sprite->Play("eat");
+				//currentKey = interact;
+				float angle = entity->GetComponent<TransformComponent>().angle;
+				Game::assets->CreateCannonBall(Vector2D(transform->centre.x, transform->centre.y), angle + 90, 4.f, 5, 10, 1.f);
 			}
 
 		}
@@ -75,34 +68,13 @@ public:
 			switch (Game::event.key.keysym.sym)
 			{
 			case SDLK_w:
-				//transform->velocity.y = 0;
-				if (!transform->velocity.x)
-				{
-					sprite->Play("idle");
-				}
+				//sprite->Play("idle");
 				break;
 			case SDLK_s:
-				//transform->velocity.y = 0;
-				if (!transform->velocity.x)
-				{
-					sprite->Play("idle");
-				}
 				break;
 			case SDLK_a:
-				//transform->velocity.x = 0;
-				if (!transform->velocity.y)
-				{
-					sprite->Play("idle");
-				}
-				//if(sprite->spriteFlip = SDL_FLIP_NONE)
-				//sprite->spriteFlip = SDL_FLIP_NONE;
 				break;
 			case SDLK_d:
-				//transform->velocity.x = 0;
-				if (!transform->velocity.y)
-				{
-					sprite->Play("idle");
-				}
 				break;
 			case SDLK_ESCAPE:
 				Game::isRunning = false;

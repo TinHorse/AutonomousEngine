@@ -43,11 +43,7 @@ public:
 
 	void Draw() override
 	{
-		SDL_Point pt;
-		pt.x = transform->position.x;
-		pt.y = transform->position.y;
-
-		TextureManager::Draw(texture, srcRect, destRect, SDL_FLIP_NONE, transform->angle, &pt);
+		TextureManager::Draw(texture, srcRect, destRect, SDL_FLIP_NONE, transform->angle, &transform->centrePt);
 	}
 
 	void LinkComponentPointers() override

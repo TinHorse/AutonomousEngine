@@ -61,7 +61,6 @@ public:
 	template<typename ...TArgs>
 	ColliderComponent& addStaticColliderComponent(Entity& entity, TArgs && ...args)
 	{
-		assert(index_tran < 5000 && "index overflow");
 		compStaticColl[index_static_coll] = ColliderComponent(std::forward<TArgs>(args)...);
 		entity.addComponent<ColliderComponent>(&compStaticColl[index_static_coll]);
 		return compStaticColl[index_static_coll++];
@@ -70,7 +69,6 @@ public:
 	template<typename ...TArgs>
 	ColliderComponent& addDynamicColliderComponent(Entity& entity, TArgs && ...args)
 	{
-		assert(index_tran < 5000 && "index overflow");
 		compDynamicColl[index_dynamic_coll] = ColliderComponent(std::forward<TArgs>(args)...);
 		entity.addComponent<ColliderComponent>(&compDynamicColl[index_dynamic_coll]);
 		return compDynamicColl[index_dynamic_coll++];
@@ -79,7 +77,6 @@ public:
 	template<typename ...TArgs>
 	TileComponent& addTileComponent(Entity& entity, TArgs && ...args)
 	{
-		assert(index_tran < 5000 && "index overflow");
 		compTile[index_tiles] = TileComponent(std::forward<TArgs>(args)...);
 		entity.addComponent<TileComponent>(&compTile[index_tiles]);
 		return compTile[index_tiles++];
@@ -88,7 +85,6 @@ public:
 	template<typename ...TArgs>
 	PathfindingComponent& addPathfindingComponent(Entity& entity, TArgs && ...args)
 	{
-		assert(index_tran < 5000 && "index overflow");
 		compPath[index_path] = PathfindingComponent(std::forward<TArgs>(args)...);
 		entity.addComponent<PathfindingComponent>(&compPath[index_path]);
 		return compPath[index_path++];
@@ -97,10 +93,17 @@ public:
 	template<typename ...TArgs>
 	ProjectileComponent& addProjectileComponent(Entity& entity, TArgs && ...args)
 	{
-		assert(index_tran < 5000 && "index overflow");
 		compProjectile[index_proj] = ProjectileComponent(std::forward<TArgs>(args)...);
 		entity.addComponent<ProjectileComponent>(&compProjectile[index_proj]);
 		return compProjectile[index_proj++];
+	}
+
+	template<typename ...TArgs>
+	AuxiliaryComponent& addAuxiliaryComponent(Entity& entity, TArgs && ...args)
+	{
+		compAux[index_aux] = AuxiliaryComponent(std::forward<TArgs>(args)...);
+		entity.addComponent<AuxiliaryComponent>(&compAux[index_aux]);
+		return compAux[index_aux++];
 	}
 
 
@@ -113,6 +116,7 @@ private:
 	std::array<TileComponent, 5000> compTile;
 	std::array<PathfindingComponent, 5000> compPath;
 	std::array<ProjectileComponent, 5000> compProjectile;
+	std::array<AuxiliaryComponent, 5000> compAux;
 
 	int index_tran = 0;
 	int index_sprites = 0;
@@ -122,6 +126,7 @@ private:
 	int index_tiles = 0;
 	int index_path = 0;
 	int index_proj = 0;
+	int index_aux = 0;
 
 	std::vector<std::unique_ptr<Entity>> entities;
 	std::array<std::vector<Entity*>, maxGroups> groupedEntities; // same as entities, but grouped for rendering

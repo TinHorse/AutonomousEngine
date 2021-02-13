@@ -8,7 +8,8 @@ class TransformComponent : public Component
 public:
 	Vector2D position;
 	Vector2D collision_response;
-	SDL_Point centre;
+	Vector2D centre;
+	SDL_Point centrePt;
 	float speed = 0.f;
 	float top_speed = 1.5f;
 	bool dynamic = false;
@@ -54,6 +55,10 @@ public:
 	{
 		centre.x = position.x + ((width * scale) / 2);
 		centre.y = position.y + ((height * scale) / 2);
+
+		centrePt.x = centre.x;
+		centrePt.y = centre.y;
+
 	}
 
 	void Update() override
@@ -65,7 +70,8 @@ public:
 			
 			centre.x = position.x + ((width * scale) / 2);
 			centre.y = position.y + ((height * scale) / 2);
-			
+			centrePt.x = centre.x;
+			centrePt.y = centre.y;
 			
 			if (speed < 0.1f) speed = 0;
 			Vector2D direction = rotate_point(0, 0, toRad(angle), Vector2D(0,-1.f));

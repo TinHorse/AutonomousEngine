@@ -135,6 +135,7 @@ auto& hunted(manager.GetGroup(Game::groupHunted));
 auto& foods(manager.GetGroup(Game::groupFood));
 auto& predators(manager.GetGroup(Game::groupPredators));
 auto& projectiles(manager.GetGroup(Game::groupProjectiles));
+auto& auxiliaries(manager.GetGroup(Game::groupAuxiliaries));
 
 void Game::HandleEvents()
 {
@@ -152,8 +153,6 @@ void Game::HandleEvents()
 void Game::Update()
 {
 	GameTime++; // increment game time
-
-	
 	
 	manager.Refresh();
 	
@@ -175,7 +174,10 @@ void Game::Update()
 	{
 		p->update();
 	}
-
+	for (auto* a : auxiliaries)
+	{
+		a->update();
+	}
 
 	Vector2D offset(-400, -300);
 	camera.Update(offset + player->GetComponent<TransformComponent>().position);
@@ -264,6 +266,14 @@ void Game::Render() // note that all draw functions have to be called inside the
 			p->GetComponent<ProjectileComponent>().Draw();
 			p->GetComponent<ColliderComponent>().Draw();
 		}
+	}
+
+	for (auto* a : auxiliaries)
+	{
+		//if (Math::distance(a->GetComponent<AuxiliaryComponent>(), player->GetComponent<TransformComponent>().position) < 300)
+		//{
+			a->GetComponent<AuxiliaryComponent>().Draw();
+		//}
 	}
 
 	SDL_RenderPresent(renderer);

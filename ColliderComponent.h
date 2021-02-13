@@ -153,7 +153,7 @@ public:
 
 	void Draw() override
 	{
-		TextureManager::Draw(texture, srcRect, destRect, SDL_FLIP_NONE, transform->angle, &transform->centre);
+		TextureManager::Draw(texture, srcRect, destRect, SDL_FLIP_NONE, transform->angle, &transform->centrePt);
 	}
 
 	void LinkComponentPointers() override

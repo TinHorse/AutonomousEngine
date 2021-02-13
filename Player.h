@@ -20,7 +20,10 @@ public:
 
 	void update() override
 	{
-		//switch(this->GetComponent<KeyboardController>().)
+		switch (this->GetComponent<KeyboardController>().current())
+		{
+			
+		}
 	}
 
 	void updateState() override
@@ -40,7 +43,7 @@ public:
 
 	void whenDead() override
 	{
-		
+
 	}
 
 	int& getFear()

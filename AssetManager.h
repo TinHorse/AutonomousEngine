@@ -5,6 +5,8 @@
 #include "Vector2D.h"
 #include "ECS.h"
 
+class TransformComponent;
+
 class AssetManager
 {
 public:
@@ -17,6 +19,7 @@ public:
 	Entity& CreateFood(Vector2D position, int sizeX = 32, int sizeY = 32, float scale = 1.f);
 	Entity& CreatePredator(Vector2D position, int sizeX = 32, int sizeY = 32, float scale = 1.f);
 	Entity& CreateCannonBall(Vector2D position, int angle, float speed, int sizeX = 32, int sizeY = 32, float scale = 1.f);
+	Entity& CreateCannon(Entity * owner, Vector2D position, TransformComponent& transform, int angle, int sizeX, int sizeY, float scale);
 
 	// Texture Management
 	void AddTexture(std::string texID, const char *path);

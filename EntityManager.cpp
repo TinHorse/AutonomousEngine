@@ -55,6 +55,12 @@ void EntityManager::Update()
 		if (index-- <= 0) { break; };
 		comp.Update();
 	}
+	index = index_aux;
+	for (auto& comp : compAux)
+	{
+		if (index-- <= 0) { break; };
+		comp.Update();
+	}
 }
 
 void EntityManager::Refresh()
@@ -80,9 +86,12 @@ void EntityManager::Refresh()
 		{
 			e->refresh();
 		}
+		for (auto* e : GetGroup(Game::groupAuxiliaries))
+		{
+			e->refresh();
+		}
 
 		// remove inactive components
-
 		int index = 0;
 		for (auto& comp : compTran)
 		{
@@ -182,6 +191,27 @@ void EntityManager::Refresh()
 					std::swap(compProjectile[index], compProjectile[index_proj - 1]);
 					entity->SetComponent<ProjectileComponent>(&compProjectile[index]);
 					index_proj--;
+				}
+			}
+			index++;
+		}
+
+		index = 0;
+		for (auto& comp : compAux)
+		{
+			if (index >= index_aux) { break; };
+			if (!comp.IsActive())
+			{
+				while (index_aux > 0 && !compAux[index_aux - 1].IsActive())
+				{
+					index_aux--;
+				}
+				if (index_aux > 0 && index_aux != index)
+				{
+					Entity* entity = compAux[index_aux - 1].entity;
+					std::swap(compAux[index], compAux[index_aux - 1]);
+					entity->SetComponent<AuxiliaryComponent>(&compAux[index]);
+					index_aux--;
 				}
 			}
 			index++;

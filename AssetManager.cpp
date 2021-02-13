@@ -20,16 +20,17 @@ AssetManager::~AssetManager()
 Entity& AssetManager::CreatePlayer(Vector2D position, int sizeX, int sizeY, float scale)
 {
 	Entity& player = manager->AddEntity<Player>();
-	manager->addTransformComponent(player, position.x, position.y, sizeX, sizeY, scale, true);
+	auto& transform = manager->addTransformComponent(player, position.x, position.y, sizeX, sizeY, scale, true);
 
 	auto& sprite = manager->addSpriteComponent(player, "player", false);
 	//sprite.addAnimation("idle", 0, 10, 150);
 	//sprite.addAnimation("walk", 1, 9, 50);
 	//sprite.addAnimation("eat", 2, 6, 50);
-
 	manager->addDynamicColliderComponent(player, "player", true, true);
-
 	manager->addKeyboardController(player);
+
+	CreateCannon(&player, transform.centre, transform, 90, 40,40, 0.1f);
+
 	manager->AddToGroup(&player, Game::groupPlayers);
 
 	return player;
@@ -83,12 +84,22 @@ Entity & AssetManager::CreateCannonBall(Vector2D position, int angle, float spee
 {
 	auto& ball = manager->AddEntity<CannonBall>();
 	manager->addTransformComponent(ball, position.x, position.y, sizeX, sizeY, scale, true, angle, speed);
-	manager->addDynamicColliderComponent(ball, "cannonBall", true, false);
+	manager->addDynamicColliderComponent(ball, "player", true, false);
 	manager->addProjectileComponent(ball, position.x, position.y, scale, sizeX, sizeY, "player");
 
 	manager->AddToGroup(&ball, Game::groupProjectiles);
-
+	
 	return ball;
+}
+
+Entity & AssetManager::CreateCannon(Entity * owner, Vector2D position, TransformComponent& transform, int angle, int sizeX, int sizeY, float scale)
+{
+	auto& cannon = manager->AddEntity<Cannon>(owner);
+	manager->addAuxiliaryComponent(cannon, 0,0,scale,angle,0, 0,"player", transform);
+
+	manager->AddToGroup(&cannon, Game::groupAuxiliaries);
+
+	return cannon;
 }
 
 void AssetManager::AddTexture(std::string texID, const char *path)

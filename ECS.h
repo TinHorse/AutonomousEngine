@@ -82,7 +82,7 @@ public:
 	bool IsActive() const;
 	virtual void update() {}
 	virtual void refresh() {}
-	void Destroy();
+	virtual void Destroy();
 	virtual ~Entity();
 	std::set<Entity*>* deletedEntities;
 

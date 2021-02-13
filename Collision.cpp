@@ -109,7 +109,7 @@ bool Collision::SATQuery(const Rect& cA, const Rect& cB, float radial_scale)
 	return true;
 }
 
-Vector2D Collision::SAT(const Rect& cA, const Rect& cB, const SDL_Point& centreA, const SDL_Point& centreB)
+Vector2D Collision::SAT(const Rect& cA, const Rect& cB, const Vector2D& centreA, const Vector2D& centreB)
 {
 	float overlap = INFINITY;
 
@@ -147,7 +147,7 @@ Vector2D Collision::SAT(const Rect& cA, const Rect& cB, const SDL_Point& centreA
 	}
 
 	// displace colA along the vector between the two object centres
-	SDL_Point centB = centreB;
+	Vector2D centB = centreB;
 	Vector2D displacement;
 	displacement.x = centB.x - centreA.x;
 	displacement.y = centB.y - centreA.y;

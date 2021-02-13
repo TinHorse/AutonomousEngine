@@ -23,7 +23,7 @@ struct Collision
 
 
 	//static Vector2D SAT(const SDL_Rect& cA, const SDL_Rect& cB);
-	static Vector2D SAT(const Rect& cA, const Rect& cB, const SDL_Point& centreA, const SDL_Point& centreB);
+	static Vector2D SAT(const Rect& cA, const Rect& cB, const Vector2D& centreA, const Vector2D& centreB);
 	static bool SATQuery(const Rect& cA, const Rect& cB, float radial_scale);
 
 

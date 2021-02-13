@@ -7,3 +7,4 @@
 #include "TileComponent.h"
 #include "PathfindingComponent.h"
 #include "ProjectileComponent.h"
+#include "AuxiliaryComponent.h"

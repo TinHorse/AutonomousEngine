@@ -37,14 +37,37 @@ public:
 		// Play animation
 		GetComponent<SpriteComponent>().PlayAnim(animation, Ticks);
 	}
+
 	virtual void updateState() = 0;
 	virtual void updateQueries() = 0;
 	virtual void updateBehaviour() = 0;
 	virtual void whenDead() = 0;
 
+	void Destroy() override
+	{
+		for (auto *a : auxiliaries)
+		{
+			a->Destroy();
+		}
+
+		active = false;
+		for (auto comp : componentArray)
+		{
+			if (comp)
+			{
+				comp->Destroy();
+			}
+		}
+	}
+
 	void setAnimation(const char * anim)
 	{
 		animation = anim;
+	}
+
+	bool isFiring()
+	{
+		return firing;
 	}
 
 protected:
@@ -52,6 +75,10 @@ protected:
 	bool isDead = false;
 	int health;
 	Result result;
+	bool firing = false;
+
+	// auxiliaries
+	std::vector<Entity*> auxiliaries;
 
 private:
 	std::string animation = "";

@@ -2,6 +2,7 @@
 #include "SDL.h"
 #include "ECS.h"
 #include "Vector2D.h"
+#include "Game.h"
 
 class TransformComponent : public Component
 {
@@ -14,21 +15,22 @@ public:
 	float top_speed = 1.5f;
 	bool dynamic = false;
 
-	int height = 128;
-	int width = 128;
-	float scale = 1;
-	int angle = 0;
+	float height = 128;
+	float width = 128;
+	float scale = 1.f;
+	float initial_scale = 1.f;
+	float angle = 0.f;
 
 	TransformComponent()
 	{
 		position.Zero();
 	}
 
-	TransformComponent(int sc, bool dyn)
+	TransformComponent(float sc, bool dyn)
 	{
 		position.x = 500;
 		position.y = 500;
-		scale = sc;
+		initial_scale = scale = sc;
 		dynamic = dyn;
 	}
 
@@ -45,7 +47,7 @@ public:
 		position.y = y;
 		width = w;
 		height = h;
-		scale = sc;
+		initial_scale = scale = sc;
 		dynamic = dyn;
 		angle = _angle;
 		speed = _speed;
@@ -63,6 +65,9 @@ public:
 
 	void Update() override
 	{
+		position.x -= Game::camera.getX();
+		position.y -= Game::camera.getY();
+
 		if (dynamic)
 		{
 			position += collision_response;
@@ -82,6 +87,11 @@ public:
 	void addCollisionResponse(const Vector2D& force)
 	{
 		collision_response += force;
+	}
+
+	void SetViewTarget(Vector2D target)
+	{
+		angle = toDeg(angleToYAxisRad(target - position));
 	}
 
 };

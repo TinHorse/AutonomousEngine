@@ -14,7 +14,7 @@ int main(int argc,  char *argv[])
 	double lag = 0.0f;
 
 	game = new Game();
-	game->Init("BoidEngine", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 640, false);
+	game->Init("BoidEngine", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1600, 880, false);
 
 	///// NOT NEEDED
 	int MAX_TIME = FPS * 5;
@@ -58,7 +58,7 @@ int main(int argc,  char *argv[])
 		}
 		if (curr % (MAX_TIME * 6) == 0)
 		{
-			//std::cout << total_time << " ::: TOTAL EXTRA TIME" << std::endl;
+			std::cout << total_time << " ::: TOTAL EXTRA TIME" << std::endl;
 		}
 		/////
 

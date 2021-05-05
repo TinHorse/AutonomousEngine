@@ -59,7 +59,6 @@ public:
 			{
 				//currentKey = interact;
 				float angle = entity->GetComponent<TransformComponent>().angle;
-				Game::assets->CreateCannonBall(Vector2D(transform->centre.x, transform->centre.y), angle + 90, 4.f, 5, 10, 1.f);
 			}
 
 		}

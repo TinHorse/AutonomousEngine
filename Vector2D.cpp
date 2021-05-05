@@ -40,24 +40,28 @@ Vector2D & Vector2D::Divide(const Vector2D & vec)
 	return *this;
 }
 
-Vector2D operator+(Vector2D& v1, const Vector2D & v2)
+Vector2D operator+(const Vector2D& v1, const Vector2D & v2)
 {
-	return v1.Add(v2); // we already have an add method defined, so we can use it here
+	Vector2D vec = v1;
+	return vec.Add(v2); // we already have an add method defined, so we can use it here
 }
 
-Vector2D operator-(Vector2D& v1, const Vector2D & v2)
+Vector2D operator-(const Vector2D& v1, const Vector2D & v2)
 {
-	return v1.Subtract(v2);
+	Vector2D vec = v1;
+	return vec.Subtract(v2);
 }
 
-Vector2D operator*(Vector2D& v1, const Vector2D & v2)
+Vector2D operator*(const Vector2D& v1, const Vector2D & v2)
 {
-	return v1.Multiply(v2);
+	Vector2D vec = v1;
+	return vec.Multiply(v2);
 }
 
-Vector2D operator/(Vector2D& v1, const Vector2D & v2)
+Vector2D operator/(const Vector2D& v1, const Vector2D & v2)
 {
-	return v1.Divide(v2);
+	Vector2D vec = v1;
+	return vec.Divide(v2);
 }
 
 std::ostream & operator<<(std::ostream & stream, const Vector2D & vec)

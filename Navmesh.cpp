@@ -4,7 +4,7 @@
 #include "Math.h"
 #include "Components.h"
 
-int Node::NodeID = 0;
+int NavNode::NavNodeID = 0;
 
 Navmesh::Navmesh()
 {
@@ -18,7 +18,7 @@ Navmesh::~Navmesh()
 
 void Navmesh::Init(int mCols, int mRows)
 {
-	mesh = std::vector<Node>(mCols * mRows);
+	mesh = std::vector<NavNode>(mCols * mRows);
 	cols = mCols;
 	rows = mRows;
 
@@ -26,9 +26,9 @@ void Navmesh::Init(int mCols, int mRows)
 	{
 		for (int x = 0; x < rows; x++)
 		{
-			visited[getNodeAt(x, y)->ID] = false;
-			parents[getNodeAt(x, y)] = nullptr;
-			goals[getNodeAt(x, y)] = LONG_MAX;
+			visited[getNavNodeAt(x, y)->ID] = false;
+			parents[getNavNodeAt(x, y)] = nullptr;
+			goals[getNavNodeAt(x, y)] = LONG_MAX;
 		}
 	}
 
@@ -51,11 +51,11 @@ void Navmesh::LoadMesh(const char * path, int sX, int sY, int sTileX, int sTileY
 			stream.get(c);
 			if (c == '1')
 			{
-				mesh[(y*cols) + x] = Node(x, y, true);
+				mesh[(y*cols) + x] = NavNode(x, y, true);
 			}
 			else
 			{
-				mesh[(y*cols) + x] = Node(x, y, false);
+				mesh[(y*cols) + x] = NavNode(x, y, false);
 			}
 
 			stream.ignore();
@@ -78,9 +78,9 @@ bool Navmesh::CalculatePath(Entity* entity, std::stack<Vector2D>& path, const Ve
 	int closestYTarget = (targLoc.y / tileSizeY);
 
 	// A*
-	// Initialize start and end node
-	Node* current = getNodeAt(closestX, closestY);
-	Node* target = getNodeAt(closestXTarget, closestYTarget);
+	// Initialize start and end NavNode
+	NavNode* current = getNavNodeAt(closestX, closestY);
+	NavNode* target = getNavNodeAt(closestXTarget, closestYTarget);
 	
 	// check if start or target are out of bounds, check if target is obstacle
 	if (!current || !target)
@@ -91,13 +91,13 @@ bool Navmesh::CalculatePath(Entity* entity, std::stack<Vector2D>& path, const Ve
 	{
 		int targX = target->x;
 		int targY = target->y;
-		target = getNodeAt((targX - current->x) / 2 + current->x, (targY - current->y) / 2 + current->y);
+		target = getNavNodeAt((targX - current->x) / 2 + current->x, (targY - current->y) / 2 + current->y);
 		// set up data structures
 		path_change = true;
 		ClearMesh();
 	}
 
-	// check if the distance between this and the target node is smaller than 2. If it is, return. Else, clear data structures
+	// check if the distance between this and the target NavNode is smaller than 2. If it is, return. Else, clear data structures
 	else if (Math::distance(current->x, current->y, target->x, target->y) < 2)
 	{
 		path.push(Vector2D(target->x * tileSizeX, target->y * tileSizeY));
@@ -110,7 +110,7 @@ bool Navmesh::CalculatePath(Entity* entity, std::stack<Vector2D>& path, const Ve
 	}
 
 
-	//check if the target is an obstacle. If it is, search the nearby nodes for a non-obstacle
+	//check if the target is an obstacle. If it is, search the nearby NavNodes for a non-obstacle
 	if (target->isObstacle)
 	{
 		for (auto* n : getNeighbours(target->x, target->y))
@@ -128,22 +128,22 @@ bool Navmesh::CalculatePath(Entity* entity, std::stack<Vector2D>& path, const Ve
 		path.push(targetLoc);
 
 	// list yet to be tested
-	std::priority_queue<Node*, std::vector<Node*>, NodeCompare> not_tested;
+	std::priority_queue<NavNode*, std::vector<NavNode*>, NavNodeCompare> not_tested;
 	not_tested.push(current);
 
 	// Initialize currrent
 	goals[current] = Math::distanceNoSqrt(current->x, current->y, target->x, target->y);
 
-	//int num_nodes_tested = 0;
-	//int max_nodes_to_test = 50;
-	//std::cout << "max nodse to test " << max_nodes_to_test << " at distance " << sqrt(goals[current]) << std::endl;
-	// while there are nodes not yet tested
+	//int num_NavNodes_tested = 0;
+	//int max_NavNodes_to_test = 50;
+	//std::cout << "max nodse to test " << max_NavNodes_to_test << " at distance " << sqrt(goals[current]) << std::endl;
+	// while there are NavNodes not yet tested
 	while (!not_tested.empty() && current != target)
 	{
-		//if (num_nodes_tested++ > max_nodes_to_test)
-			//std::cout << "LIMIT REACHED : " << num_nodes_tested << std::endl;
+		//if (num_NavNodes_tested++ > max_NavNodes_to_test)
+			//std::cout << "LIMIT REACHED : " << num_NavNodes_tested << std::endl;
 
-		// if the node has been visited, remove it
+		// if the NavNode has been visited, remove it
 		while (!not_tested.empty() && visited[not_tested.top()->ID])
 		{
 			not_tested.pop();
@@ -155,7 +155,7 @@ bool Navmesh::CalculatePath(Entity* entity, std::stack<Vector2D>& path, const Ve
 			break;
 		}
 
-		// set current node to front of the list
+		// set current NavNode to front of the list
 		current = not_tested.top();
 		visited[current->ID] = true;
 
@@ -180,7 +180,7 @@ bool Navmesh::CalculatePath(Entity* entity, std::stack<Vector2D>& path, const Ve
 			// check if the lowest local goal is smaller than the neighbour's previous local goal
 			if (lowestGoal < goals[n])
 			{
-				// set the neighbour's parent to the current node
+				// set the neighbour's parent to the current NavNode
 				parents[n] = current;
 
 				// update the neighbour's local goal
@@ -231,7 +231,7 @@ void Navmesh::ClearMesh()
 	}
 }
 
-Node & Navmesh::operator()(const int& x, const int& y)
+NavNode & Navmesh::operator()(const int& x, const int& y)
 {
 	if (boundsCheck(y * cols + x))
 	{
@@ -239,11 +239,11 @@ Node & Navmesh::operator()(const int& x, const int& y)
 	}
 	else
 	{
-		return nullNode;
+		return nullNavNode;
 	}
 }
 
-Node * Navmesh::getNodeAt(const int& x, const int& y)
+NavNode * Navmesh::getNavNodeAt(const int& x, const int& y)
 {
 	int index = y * cols + x;
 	if (index >= 0 && index < mesh.size())
@@ -256,7 +256,7 @@ Node * Navmesh::getNodeAt(const int& x, const int& y)
 	}
 }
 
-const std::vector<Node*>& Navmesh::getNeighbours(const int& x, const int& y)
+const std::vector<NavNode*>& Navmesh::getNeighbours(const int& x, const int& y)
 {
 	neighbours.clear();
 	int index = y * cols + x + 1;

@@ -1,4 +1,5 @@
 #include "Game.h"
+#include "SDL_ttf.h"
 #include "TextureManager.h"
 #include "Map.h"
 #include "ECS.h"
@@ -9,6 +10,13 @@
 #include "NavMesh.h"
 #include "Collisionmesh.h"
 #include "Queues.h"
+#include "InputManager.h"
+#include "ConstructionManager.h"
+#include "TurretManager.h"
+#include "NodeSystem.h"
+#include "Player.h"
+#include "PlayerInterface.h"
+#include "ManufacturingManager.h"
 
 #include <fstream>
 #include <chrono>
@@ -30,13 +38,21 @@ Collisionmesh collision;
 
 PathfindingQueue pathfindingQueue(manager);
 
+InputManager input;
+
+ConstructionManager* Game::construction = new ConstructionManager();
+TurretManager* Game::turretManager = new TurretManager();
+ManufacturingManager* Game::manufacturingManager = new ManufacturingManager();
+
+NodeSystem* Game::node_system = new NodeSystem();
+
 
 bool Game::isRunning = false;
 int Game::GameTime = 0;
 
-Entity *player = nullptr;
+Player* Game::player = new Player(manager);
 
-
+PlayerInterface* Game::interface = new PlayerInterface(Game::player);
 
 Game::Game()
 {
@@ -74,76 +90,130 @@ void Game::Init(const char * title, int xpos, int ypos, int width, int height, b
 	}
 
 	// Load assets
-	assets->AddTexture("collider", "assets/colliderTex.png");
-	assets->AddTexture("food", "assets/foodItem.png");
-	assets->AddTexture("terrain", "assets/water_map_2.png");
-	assets->AddTexture("player", "assets/ship_one_BlueAlpha.png");
-	assets->AddTexture("hunted", "assets/hunted_anim_alpha.png");
-	assets->AddTexture("enemy", "assets/enemy.png");
 
-	assets->AddTexture("enemy2", "assets/player2.png");
-
-	// Load map
-	map = new Map("terrain", 100, 0.5f);
-	map->LoadMap("assets/water_map_2.txt", 40, 40);
+	assets->LoadAllTextures();
 
 	// Load navigation
-	navigation.LoadMesh("assets/water_map2_collision.txt", 40, 40, 100, 100, 0.5f);
+	//navigation.LoadMesh("assets/water_map2_collision.txt", 40, 40, 100, 100, 0.5f);
 
 	// Load collision
-	collision.LoadMesh("assets/water_map2_collision.txt", 40, 40, 100, 100, 0.5f);
+	//collision.LoadMesh("assets/water_map2_collision.txt", 40, 40, 100, 100, 0.5f);
 
 	// Create player
-	player = &assets->CreatePlayer(Vector2D(225,200), 85, 205, 0.3f);
+	manager.addPlayerResourceComponent(*player);
 
 	// Initialize camera
-	auto& t = player->GetComponent<TransformComponent>();
-	camera.Init(t.position.x, t.position.y, 2000, 2000);
+	//auto& t = player->GetComponent<TransformComponent>();
+	camera.Init(0,0, 1600,880);
 
-	// Create Hunted
-	for (int i = 0; i < 15; i++)
+
+	// Create Base
+	//assets->CreateBase(Vector2D(1000, 1000), 85, 205, 1.f);
+
+	// Initialize fonts
+	TTF_Init();
+
+	assets->Init(); // load font
+
+	interface->Init(renderer, construction, &player->GetComponent<PlayerResourceComponent>(), turretManager, node_system, manufacturingManager);
+
+	for (int i = 0; i < 35; i++)
 	{
-		for (int j = 0; j < 15; j++)
-		{
-			assets->CreateHunted(Vector2D(400+i * 40, 400+j * 40), 85, 205, 0.2f);
-		}
-	}
-	
-	// Create Food
-	for (int i = 0; i < 5; i++)
-	{
-		for (int j = 0; j < 5; j++)
-		{
-			assets->CreateFood(Vector2D(rand_float(100,400), rand_float(500, 800)), 407, 451, 0.12f);
-		}
+		Vector2D random_position = { rand_float(-650.f, 2100.f), rand_float(-300.f,1200) };
+		int random_amount = rand_int(1, 2);
+		float random_distBetweenX = rand_float(50.f, 80.f);
+		float random_distBetweenY = rand_float(50.f, 80.f);
+		assets->MakeMushroomField(random_position, random_amount, random_distBetweenX, random_distBetweenY);
 	}
 
-	// Create Predators
-	for (int i = 0; i < 0; i++)
+	for (int i = 0; i < 9; i++)
 	{
-		for (int j = 0; j < 0; j++)
-		{
-			assets->CreatePredator(Vector2D(600 + i * 60, 800 + j * 60), 236, 233, 0.18f);
-		}
+		Vector2D random_position = { rand_float(-650.f, 2100.f), rand_float(-300.f,1200) };
+		int random_amount = rand_int(2, 4);
+		float random_distBetweenX = rand_float(40.f, 60.f);
+		float random_distBetweenY = rand_float(40.f, 60.f);
+		assets->MakeObsidianField(random_position, random_amount, random_distBetweenX, random_distBetweenY);
 	}
+
+	for (int i = 0; i < 25; i++)
+	{
+		Vector2D random_position = { rand_float(-650.f, 2100.f), rand_float(-300.f,1200) };
+		int random_amount = rand_int(3, 20);
+		float random_distBetweenX = rand_float(20.f, 70.f);
+		float random_distBetweenY = rand_float(20.f, 70.f);
+		assets->MakeAmberForest(random_position, random_amount, random_distBetweenX, random_distBetweenY);
+	}
+
+	for (int i = 0; i < 22; i++)
+	{
+		Vector2D random_position = { rand_float(-650.f, 2100.f), rand_float(-300.f,1200) };
+		int random_amount = rand_int(3, 8);
+		float random_distBetweenX = rand_float(60.f, 120.f);
+		float random_distBetweenY = rand_float(60.f, 120.f);
+		assets->MakeIronField(random_position, random_amount, random_distBetweenX, random_distBetweenY);
+	}
+
+	for (int i = 0; i < 18; i++)
+	{
+		Vector2D random_position = { rand_float(-300.f, 1700.f), rand_float(-300.f,1200) };
+		int random_amount = rand_int(1, 2);
+		float random_distBetweenX = rand_float(20.f, 40.f);
+		float random_distBetweenY = rand_float(100.f, 200.f);
+		assets->MakeSilicateField(random_position, random_amount, random_distBetweenX, random_distBetweenY);
+	}
+
+	for (int i = 0; i < 11; i++)
+	{
+		Vector2D random_position = { rand_float(-650.f, 2100.f), rand_float(-300.f,1200) };
+		int random_amount = rand_int(8,15);
+		float random_distBetweenX = rand_float(200.f, 250.f);
+		float random_distBetweenY = rand_float(100.f, 170.f);
+		assets->MakeWetlandField(random_position, random_amount, random_distBetweenX, random_distBetweenY);
+	}
+
+	for (int i = 0; i < 23; i++)
+	{
+		Vector2D random_position = { rand_float(-650.f, 2100.f), rand_float(-300.f,1200) };
+		int random_amount = rand_int(8, 15);
+		float random_distBetweenX = rand_float(60.f, 150.f);
+		float random_distBetweenY = rand_float(60.f, 150.f);
+		assets->MakeScuffsField(random_position, random_amount, random_distBetweenX, random_distBetweenY);
+	}
+
 }
 
-auto& players(manager.GetGroup(Game::groupPlayers));
 auto& colliders(manager.GetGroup(Game::groupColliders));
-auto& tiles(manager.GetGroup(Game::groupTiles));
-auto& hunted(manager.GetGroup(Game::groupHunted));
-auto& foods(manager.GetGroup(Game::groupFood));
-auto& predators(manager.GetGroup(Game::groupPredators));
 auto& projectiles(manager.GetGroup(Game::groupProjectiles));
-auto& auxiliaries(manager.GetGroup(Game::groupAuxiliaries));
+auto& buildings(manager.GetGroup(Game::groupBuildings));
+auto& resources(manager.GetGroup(Game::groupResources));
+auto& transporters(manager.GetGroup(Game::groupTransporters));
+auto& environment(manager.GetGroup(Game::groupEnvironment));
+
 
 void Game::HandleEvents()
 {
-	SDL_PollEvent(&event);
-	switch (event.type)
+	input.Update();
+
+	input.HandleContinuousInput();
+
+	SDL_Event e;
+	SDL_PollEvent(&e);
+	switch (e.type)
 	{
 	case SDL_QUIT: // check if QUIT was called
 		isRunning = false;
+		break;
+	case SDL_MOUSEBUTTONDOWN:
+		input.HandleMouseButton(e.button, manager);
+		break;
+	case SDL_KEYDOWN:
+		input.HandleKeyDown();
+		break;
+	case SDL_KEYUP:
+		input.HandleKeyUp(e);
+		break;
+	case SDL_MOUSEWHEEL:
+		input.HandleMouseWheel(e.wheel);
 		break;
 	default:
 		break;
@@ -153,128 +223,156 @@ void Game::HandleEvents()
 void Game::Update()
 {
 	GameTime++; // increment game time
-	
+
 	manager.Refresh();
-	
 	manager.Update();
 
-	for (auto* h : hunted)
+	camera.Update();
+
+	construction->UpdateMousePosition(input.GetMouseX(), input.GetMouseY());
+	construction->Update();
+	construction->UpdateActiveConstructions(manager, GameTime);
+
+	manufacturingManager->Update();
+
+	interface->UpdateMousePosition(input.GetMouseX(), input.GetMouseY());
+
+	node_system->UpdatePlayerResourcesFromStorages();
+	node_system->Update(GameTime, camera.GetPosition());
+	
+	for (auto* e : projectiles)
 	{
-		h->update();
-	}
-	for (auto* f : foods)
-	{
-		f->update();
-	}
-	for (auto* p : predators)
-	{
-		p->update();
-	}
-	for (auto* p : projectiles)
-	{
-		p->update();
-	}
-	for (auto* a : auxiliaries)
-	{
-		a->update();
+		e->Update();
 	}
 
-	Vector2D offset(-400, -300);
-	camera.Update(offset + player->GetComponent<TransformComponent>().position);
+	camera.Reset();
+
 
 	// Collision
 	collision.update();
 
-	
+	interface->Update(renderer, GameTime);
 
+	// Update construction manager
+	if (construction->ShouldSumResourcesInArea())
+	{
+		construction->SumResourcesInArea(manager);
+	}
+
+
+
+
+	// UPDATE LIGHTING PROTOTYPE
+	if (construction->updateLightingIntensity > 0.f)
+	{
+		for (auto r : resources)
+		{
+			TransformComponent& transform = r->GetComponent<TransformComponent>();
+			float dist = Math::distance(construction->LastBuilding->GetComponent<TransformComponent>().position, transform.position);
+			if (dist < 300.f)
+			{
+				int previousAplha = r->GetComponent<SpriteComponent>().alpha;
+				int alpha = 255 - (dist * (dist/(construction->updateLightingIntensity * 3.f)));
+				if (alpha < 0) alpha = 0;
+				if (alpha > 255) alpha = 255;
+				
+
+				alpha = std::max(alpha, previousAplha);
+
+				r->GetComponent<SpriteComponent>().alpha = alpha;
+			}
+		}
+		for (auto r : environment)
+		{
+			TransformComponent& transform = r->GetComponent<TransformComponent>();
+			float dist = Math::distance(construction->LastBuilding->GetComponent<TransformComponent>().position, transform.position);
+			if (dist < 300.f)
+			{
+				int previousAplha = r->GetComponent<SpriteComponent>().alpha;
+				int alpha = 255 - (dist * (dist / (construction->updateLightingIntensity * 3.f)));
+				if (alpha < 0) alpha = 0;
+				if (alpha > 255) alpha = 255;
+
+
+				alpha = std::max(alpha, previousAplha);
+
+				r->GetComponent<SpriteComponent>().alpha = alpha;
+			}
+		}
+		for (auto r : buildings)
+		{
+			TransformComponent& transform = r->GetComponent<TransformComponent>();
+			float dist = Math::distance(construction->LastBuilding->GetComponent<TransformComponent>().position, transform.position);
+			if (dist < 300.f)
+			{
+				int previousAplha = r->GetComponent<SpriteComponent>().alpha;
+				int alpha = 255 - (dist * (dist / (construction->updateLightingIntensity * 3.f)));
+				if (alpha < 0) alpha = 0;
+				if (alpha > 255) alpha = 255;
+
+
+				alpha = std::max(alpha, previousAplha);
+
+				r->GetComponent<SpriteComponent>().alpha = alpha;
+			}
+		}
+		construction->updateLightingIntensity = 0.f;
+		construction->LastBuilding = nullptr;
+	}
+	
 }
 
 void Game::ExecuteQueues(double maxTime)
 {
 	pathfindingQueue.refresh();
 
-	auto start = std::chrono::high_resolution_clock().now();
-	//std::cout << maxTime << " Max time" << std::endl;
-
 	if (maxTime > 0)
 	{
 		pathfindingQueue.executePathfindingRequests(maxTime);
 	}
-	auto end = std::chrono::high_resolution_clock().now();
-
-	auto totaltime = std::chrono::duration_cast<microseconds>(end - start);
-	if (totaltime.count() < 500)
-	{
-		average_time += totaltime.count();
-	}
-
-	//std::cout << average_time / GameTime << std::endl;
-	//std::cout << totaltime.count() << std::endl;
 }
 
 
 void Game::Render() // note that all draw functions have to be called inside the SDL Renderer
 {
 	SDL_RenderClear(renderer);
+	SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
+	node_system->Draw(renderer);
+	construction->DrawShadow(renderer);
 
-	for (auto* t : tiles)
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
+	for (auto* e : colliders)
 	{
-		if (Math::distance(t->GetComponent<TileComponent>().position, player->GetComponent<TransformComponent>().position) < 300)
-		{
-			t->GetComponent<TileComponent>().Draw();
-		}
-	}
-	for (auto* c : colliders)
-	{
+		/*
 		if (Math::distance(c->GetComponent<TransformComponent>().position, player->GetComponent<TransformComponent>().position) < 300)
 		{
 			c->GetComponent<ColliderComponent>().Draw();
 		}
-	}
-	for (auto* h : hunted)
-	{
-		if (Math::distance(h->GetComponent<TransformComponent>().position, player->GetComponent<TransformComponent>().position) < 300)
-		{
-			h->GetComponent<SpriteComponent>().Draw();
-			h->GetComponent<ColliderComponent>().Draw();
-		}
-	}
-	for (auto* f : foods)
-	{
-		if (Math::distance(f->GetComponent<TransformComponent>().position, player->GetComponent<TransformComponent>().position) < 300)
-		{
-		f->GetComponent<SpriteComponent>().Draw();
-		}
-	}
-	for (auto* p : predators)
-	{
-		if (Math::distance(p->GetComponent<TransformComponent>().position, player->GetComponent<TransformComponent>().position) < 300)
-		{
-		p->GetComponent<SpriteComponent>().Draw();
-		}
-	}
-	for (auto* p : players)
-	{
-		p->GetComponent<SpriteComponent>().Draw();
-		p->GetComponent<ColliderComponent>().Draw();
+		*/
 	}
 
-	for (auto* p : projectiles)
+	for (auto* e : environment)
 	{
-		if (Math::distance(p->GetComponent<TransformComponent>().position, player->GetComponent<TransformComponent>().position) < 300)
-		{
-			p->GetComponent<ProjectileComponent>().Draw();
-			p->GetComponent<ColliderComponent>().Draw();
-		}
+		e->GetComponent<SpriteComponent>().Draw();
 	}
 
-	for (auto* a : auxiliaries)
+	for (auto* e : resources)
 	{
-		//if (Math::distance(a->GetComponent<AuxiliaryComponent>(), player->GetComponent<TransformComponent>().position) < 300)
-		//{
-			a->GetComponent<AuxiliaryComponent>().Draw();
-		//}
+		e->GetComponent<SpriteComponent>().Draw();
 	}
+
+	for (auto* e : buildings)
+	{
+		e->GetComponent<SpriteComponent>().Draw();
+	}
+
+	for (auto* e : transporters)
+	{
+		e->GetComponent<SpriteComponent>().Draw();
+	}
+
+
+	interface->DrawWidgets();
 
 	SDL_RenderPresent(renderer);
 }

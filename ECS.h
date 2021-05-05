@@ -59,6 +59,7 @@ public:
 	bool IsActive() const;
 	void Destroy();
 	virtual void LinkComponentPointers() {}; // used for re-linking components after a component pointer has changed
+	virtual void NotifyOfEntityDestroyed(Entity* entity) {} // notifies other components that an entity is no longer alive and pointers to it should be set to null or removed entirely
 
 	virtual void Init() {};
 	virtual void Update() {};
@@ -80,11 +81,11 @@ public:
 	friend EntityManager;
 
 	bool IsActive() const;
-	virtual void update() {}
+	virtual void Update() {}
 	virtual void refresh() {}
 	virtual void Destroy();
 	virtual ~Entity();
-	std::set<Entity*>* deletedEntities;
+	void MarkForDestruction();
 
 	bool HasGroup(Group mGroup); // checks if entity is part of a specific group
 	void AddToGroup(Group mGroup); // adds entity to specified group

@@ -33,7 +33,7 @@ static int rand_int(int low, int high)
 	return uid(rd, Dist::param_type{ low,high });
 }
 
-static int rand_float(float low, float high)
+static float rand_float(float low, float high)
 {
 	static std::default_random_engine rd{};
 	using Dist = std::uniform_real_distribution<float>;

@@ -9,7 +9,13 @@ SDL_Texture * TextureManager::LoadTexture(const char *texture)
 	return tex;
 }
 
-void TextureManager::Draw(SDL_Texture * tex, SDL_Rect src, SDL_Rect dest, SDL_RendererFlip flip, float angle, const SDL_Point * centre)
+void TextureManager::Draw(SDL_Texture * tex, SDL_Rect src, SDL_Rect dest, SDL_RendererFlip flip, float angle, const SDL_Point * centre, int alpha)
 {
+	SDL_SetTextureAlphaMod(tex, alpha);
 	SDL_RenderCopyEx(Game::renderer, tex, &src, &dest, angle, NULL, flip); // render a copy of the given texture in the specified location
+}
+
+void TextureManager::DrawText(SDL_Texture * message, SDL_Rect dest)
+{
+	SDL_RenderCopy(Game::renderer, message, NULL, &dest);
 }

@@ -2,58 +2,14 @@
 #include "Components.h"
 #include "StateMachine.h"
 
-class Player : public Agent
+class Player : public Entity
 {
 public:
-	Player(EntityManager& mManager) : Agent(mManager) {}
+	Player(EntityManager& manager) : Entity(manager)
+	{
 
-	Player() = default;
+	}
 	~Player() {}
 
-	enum Behaviour : std::size_t 
-	{
-		walking,
-		eating,
-		feeding,
-		attacking
-	};
-
-	void update() override
-	{
-		switch (this->GetComponent<KeyboardController>().current())
-		{
-			
-		}
-	}
-
-	void updateState() override
-	{
-		
-	}
-
-	void updateQueries() override
-	{
-
-	}
-
-	void updateBehaviour() override
-	{
-		
-	}
-
-	void whenDead() override
-	{
-
-	}
-
-	int& getFear()
-	{
-		return fear;
-	}
-
 private:
-	int fear = 0;
-
-	StateMachine<Behaviour> machine;
-	Behaviour currentState;
 };

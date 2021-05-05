@@ -8,26 +8,26 @@
 
 class Vector2D;
 
-struct Node
+struct NavNode
 {
-	Node()
+	NavNode()
 	{
-		ID = ++NodeID;
+		ID = ++NavNodeID;
 	}
-	Node(int X, int Y, bool obs) : x(X), y(Y), isObstacle(obs)
+	NavNode(int X, int Y, bool obs) : x(X), y(Y), isObstacle(obs)
 	{
-		ID = ++NodeID;
+		ID = ++NavNodeID;
 	}
-	bool operator==(const Node& node)
+	bool operator==(const NavNode& NavNode)
 	{
-		return this->ID == node.ID;
+		return this->ID == NavNode.ID;
 	}
 
 	int x, y;
 	int ID;
 	bool isObstacle;
 	long int globalDist = LONG_MAX;
-	static int NodeID;
+	static int NavNodeID;
 };
 
 struct Navmesh
@@ -41,9 +41,9 @@ public:
 	bool CalculatePath(Entity* entity, std::stack<Vector2D>& path, const Vector2D targetLoc);
 	void ClearMesh();
 
-	Node &operator()(const int& x, const int& y);
-	Node *getNodeAt(const int& x, const int& y);
-	const std::vector<Node*>& getNeighbours(const int& x, const int& y);
+	NavNode &operator()(const int& x, const int& y);
+	NavNode *getNavNodeAt(const int& x, const int& y);
+	const std::vector<NavNode*>& getNeighbours(const int& x, const int& y);
 	bool boundsCheck(const int& index);
 
 private:
@@ -53,21 +53,21 @@ private:
 	// visited map
 	std::map<int, bool> visited;
 
-	// current parent node map
-	std::map<Node*, Node*> parents;
+	// current parent NavNode map
+	std::map<NavNode*, NavNode*> parents;
 
 	// fLocal map
-	std::map<Node*, long int> goals;
+	std::map<NavNode*, long int> goals;
 
-	std::vector<Node> mesh;
-	std::vector<Node*> neighbours;
+	std::vector<NavNode> mesh;
+	std::vector<NavNode*> neighbours;
 
-	Node nullNode;
+	NavNode nullNavNode;
 };
 
-struct NodeCompare
+struct NavNodeCompare
 {
-	bool operator()(const Node* nA, const Node* nB) const
+	bool operator()(const NavNode* nA, const NavNode* nB) const
 	{
 		return nA->globalDist > nB->globalDist;
 	}

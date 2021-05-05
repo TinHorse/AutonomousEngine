@@ -11,12 +11,14 @@ void EntityManager::Update()
 		if (index-- <= 0) { break; };
 		comp.Update();
 	}
+
 	index = index_sprites;
 	for (auto& comp : compSprite)
 	{
 		if (index-- <= 0) { break; };
 		comp.Update();
 	}
+
 	index = index_keyboard;
 	for (auto& comp : compKeyboard)
 	{
@@ -24,12 +26,6 @@ void EntityManager::Update()
 		comp.Update();
 	}
 
-	index = index_static_coll;
-	for (auto& comp : compStaticColl)
-	{
-		if (index-- <= 0) { break; };
-		comp.Update();
-	}
 	index = index_dynamic_coll;
 	for (auto& comp : compDynamicColl)
 	{
@@ -37,26 +33,56 @@ void EntityManager::Update()
 		comp.Update();
 	}
 
-	index = index_tiles;
-	for (auto& comp : compTile)
-	{
-		if (index-- <= 0) { break; };
-		comp.Update();
-	}
 	index = index_path;
 	for (auto& comp : compPath)
 	{
 		if (index-- <= 0) { break; };
 		comp.Update();
 	}
+
 	index = index_proj;
 	for (auto& comp : compProjectile)
 	{
 		if (index-- <= 0) { break; };
 		comp.Update();
 	}
-	index = index_aux;
-	for (auto& comp : compAux)
+
+	index = index_storage;
+	for (auto& comp : compStorage)
+	{
+		if (index-- <= 0) { break; };
+		comp.Update();
+	}
+
+	index = index_node_mov;
+	for (auto& comp : compNodeMov)
+	{
+		if (index-- <= 0) { break; };
+		comp.Update();
+	}
+
+	index = index_prod;
+	for (auto& comp : compProd)
+	{
+		if (index-- <= 0) { break; };
+		comp.Update();
+	}
+	index = index_player_res;
+	for (auto& comp : compPlayerRes)
+	{
+		if (index-- <= 0) { break; };
+		comp.Update();
+	}
+
+	index = index_manufac;
+	for (auto& comp : compManufac)
+	{
+		if (index-- <= 0) { break; };
+		comp.Update();
+	}
+
+	index = index_hangar;
+	for (auto& comp : compHangar)
 	{
 		if (index-- <= 0) { break; };
 		comp.Update();
@@ -65,6 +91,11 @@ void EntityManager::Update()
 
 void EntityManager::Refresh()
 {
+	for (auto& e : GetGroup(Game::groupResources))
+	{
+		e->Update();
+	}
+
 	deleted_entities.clear();
 	for (auto& e : entities)
 	{
@@ -78,15 +109,8 @@ void EntityManager::Refresh()
 	{
 
 		// refresh agents
-		for (auto* e : GetGroup(Game::groupHunted))
-		{
-			e->refresh();
-		}
-		for (auto* e : GetGroup(Game::groupPredators))
-		{
-			e->refresh();
-		}
-		for (auto* e : GetGroup(Game::groupAuxiliaries))
+		// NOTE: Players dont need to refresh (update pointers to entities), but left this here to show hwere it should go
+		for (auto* e : GetGroup(Game::groupPlayers))
 		{
 			e->refresh();
 		}
@@ -197,25 +221,111 @@ void EntityManager::Refresh()
 		}
 
 		index = 0;
-		for (auto& comp : compAux)
+		for (auto& comp : compStorage)
 		{
-			if (index >= index_aux) { break; };
+			if (index >= index_storage) { break; };
 			if (!comp.IsActive())
 			{
-				while (index_aux > 0 && !compAux[index_aux - 1].IsActive())
+				while (index_storage > 0 && !compStorage[index_storage - 1].IsActive())
 				{
-					index_aux--;
+					index_storage--;
 				}
-				if (index_aux > 0 && index_aux != index)
+				if (index_storage > 0 && index_storage != index)
 				{
-					Entity* entity = compAux[index_aux - 1].entity;
-					std::swap(compAux[index], compAux[index_aux - 1]);
-					entity->SetComponent<AuxiliaryComponent>(&compAux[index]);
-					index_aux--;
+					Entity* entity = compStorage[index_storage - 1].entity;
+					std::swap(compStorage[index], compStorage[index_storage - 1]);
+					entity->SetComponent<StorageComponent>(&compStorage[index]);
+					index_storage--;
 				}
 			}
 			index++;
 		}
+
+		index = 0;
+		for (auto& comp : compNodeMov)
+		{
+			if (index >= index_node_mov) { break; };
+			if (!comp.IsActive())
+			{
+				while (index_node_mov > 0 && !compNodeMov[index_node_mov - 1].IsActive())
+				{
+					index_node_mov--;
+				}
+				if (index_node_mov > 0 && index_node_mov != index)
+				{
+					Entity* entity = compNodeMov[index_node_mov - 1].entity;
+					std::swap(compNodeMov[index], compNodeMov[index_node_mov - 1]);
+					entity->SetComponent<NodeMovementComponent>(&compNodeMov[index]);
+					index_node_mov--;
+				}
+			}
+			index++;
+		}
+
+		index = 0;
+		for (auto& comp : compProd)
+		{
+			if (index >= index_prod) { break; };
+			if (!comp.IsActive())
+			{
+				while (index_prod > 0 && !compProd[index_prod - 1].IsActive())
+				{
+					index_prod--;
+				}
+				if (index_prod > 0 && index_prod != index)
+				{
+					Entity* entity = compProd[index_prod - 1].entity;
+					std::swap(compProd[index], compProd[index_prod - 1]);
+					entity->SetComponent<ProductionComponent>(&compProd[index]);
+					index_prod--;
+				}
+			}
+			index++;
+		}
+
+		index = 0;
+		for (auto& comp : compManufac)
+		{
+			if (index >= index_manufac) { break; };
+			if (!comp.IsActive())
+			{
+				while (index_manufac > 0 && !compManufac[index_manufac - 1].IsActive())
+				{
+					index_manufac--;
+				}
+				if (index_manufac > 0 && index_manufac != index)
+				{
+					Entity* entity = compManufac[index_manufac - 1].entity;
+					std::swap(compManufac[index], compManufac[index_manufac - 1]);
+					entity->SetComponent<ManufacturingComponent>(&compManufac[index]);
+					index_manufac--;
+				}
+			}
+			index++;
+		}
+
+		index = 0;
+		for (auto& comp : compHangar)
+		{
+			if (index >= index_hangar) { break; };
+			if (!comp.IsActive())
+			{
+				while (index_hangar > 0 && !compHangar[index_hangar - 1].IsActive())
+				{
+					index_hangar--;
+				}
+				if (index_hangar > 0 && index_hangar != index)
+				{
+					Entity* entity = compHangar[index_hangar - 1].entity;
+					std::swap(compHangar[index], compHangar[index_hangar - 1]);
+					entity->SetComponent<HangarComponent>(&compHangar[index]);
+					index_hangar--;
+				}
+			}
+			index++;
+		}
+
+		// NOTE: add player Resource component as well
 
 		// removes entity groups if they are inactive. This is called the erase-remove idiom
 		for (auto i(0u); i < maxGroups; i++)

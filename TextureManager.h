@@ -7,5 +7,8 @@
 struct TextureManager
 {
 	static SDL_Texture *LoadTexture(const char *fileName); // load texture from file
-	static void Draw(SDL_Texture * tex, SDL_Rect src, SDL_Rect dest, SDL_RendererFlip flip, float angle = 0.f, const SDL_Point * centre = NULL); // draw a texture in the given rectangle
+
+	static void Draw(SDL_Texture * tex, SDL_Rect src, SDL_Rect dest, SDL_RendererFlip flip, float angle = 0.f, const SDL_Point * centre = NULL, int alpha = 0); // draw a texture in the given rectangle
+
+	static void DrawText(SDL_Texture * message, SDL_Rect dest);
 };
